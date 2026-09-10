@@ -66,7 +66,7 @@
         <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
           <i data-lucide="file-pen" class="text-sky-600"></i> Borang Pelaporan Aktiviti Mingguan
         </h2>
-        <p class="text-xs text-slate-500">Sila lengkapkan maklumat aktiviti. Gambar 1 adalah wajib manakala Gambar 2-4 adalah pilihan.</p>
+        <p class="text-xs text-slate-500">Sila lengkapkan butiran. Gambar 1 adalah wajib, manakala Gambar 2 hingga 4 adalah pilihan.</p>
       </div>
 
       <form id="laporanForm" onsubmit="submitForm(event)" class="space-y-5">
@@ -82,24 +82,24 @@
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Aktiviti / Unit <span class="text-red-500">*</span></label>
-          <input type="text" id="aktiviti" required placeholder="cth: Perjumpaan Kadet Remaja Sekolah / Kelab Catur" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Aktiviti / Unit Kokurikulum <span class="text-red-500">*</span></label>
+          <input type="text" id="aktiviti" required placeholder="cth: Pengakap / Kelab Seni Budaya / Sukan Bola Sepak" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Penerangan Aktiviti <span class="text-red-500">*</span></label>
-          <textarea id="penerangan" rows="3" required placeholder="Nyatakan modul atau perjalanan aktiviti yang dijalankan..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <textarea id="penerangan" rows="3" required placeholder="Nyatakan perjalanan atau modul aktiviti yang dijalankan..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Hasil / Dapatan Aktiviti <span class="text-red-500">*</span></label>
-          <textarea id="hasil" rows="3" required placeholder="Pencapaian murid, kemahiran yang dikuasai, atau refleksi..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <textarea id="hasil" rows="3" required placeholder="Pencapaian murid, kemahiran yang dikuasai, atau refleksi program..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
         <!-- UPLOAD GAMBAR (1 WAJIB, 3 PILIHAN) -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Muat Naik Gambar Dokumentasi (1 hingga 4 Keping)</label>
-          <p class="text-xs text-slate-500 mb-2">Gambar 1 <span class="text-red-500 font-semibold">*Wajib</span>, Gambar 2-4 adalah pilihan (maksimum 4).</p>
+          <p class="text-xs text-slate-500 mb-2">Gambar 1 <span class="text-red-500 font-semibold">*Wajib</span>, Gambar 2-4 pilihan (maksimum 4 keping).</p>
           
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             <!-- Gambar 1 (Wajib) -->
@@ -151,7 +151,7 @@
       <div class="flex justify-between items-center">
         <div>
           <h2 class="text-xl font-bold text-slate-800">Senarai Laporan Aktiviti</h2>
-          <p class="text-xs text-slate-500">Rekod data yang dimuat turun secara langsung dari Google Sheets.</p>
+          <p class="text-xs text-slate-500">Rekod data yang dimuat turun daripada Google Sheets.</p>
         </div>
         <button onclick="loadDataFromSheets()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 rounded text-xs font-semibold flex items-center gap-1 transition">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Segar Semula
@@ -206,7 +206,7 @@
         </div>
 
         <div id="printContentPlaceholder" class="text-center py-12 text-slate-400">
-          Sila pilih rekod laporan dari menu atas untuk memaparkan lembaran cetakan rasmi.
+          Sila pilih rekod laporan dari menu di atas untuk memaparkan lembaran cetakan rasmi.
         </div>
 
         <div id="printContentDetails" class="hidden space-y-6">
@@ -231,7 +231,6 @@
 
           <div>
             <h4 class="font-bold text-sm text-slate-800 mb-2 border-b pb-1">DOKUMENTASI BERGAMBAR:</h4>
-            <!-- Bekas Gambar Dinamik -->
             <div id="printImagesContainer" class="grid grid-cols-2 gap-4"></div>
           </div>
 
@@ -255,7 +254,7 @@
   </main>
 
   <script>
-    // URL WEB APP RASMI GOOGLE APPS SCRIPT
+    // URL Google Apps Script yang sah menggunakan ID anda
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/1oTJyj0g1wVoTQj88Uf4zzaQaqPbVUHPwpJKFmeHfvG8isxpRYEUOudaS/exec";
 
     let storedReports = [];
@@ -301,13 +300,13 @@
       e.preventDefault();
 
       if (!base64Images[0]) {
-        alert("Sila muat naik sekurang-kurangnya Gambar 1 sebagai bukti aktiviti!");
+        alert("Sila muat naik sekurang-kurangnya Gambar 1!");
         return;
       }
 
       const btn = document.getElementById('btnSubmit');
       btn.disabled = true;
-      btn.innerText = "Sedang menyimpan laporan ke Google Sheets...";
+      btn.innerText = "Sedang menghantar laporan...";
 
       const payload = {
         tarikh: document.getElementById('tarikh').value,
@@ -326,7 +325,7 @@
           body: JSON.stringify(payload)
         });
 
-        alert("Laporan berjaya dihantar dan disimpan ke Google Sheets & Drive!");
+        alert("Laporan berjaya dihantar ke Google Sheets & Google Drive!");
         document.getElementById('laporanForm').reset();
         for (let i = 1; i <= 4; i++) {
           document.getElementById(`prev-${i}`).classList.add('hidden');
@@ -343,64 +342,73 @@
       }
     }
 
-    async function loadDataFromSheets() {
+    // Fungsi muat data kalis CORS menggunakan JSONP
+    function loadDataFromSheets() {
       const tbody = document.getElementById('dashboardTableBody');
-      const select = document.getElementById('selectRecordToPrint');
-
       tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Sedang memuat data dari Google Sheets...</td></tr>`;
       lucide.createIcons();
 
-      try {
-        const response = await fetch(GOOGLE_SCRIPT_URL);
-        const data = await response.json();
+      // Buang script tag lama jika ada
+      const oldScript = document.getElementById('jsonp-script');
+      if (oldScript) oldScript.remove();
 
-        if (data && data.error) {
-          throw new Error(data.error);
-        }
-
-        storedReports = Array.isArray(data) ? data : [];
-        tbody.innerHTML = '';
-        select.innerHTML = '<option value="">-- Pilih Aktiviti --</option>';
-
-        if (storedReports.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Tiada rekod laporan dijumpai dalam Google Sheets.</td></tr>`;
-          return;
-        }
-
-        storedReports.forEach((item, index) => {
-          const tr = document.createElement('tr');
-          tr.className = "hover:bg-slate-50 border-b";
-          tr.innerHTML = `
-            <td class="p-3 font-semibold text-slate-800">${item['Tarikh'] || '-'}<br><span class="text-xs font-normal text-slate-500">${item['Hari'] || ''}</span></td>
-            <td class="p-3 font-medium text-sky-900">${item['Aktiviti'] || '-'}</td>
-            <td class="p-3 max-w-xs text-xs line-clamp-2">${item['Penerangan'] || '-'}</td>
-            <td class="p-3 max-w-xs text-xs line-clamp-2">${item['Hasil'] || '-'}</td>
-            <td class="p-3 text-center">
-              <button onclick="goToPrintRecord(${index})" class="text-xs bg-sky-100 hover:bg-sky-200 text-sky-800 font-semibold px-3 py-1.5 rounded transition shadow-sm">
-                Lihat / Cetak
-              </button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-
-          const opt = document.createElement('option');
-          opt.value = index;
-          opt.textContent = `${item['Tarikh']} - ${item['Aktiviti']}`;
-          select.appendChild(opt);
-        });
-
-      } catch (err) {
-        console.error("Ralat memuat data:", err);
+      // Cipta script tag dinamik untuk panggil JSONP
+      const script = document.createElement('script');
+      script.id = 'jsonp-script';
+      script.src = `${GOOGLE_SCRIPT_URL}?callback=handleSheetsData&t=${new Date().getTime()}`;
+      script.onerror = function() {
         tbody.innerHTML = `
           <tr>
             <td colspan="5" class="p-6 text-center text-red-600">
-              <p class="font-bold mb-1">Gagal memuat data dari Google Sheets!</p>
-              <p class="text-xs text-slate-500">${err.message}</p>
-              <p class="text-xs text-slate-400 mt-2">Pastikan deployment Web App ditetapkan kepada <b>Who has access: Anyone</b>.</p>
+              <p class="font-bold">Gagal berhubung dengan Google Apps Script!</p>
+              <p class="text-xs text-slate-500 mt-1">Pastikan deployment Web App ditetapkan dengan <b>Who has access: Anyone</b> (bukan akaun DELIMa yang menyekat akses luar).</p>
             </td>
           </tr>`;
-      }
+      };
+      document.body.appendChild(script);
     }
+
+    // Callback JSONP yang menerima respons terus daripada Google Apps Script
+    window.handleSheetsData = function(data) {
+      const tbody = document.getElementById('dashboardTableBody');
+      const select = document.getElementById('selectRecordToPrint');
+
+      if (data && data.error) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-red-600 font-semibold">${data.error}</td></tr>`;
+        return;
+      }
+
+      storedReports = Array.isArray(data) ? data : [];
+      tbody.innerHTML = '';
+      select.innerHTML = '<option value="">-- Pilih Aktiviti --</option>';
+
+      if (storedReports.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Tiada rekod laporan dijumpai dalam Google Sheets. Sila buat pelaporan baharu.</td></tr>`;
+        return;
+      }
+
+      storedReports.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 border-b";
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-slate-800">${item['Tarikh'] || '-'}<br><span class="text-xs font-normal text-slate-500">${item['Hari'] || ''}</span></td>
+          <td class="p-3 font-medium text-sky-900">${item['Aktiviti'] || '-'}</td>
+          <td class="p-3 max-w-xs text-xs line-clamp-2">${item['Penerangan'] || '-'}</td>
+          <td class="p-3 max-w-xs text-xs line-clamp-2">${item['Hasil'] || '-'}</td>
+          <td class="p-3 text-center">
+            <button onclick="goToPrintRecord(${index})" class="text-xs bg-sky-100 hover:bg-sky-200 text-sky-800 font-semibold px-3 py-1.5 rounded transition shadow-sm">
+              Lihat / Cetak
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+
+        const opt = document.createElement('option');
+        opt.value = index;
+        opt.textContent = `${item['Tarikh']} - ${item['Aktiviti']}`;
+        select.appendChild(opt);
+      });
+    };
 
     function goToPrintRecord(index) {
       switchTab('print');
