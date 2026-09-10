@@ -66,7 +66,7 @@
         <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
           <i data-lucide="file-pen" class="text-sky-600"></i> Borang Pelaporan Aktiviti Mingguan
         </h2>
-        <p class="text-xs text-slate-500">Sila lengkapkan maklumat aktiviti di bawah. Gambar 1 adalah wajib manakala Gambar 2-4 adalah pilihan.</p>
+        <p class="text-xs text-slate-500">Sila lengkapkan maklumat aktiviti. Gambar 1 adalah wajib manakala Gambar 2-4 adalah pilihan.</p>
       </div>
 
       <form id="laporanForm" onsubmit="submitForm(event)" class="space-y-5">
@@ -93,7 +93,7 @@
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Hasil / Dapatan Aktiviti <span class="text-red-500">*</span></label>
-          <textarea id="hasil" rows="3" required placeholder="Pencapaian murid, kemahiran yang dikuasai, atau refleksi program..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <textarea id="hasil" rows="3" required placeholder="Pencapaian murid, kemahiran yang dikuasai, atau refleksi..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
         <!-- UPLOAD GAMBAR (1 WAJIB, 3 PILIHAN) -->
@@ -151,7 +151,7 @@
       <div class="flex justify-between items-center">
         <div>
           <h2 class="text-xl font-bold text-slate-800">Senarai Laporan Aktiviti</h2>
-          <p class="text-xs text-slate-500">Rekod data yang dimuat turun secara automatik daripada Google Sheets.</p>
+          <p class="text-xs text-slate-500">Rekod data yang dimuat turun secara langsung dari Google Sheets.</p>
         </div>
         <button onclick="loadDataFromSheets()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 rounded text-xs font-semibold flex items-center gap-1 transition">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Segar Semula
@@ -231,7 +231,7 @@
 
           <div>
             <h4 class="font-bold text-sm text-slate-800 mb-2 border-b pb-1">DOKUMENTASI BERGAMBAR:</h4>
-            <!-- Grid Gambar Dinamik Mengikut Jumlah Gambar yang Dimuat Naik -->
+            <!-- Bekas Gambar Dinamik -->
             <div id="printImagesContainer" class="grid grid-cols-2 gap-4"></div>
           </div>
 
@@ -255,8 +255,8 @@
   </main>
 
   <script>
-    // GANTIKAN DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA (BERAKHIR DENGAN /exec)
-    const GOOGLE_SCRIPT_URL = "GANTIKAN_DENGAN_GOOGLE_SCRIPT_WEB_APP_URL";
+    // URL WEB APP RASMI GOOGLE APPS SCRIPT
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/1oTJyj0g1wVoTQj88Uf4zzaQaqPbVUHPwpJKFmeHfvG8isxpRYEUOudaS/exec";
 
     let storedReports = [];
     const base64Images = ["", "", "", ""];
@@ -326,7 +326,7 @@
           body: JSON.stringify(payload)
         });
 
-        alert("Laporan berjaya disimpan ke Google Sheets & Drive!");
+        alert("Laporan berjaya dihantar dan disimpan ke Google Sheets & Drive!");
         document.getElementById('laporanForm').reset();
         for (let i = 1; i <= 4; i++) {
           document.getElementById(`prev-${i}`).classList.add('hidden');
@@ -347,11 +347,6 @@
       const tbody = document.getElementById('dashboardTableBody');
       const select = document.getElementById('selectRecordToPrint');
 
-      if (GOOGLE_SCRIPT_URL === "1oTJyj0g1wVoTQj88Uf4zzaQaqPbVUHPwpJKFmeHfvG8isxpRYEUOudaS" || !GOOGLE_SCRIPT_URL.startsWith("http")) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500 font-semibold">Sila masukkan GOOGLE_SCRIPT_URL yang sah di dalam fail HTML anda.</td></tr>`;
-        return;
-      }
-
       tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Sedang memuat data dari Google Sheets...</td></tr>`;
       lucide.createIcons();
 
@@ -368,7 +363,7 @@
         select.innerHTML = '<option value="">-- Pilih Aktiviti --</option>';
 
         if (storedReports.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Tiada rekod laporan dijumpai. Sila masukkan laporan baharu.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Tiada rekod laporan dijumpai dalam Google Sheets.</td></tr>`;
           return;
         }
 
