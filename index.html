@@ -20,6 +20,8 @@
         left: 0;
         top: 0;
         width: 100%;
+        margin: 0;
+        padding: 0;
       }
       .no-print {
         display: none !important;
@@ -64,13 +66,13 @@
         <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
           <i data-lucide="file-pen" class="text-sky-600"></i> Borang Pelaporan Aktiviti Mingguan
         </h2>
-        <p class="text-xs text-slate-500">Sila lengkapkan maklumat aktiviti dan muat naik 4 gambar bukti.</p>
+        <p class="text-xs text-slate-500">Sila lengkapkan maklumat di bawah. Sekurang-kurangnya 1 gambar wajib dimuat naik (maksimum 4).</p>
       </div>
 
       <form id="laporanForm" onsubmit="submitForm(event)" class="space-y-5">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">Tarikh Aktiviti</label>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Tarikh Aktiviti <span class="text-red-500">*</span></label>
             <input type="date" id="tarikh" required onchange="autoFillDay(this.value)" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
           </div>
           <div>
@@ -80,51 +82,61 @@
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Aktiviti / Unit</label>
-          <input type="text" id="aktiviti" required placeholder="cth: Perjumpaan Kadet Remaja Sekolah / Kelab Catur" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Aktiviti / Unit <span class="text-red-500">*</span></label>
+          <input type="text" id="aktiviti" required placeholder="cth: Perjumpaan Kadet Remaja Sekolah / Kelab Komputer" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Penerangan Aktiviti</label>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Penerangan Aktiviti <span class="text-red-500">*</span></label>
           <textarea id="penerangan" rows="3" required placeholder="Nyatakan perjalanan atau modul aktiviti yang telah dijalankan..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Hasil / Dapatan Aktiviti</label>
-          <textarea id="hasil" rows="3" required placeholder="Pencapaian murid, penguasaan kemahiran, atau refleksi program..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Hasil / Dapatan Aktiviti <span class="text-red-500">*</span></label>
+          <textarea id="hasil" rows="3" required placeholder="Pencapaian murid, penguasaan kemahiran, atau refleksi..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
-        <!-- UPLOAD 4 GAMBAR -->
+        <!-- UPLOAD GAMBAR (1 WAJIB, 3 PILIHAN) -->
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-2">Muat Naik 4 Keping Gambar Dokumentasi</label>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">
+            Muat Naik Gambar Dokumentasi (1 hingga 4 Keping)
+          </label>
+          <p class="text-xs text-slate-500 mb-2">Gambar 1 <span class="text-red-500 font-semibold">*Wajib</span>, manakala Gambar 2-4 adalah pilihan.</p>
+          
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <!-- Box Gambar 1-4 -->
-            <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative min-h-[140px] bg-slate-50">
-              <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 1)" required>
+            <!-- Gambar 1 (Wajib) -->
+            <div class="border-2 border-dashed border-sky-400 bg-sky-50/40 rounded-lg p-2 text-center flex flex-col items-center justify-center relative min-h-[140px]">
+              <input type="file" id="file-1" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 1)" required>
               <img id="prev-1" class="hidden w-full h-24 object-cover rounded mb-1">
-              <span id="txt-1" class="text-xs text-slate-500 flex flex-col items-center">
-                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 1
+              <span id="txt-1" class="text-xs text-slate-600 flex flex-col items-center">
+                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-sky-600"></i> Gambar 1 <span class="text-[10px] text-red-500 font-bold">(Wajib)</span>
               </span>
             </div>
+
+            <!-- Gambar 2 (Pilihan) -->
             <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative min-h-[140px] bg-slate-50">
-              <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 2)" required>
+              <input type="file" id="file-2" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 2)">
               <img id="prev-2" class="hidden w-full h-24 object-cover rounded mb-1">
               <span id="txt-2" class="text-xs text-slate-500 flex flex-col items-center">
-                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 2
+                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 2 <span class="text-[10px] text-slate-400">(Pilihan)</span>
               </span>
             </div>
+
+            <!-- Gambar 3 (Pilihan) -->
             <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative min-h-[140px] bg-slate-50">
-              <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 3)" required>
+              <input type="file" id="file-3" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 3)">
               <img id="prev-3" class="hidden w-full h-24 object-cover rounded mb-1">
               <span id="txt-3" class="text-xs text-slate-500 flex flex-col items-center">
-                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 3
+                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 3 <span class="text-[10px] text-slate-400">(Pilihan)</span>
               </span>
             </div>
+
+            <!-- Gambar 4 (Pilihan) -->
             <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative min-h-[140px] bg-slate-50">
-              <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 4)" required>
+              <input type="file" id="file-4" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 4)">
               <img id="prev-4" class="hidden w-full h-24 object-cover rounded mb-1">
               <span id="txt-4" class="text-xs text-slate-500 flex flex-col items-center">
-                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 4
+                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 4 <span class="text-[10px] text-slate-400">(Pilihan)</span>
               </span>
             </div>
           </div>
@@ -141,7 +153,7 @@
       <div class="flex justify-between items-center">
         <div>
           <h2 class="text-xl font-bold text-slate-800">Senarai Laporan Aktiviti</h2>
-          <p class="text-xs text-slate-500">Rekod laporan yang telah dimuat naik ke pangkalan data Google Sheets.</p>
+          <p class="text-xs text-slate-500">Rekod laporan yang telah tersimpan di pangkalan data Google Sheets.</p>
         </div>
         <button onclick="loadDataFromSheets()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 rounded text-xs font-semibold flex items-center gap-1">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Segar Semula
@@ -184,13 +196,13 @@
 
       <!-- TEMPLAT CETAKAN A4 RASMI -->
       <div id="printArea" class="bg-white p-8 md:p-12 rounded-xl shadow max-w-4xl mx-auto border border-slate-200">
-        <!-- Kepala Surat Rasmi SMKKA -->
+        <!-- Kepala Surat Rasmi SMKKA (DIKEMAS KINI) -->
         <div class="flex items-center gap-6 border-b-2 border-slate-800 pb-4 mb-6">
           <img src="logo.png" alt="Logo SMKKA" class="w-24 h-24 object-contain">
           <div>
-            <h2 class="text-xl font-bold uppercase text-slate-900 tracking-wide">SMK Kamarul Ariffin</h2>
-            <p class="text-xs text-slate-600">Jalan Segamat, 85300 Labis, Johor Darul Ta'zim</p>
-            <p class="text-xs text-slate-600">Kod Sekolah: JEA7001 | Tel: 07-9251234</p>
+            <h2 class="text-xl font-bold uppercase text-slate-900 tracking-wide">SMK KAMARUL ARIFFIN</h2>
+            <p class="text-xs text-slate-600">Jalan Tenang, 85300 Labis, Johor Darul Ta'zim</p>
+            <p class="text-xs text-slate-600">Kod Sekolah: JEA7039 | Tel: 07-9255793</p>
             <p class="text-sm font-bold text-sky-800 mt-1 uppercase">Laporan Dokumentasi Aktiviti Kokurikulum</p>
           </div>
         </div>
@@ -221,23 +233,9 @@
 
           <div>
             <h4 class="font-bold text-sm text-slate-800 mb-2 border-b pb-1">DOKUMENTASI BERGAMBAR:</h4>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="border border-slate-200 rounded p-1 text-center">
-                <img id="p-img-1" class="w-full h-44 object-cover rounded bg-slate-100" src="">
-                <p class="text-[11px] text-slate-500 mt-1">Gambar 1</p>
-              </div>
-              <div class="border border-slate-200 rounded p-1 text-center">
-                <img id="p-img-2" class="w-full h-44 object-cover rounded bg-slate-100" src="">
-                <p class="text-[11px] text-slate-500 mt-1">Gambar 2</p>
-              </div>
-              <div class="border border-slate-200 rounded p-1 text-center">
-                <img id="p-img-3" class="w-full h-44 object-cover rounded bg-slate-100" src="">
-                <p class="text-[11px] text-slate-500 mt-1">Gambar 3</p>
-              </div>
-              <div class="border border-slate-200 rounded p-1 text-center">
-                <img id="p-img-4" class="w-full h-44 object-cover rounded bg-slate-100" src="">
-                <p class="text-[11px] text-slate-500 mt-1">Gambar 4</p>
-              </div>
+            <!-- Bekas Gambar Dinamik Mengikut Jumlah Gambar yang Dimuat Naik -->
+            <div id="printImagesContainer" class="grid grid-cols-2 gap-4">
+              <!-- Kad gambar akan dijana secara dinamik oleh JavaScript -->
             </div>
           </div>
 
@@ -261,8 +259,8 @@
   </main>
 
   <script>
-    // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzede3L7tgU4zUwW_qwOENAZdMAuEdjWSNZ_t6zqvTQRRZz0qHrbRgfPiVNUZxGiP7Ulw/exec";
+    // MASUKKAN URL GOOGLE APPS SCRIPT WEB APP ANDA DI SINI
+    const GOOGLE_SCRIPT_URL = "GANTIKAN_DENGAN_GOOGLE_SCRIPT_WEB_APP_URL";
 
     let storedReports = [];
     const base64Images = ["", "", "", ""];
@@ -285,7 +283,7 @@
       }
     }
 
-    // Kira Hari Secara Automatik
+    // Kira Hari Secara Automatik Berdasarkan Tarikh
     function autoFillDay(dateStr) {
       if (!dateStr) return;
       const days = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
@@ -293,7 +291,7 @@
       document.getElementById('hari').value = days[date.getDay()];
     }
 
-    // Preview dan Convert Gambar ke Base64
+    // Preview dan Tukar Fail Gambar kepada Base64
     function previewImage(input, index) {
       if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -307,12 +305,18 @@
       }
     }
 
-    // Hantar data ke Google Apps Script
+    // Hantar Laporan ke Google Apps Script (Sheets & Drive)
     async function submitForm(e) {
       e.preventDefault();
+
+      if (!base64Images[0]) {
+        alert("Sila muat naik sekurang-kurangnya Gambar 1!");
+        return;
+      }
+
       const btn = document.getElementById('btnSubmit');
       btn.disabled = true;
-      btn.innerText = "Sedang menghantar...";
+      btn.innerText = "Sedang menyimpan laporan...";
 
       const payload = {
         tarikh: document.getElementById('tarikh').value,
@@ -340,7 +344,7 @@
         }
         switchTab('dashboard');
       } catch (error) {
-        alert("Ralat semasa penghantaran: " + error.message);
+        alert("Ralat penghantaran: " + error.message);
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> Hantar Laporan ke Google`;
@@ -348,27 +352,24 @@
       }
     }
 
-    // Muat Turun Data dari Google Sheets
+    // Ambil Data daripada Google Sheets
     async function loadDataFromSheets() {
       try {
         const response = await fetch(GOOGLE_SCRIPT_URL);
         storedReports = await response.json();
         
-        // Render Jadual Dashboard
         const tbody = document.getElementById('dashboardTableBody');
         tbody.innerHTML = '';
 
-        // Render Select Box untuk Cetakan
         const select = document.getElementById('selectRecordToPrint');
         select.innerHTML = '<option value="">-- Pilih Aktiviti --</option>';
 
-        if (storedReports.length === 0) {
+        if (!storedReports || storedReports.length === 0) {
           tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Tiada rekod laporan dijumpai.</td></tr>`;
           return;
         }
 
         storedReports.forEach((item, index) => {
-          // Tambah ke table
           const tr = document.createElement('tr');
           tr.className = "hover:bg-slate-50";
           tr.innerHTML = `
@@ -377,12 +378,11 @@
             <td class="p-3 max-w-xs truncate">${item.Penerangan}</td>
             <td class="p-3 max-w-xs truncate">${item.Hasil}</td>
             <td class="p-3 text-center">
-              <button onclick="goToPrintRecord(${index})" class="text-xs bg-sky-100 hover:bg-sky-200 text-sky-700 px-2.5 py-1 rounded font-medium">Lihat/Cetak</button>
+              <button onclick="goToPrintRecord(${index})" class="text-xs bg-sky-100 hover:bg-sky-200 text-sky-700 px-2.5 py-1 rounded font-medium">Lihat / Cetak</button>
             </td>
           `;
           tbody.appendChild(tr);
 
-          // Tambah ke select dropdown
           const opt = document.createElement('option');
           opt.value = index;
           opt.textContent = `${item.Tarikh} - ${item.Aktiviti}`;
@@ -400,6 +400,7 @@
       renderPrintTemplate(index);
     }
 
+    // Papar Lembaran Cetakan
     function renderPrintTemplate(index) {
       if (index === "" || !storedReports[index]) {
         document.getElementById('printContentPlaceholder').classList.remove('hidden');
@@ -413,15 +414,30 @@
       document.getElementById('p-penerangan').textContent = d.Penerangan;
       document.getElementById('p-hasil').textContent = d.Hasil;
 
+      const container = document.getElementById('printImagesContainer');
+      container.innerHTML = '';
+
+      // Tapis gambar yang wujud sahaja
+      let count = 0;
       for (let i = 1; i <= 4; i++) {
         const imgKey = `Gambar ${i}`;
-        const el = document.getElementById(`p-img-${i}`);
-        if (d[imgKey]) {
-          el.src = d[imgKey];
-          el.classList.remove('hidden');
-        } else {
-          el.src = "https://via.placeholder.com/400x300?text=Tiada+Gambar";
+        if (d[imgKey] && d[imgKey].trim() !== "") {
+          count++;
+          const div = document.createElement('div');
+          div.className = "border border-slate-200 rounded p-1 text-center bg-slate-50";
+          div.innerHTML = `
+            <img class="w-full h-44 object-cover rounded bg-white" src="${d[imgKey]}" alt="Gambar Dokumentasi ${count}">
+            <p class="text-[11px] text-slate-500 mt-1 font-medium">Gambar ${count}</p>
+          `;
+          container.appendChild(div);
         }
+      }
+
+      // Jika hanya ada 1 gambar, besarkan sedikit paparan gridnya
+      if (count === 1) {
+        container.className = "grid grid-cols-1 max-w-md mx-auto gap-4";
+      } else {
+        container.className = "grid grid-cols-2 gap-4";
       }
 
       document.getElementById('printContentPlaceholder').classList.add('hidden');
