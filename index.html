@@ -66,7 +66,7 @@
         <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
           <i data-lucide="file-pen" class="text-sky-600"></i> Borang Pelaporan Aktiviti Mingguan
         </h2>
-        <p class="text-xs text-slate-500">Sila lengkapkan butiran. Gambar 1 adalah wajib, manakala Gambar 2 hingga 4 adalah pilihan.</p>
+        <p class="text-xs text-slate-500">Sila lengkapkan maklumat aktiviti. Gambar 1 adalah wajib manakala Gambar 2 hingga 4 adalah pilihan.</p>
       </div>
 
       <form id="laporanForm" onsubmit="submitForm(event)" class="space-y-5">
@@ -82,24 +82,24 @@
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Aktiviti / Unit Kokurikulum <span class="text-red-500">*</span></label>
-          <input type="text" id="aktiviti" required placeholder="cth: Pengakap / Kelab Seni Budaya / Sukan Bola Sepak" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Aktiviti / Unit <span class="text-red-500">*</span></label>
+          <input type="text" id="aktiviti" required placeholder="cth: Perjumpaan Kadet Remaja Sekolah / Kelab Bola Jaring" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Penerangan Aktiviti <span class="text-red-500">*</span></label>
-          <textarea id="penerangan" rows="3" required placeholder="Nyatakan perjalanan atau modul aktiviti yang dijalankan..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <textarea id="penerangan" rows="3" required placeholder="Nyatakan perjalanan atau modul aktiviti yang telah dijalankan..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Hasil / Dapatan Aktiviti <span class="text-red-500">*</span></label>
-          <textarea id="hasil" rows="3" required placeholder="Pencapaian murid, kemahiran yang dikuasai, atau refleksi program..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <textarea id="hasil" rows="3" required placeholder="Pencapaian murid, penguasaan kemahiran, atau refleksi program..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
         <!-- UPLOAD GAMBAR (1 WAJIB, 3 PILIHAN) -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Muat Naik Gambar Dokumentasi (1 hingga 4 Keping)</label>
-          <p class="text-xs text-slate-500 mb-2">Gambar 1 <span class="text-red-500 font-semibold">*Wajib</span>, Gambar 2-4 pilihan (maksimum 4 keping).</p>
+          <p class="text-xs text-slate-500 mb-2">Gambar 1 <span class="text-red-500 font-semibold">*Wajib</span>, Gambar 2-4 adalah pilihan (maksimum 4).</p>
           
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             <!-- Gambar 1 (Wajib) -->
@@ -151,7 +151,7 @@
       <div class="flex justify-between items-center">
         <div>
           <h2 class="text-xl font-bold text-slate-800">Senarai Laporan Aktiviti</h2>
-          <p class="text-xs text-slate-500">Rekod data yang dimuat turun daripada Google Sheets.</p>
+          <p class="text-xs text-slate-500">Rekod data dimuat turun daripada Google Sheets.</p>
         </div>
         <button onclick="loadDataFromSheets()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 rounded text-xs font-semibold flex items-center gap-1 transition">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Segar Semula
@@ -206,7 +206,7 @@
         </div>
 
         <div id="printContentPlaceholder" class="text-center py-12 text-slate-400">
-          Sila pilih rekod laporan dari menu di atas untuk memaparkan lembaran cetakan rasmi.
+          Sila pilih rekod laporan dari menu atas untuk memaparkan lembaran cetakan rasmi.
         </div>
 
         <div id="printContentDetails" class="hidden space-y-6">
@@ -254,8 +254,8 @@
   </main>
 
   <script>
-    // URL Google Apps Script yang sah menggunakan ID anda
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/1oTJyj0g1wVoTQj88Uf4zzaQaqPbVUHPwpJKFmeHfvG8isxpRYEUOudaS/exec";
+    // URL WEB APP TERKINI DENGAN ID DEPLOYMENT ANDA
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzede3L7tgU4zUwW_qwOENAZdMAuEdjWSNZ_t6zqvTQRRZz0qHrbRgfPiVNUZxGiP7Ulw/exec";
 
     let storedReports = [];
     const base64Images = ["", "", "", ""];
@@ -306,7 +306,7 @@
 
       const btn = document.getElementById('btnSubmit');
       btn.disabled = true;
-      btn.innerText = "Sedang menghantar laporan...";
+      btn.innerText = "Sedang menyimpan laporan ke Google Drive & Sheets...";
 
       const payload = {
         tarikh: document.getElementById('tarikh').value,
@@ -325,7 +325,7 @@
           body: JSON.stringify(payload)
         });
 
-        alert("Laporan berjaya dihantar ke Google Sheets & Google Drive!");
+        alert("Laporan berjaya dihantar dan disimpan ke Google Sheets!");
         document.getElementById('laporanForm').reset();
         for (let i = 1; i <= 4; i++) {
           document.getElementById(`prev-${i}`).classList.add('hidden');
@@ -334,7 +334,7 @@
         }
         switchTab('dashboard');
       } catch (error) {
-        alert("Ralat semasa penghantaran: " + error.message);
+        alert("Ralat penghantaran: " + error.message);
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> Hantar Laporan ke Google`;
@@ -342,17 +342,15 @@
       }
     }
 
-    // Fungsi muat data kalis CORS menggunakan JSONP
+    // Fungsi muat data kalis sekatan CORS (JSONP)
     function loadDataFromSheets() {
       const tbody = document.getElementById('dashboardTableBody');
       tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Sedang memuat data dari Google Sheets...</td></tr>`;
       lucide.createIcons();
 
-      // Buang script tag lama jika ada
       const oldScript = document.getElementById('jsonp-script');
       if (oldScript) oldScript.remove();
 
-      // Cipta script tag dinamik untuk panggil JSONP
       const script = document.createElement('script');
       script.id = 'jsonp-script';
       script.src = `${GOOGLE_SCRIPT_URL}?callback=handleSheetsData&t=${new Date().getTime()}`;
@@ -361,14 +359,14 @@
           <tr>
             <td colspan="5" class="p-6 text-center text-red-600">
               <p class="font-bold">Gagal berhubung dengan Google Apps Script!</p>
-              <p class="text-xs text-slate-500 mt-1">Pastikan deployment Web App ditetapkan dengan <b>Who has access: Anyone</b> (bukan akaun DELIMa yang menyekat akses luar).</p>
+              <p class="text-xs text-slate-500 mt-1">Pastikan deployment Web App ditetapkan dengan <b>Who has access: Anyone</b>.</p>
             </td>
           </tr>`;
       };
       document.body.appendChild(script);
     }
 
-    // Callback JSONP yang menerima respons terus daripada Google Apps Script
+    // Callback JSONP penerima data
     window.handleSheetsData = function(data) {
       const tbody = document.getElementById('dashboardTableBody');
       const select = document.getElementById('selectRecordToPrint');
@@ -383,10 +381,11 @@
       select.innerHTML = '<option value="">-- Pilih Aktiviti --</option>';
 
       if (storedReports.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Tiada rekod laporan dijumpai dalam Google Sheets. Sila buat pelaporan baharu.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Tiada rekod laporan dijumpai. Sila hantar laporan baharu.</td></tr>`;
         return;
       }
 
+      // Susun rekod aktiviti ke dalam jadual dashboard
       storedReports.forEach((item, index) => {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 border-b";
