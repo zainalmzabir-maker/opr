@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Pelaporan Kokurikulum SMK Kamarul Ariffin</title>
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printArea, #printArea * {
+        visibility: visible;
+      }
+      #printArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header class="bg-sky-700 text-white shadow-md sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <img src="logo.png" alt="Logo SMKKA" class="w-12 h-12 object-contain bg-white rounded-full p-1 shadow">
+        <div>
+          <h1 class="text-lg font-bold tracking-wide">SMK KAMARUL ARIFFIN</h1>
+          <p class="text-xs text-sky-200">Sistem Pelaporan & Pemantauan Kokurikulum</p>
+        </div>
+      </div>
+
+      <!-- NAVIGASI 3 MENU -->
+      <nav class="flex space-x-2 bg-sky-800/60 p-1 rounded-lg">
+        <button onclick="switchTab('form')" id="btn-form" class="nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 bg-white text-sky-800 shadow">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i> Pelaporan Aktiviti
+        </button>
+        <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 text-white hover:bg-sky-600">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+        </button>
+        <button onclick="switchTab('print')" id="btn-print" class="nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 text-white hover:bg-sky-600">
+          <i data-lucide="printer" class="w-4 h-4"></i> Cetakan Pelaporan
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- KANDUNGAN UTAMA -->
+  <main class="max-w-7xl mx-auto p-4 md:p-6 flex-1 w-full">
+
+    <!-- 1. MENU: BORANG PELAPORAN -->
+    <section id="menu-form" class="max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow border border-slate-100">
+      <div class="border-b pb-4 mb-6">
+        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <i data-lucide="file-pen" class="text-sky-600"></i> Borang Pelaporan Aktiviti Mingguan
+        </h2>
+        <p class="text-xs text-slate-500">Sila lengkapkan maklumat aktiviti dan muat naik 4 gambar bukti.</p>
+      </div>
+
+      <form id="laporanForm" onsubmit="submitForm(event)" class="space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Tarikh Aktiviti</label>
+            <input type="date" id="tarikh" required onchange="autoFillDay(this.value)" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Hari</label>
+            <input type="text" id="hari" readonly placeholder="cth: Rabu" class="w-full bg-slate-100 border rounded-lg p-2.5 text-sm font-medium text-slate-600">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Aktiviti / Unit</label>
+          <input type="text" id="aktiviti" required placeholder="cth: Perjumpaan Kadet Remaja Sekolah / Kelab Catur" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Penerangan Aktiviti</label>
+          <textarea id="penerangan" rows="3" required placeholder="Nyatakan perjalanan atau modul aktiviti yang telah dijalankan..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Hasil / Dapatan Aktiviti</label>
+          <textarea id="hasil" rows="3" required placeholder="Pencapaian murid, penguasaan kemahiran, atau refleksi program..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+        </div>
+
+        <!-- UPLOAD 4 GAMBAR -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">Muat Naik 4 Keping Gambar Dokumentasi</label>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <!-- Box Gambar 1-4 -->
+            <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative min-h-[140px] bg-slate-50">
+              <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 1)" required>
+              <img id="prev-1" class="hidden w-full h-24 object-cover rounded mb-1">
+              <span id="txt-1" class="text-xs text-slate-500 flex flex-col items-center">
+                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 1
+              </span>
+            </div>
+            <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative min-h-[140px] bg-slate-50">
+              <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 2)" required>
+              <img id="prev-2" class="hidden w-full h-24 object-cover rounded mb-1">
+              <span id="txt-2" class="text-xs text-slate-500 flex flex-col items-center">
+                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 2
+              </span>
+            </div>
+            <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative min-h-[140px] bg-slate-50">
+              <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 3)" required>
+              <img id="prev-3" class="hidden w-full h-24 object-cover rounded mb-1">
+              <span id="txt-3" class="text-xs text-slate-500 flex flex-col items-center">
+                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 3
+              </span>
+            </div>
+            <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative min-h-[140px] bg-slate-50">
+              <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 4)" required>
+              <img id="prev-4" class="hidden w-full h-24 object-cover rounded mb-1">
+              <span id="txt-4" class="text-xs text-slate-500 flex flex-col items-center">
+                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 4
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" id="btnSubmit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 rounded-lg shadow transition flex justify-center items-center gap-2">
+          <i data-lucide="send" class="w-4 h-4"></i> Hantar Laporan ke Google
+        </button>
+      </form>
+    </section>
+
+    <!-- 2. MENU: DASHBOARD -->
+    <section id="menu-dashboard" class="hidden space-y-6">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">Senarai Laporan Aktiviti</h2>
+          <p class="text-xs text-slate-500">Rekod laporan yang telah dimuat naik ke pangkalan data Google Sheets.</p>
+        </div>
+        <button onclick="loadDataFromSheets()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 rounded text-xs font-semibold flex items-center gap-1">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Segar Semula
+        </button>
+      </div>
+
+      <div class="bg-white rounded-xl shadow border border-slate-200 overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-100 border-b text-slate-700 uppercase text-xs font-semibold">
+            <tr>
+              <th class="p-3">Tarikh / Hari</th>
+              <th class="p-3">Aktiviti</th>
+              <th class="p-3">Penerangan</th>
+              <th class="p-3">Hasil / Dapatan</th>
+              <th class="p-3 text-center">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody id="dashboardTableBody" class="divide-y text-slate-600">
+            <tr>
+              <td colspan="5" class="p-4 text-center text-slate-400">Memuat data dari Google Sheets...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. MENU: CETAKAN PELAPORAN -->
+    <section id="menu-print" class="hidden space-y-6">
+      <div class="flex flex-wrap justify-between items-center gap-4 no-print bg-white p-4 rounded-xl shadow border">
+        <div>
+          <label class="text-sm font-semibold text-slate-700 block mb-1">Pilih Rekod Laporan untuk Dicetak:</label>
+          <select id="selectRecordToPrint" onchange="renderPrintTemplate(this.value)" class="border rounded-md p-2 text-sm min-w-[280px]">
+            <option value="">-- Pilih Aktiviti --</option>
+          </select>
+        </div>
+        <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg shadow text-sm font-semibold flex items-center gap-2">
+          <i data-lucide="printer" class="w-4 h-4"></i> Cetak Dokumen / Simpan PDF
+        </button>
+      </div>
+
+      <!-- TEMPLAT CETAKAN A4 RASMI -->
+      <div id="printArea" class="bg-white p-8 md:p-12 rounded-xl shadow max-w-4xl mx-auto border border-slate-200">
+        <!-- Kepala Surat Rasmi SMKKA -->
+        <div class="flex items-center gap-6 border-b-2 border-slate-800 pb-4 mb-6">
+          <img src="logo.png" alt="Logo SMKKA" class="w-24 h-24 object-contain">
+          <div>
+            <h2 class="text-xl font-bold uppercase text-slate-900 tracking-wide">SMK Kamarul Ariffin</h2>
+            <p class="text-xs text-slate-600">Jalan Segamat, 85300 Labis, Johor Darul Ta'zim</p>
+            <p class="text-xs text-slate-600">Kod Sekolah: JEA7001 | Tel: 07-9251234</p>
+            <p class="text-sm font-bold text-sky-800 mt-1 uppercase">Laporan Dokumentasi Aktiviti Kokurikulum</p>
+          </div>
+        </div>
+
+        <div id="printContentPlaceholder" class="text-center py-12 text-slate-400">
+          Sila pilih rekod laporan dari menu atas untuk memaparkan lembaran cetakan rasmi.
+        </div>
+
+        <div id="printContentDetails" class="hidden space-y-6">
+          <table class="w-full text-sm border-collapse border border-slate-300">
+            <tr>
+              <td class="border border-slate-300 p-2 font-bold bg-slate-50 w-1/4">Nama Aktiviti / Unit</td>
+              <td id="p-aktiviti" class="border border-slate-300 p-2 font-semibold text-slate-800"></td>
+            </tr>
+            <tr>
+              <td class="border border-slate-300 p-2 font-bold bg-slate-50">Tarikh & Hari</td>
+              <td id="p-tarikh" class="border border-slate-300 p-2"></td>
+            </tr>
+            <tr>
+              <td class="border border-slate-300 p-2 font-bold bg-slate-50">Penerangan Aktiviti</td>
+              <td id="p-penerangan" class="border border-slate-300 p-2 whitespace-pre-line leading-relaxed"></td>
+            </tr>
+            <tr>
+              <td class="border border-slate-300 p-2 font-bold bg-slate-50">Hasil / Dapatan</td>
+              <td id="p-hasil" class="border border-slate-300 p-2 whitespace-pre-line leading-relaxed"></td>
+            </tr>
+          </table>
+
+          <div>
+            <h4 class="font-bold text-sm text-slate-800 mb-2 border-b pb-1">DOKUMENTASI BERGAMBAR:</h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="border border-slate-200 rounded p-1 text-center">
+                <img id="p-img-1" class="w-full h-44 object-cover rounded bg-slate-100" src="">
+                <p class="text-[11px] text-slate-500 mt-1">Gambar 1</p>
+              </div>
+              <div class="border border-slate-200 rounded p-1 text-center">
+                <img id="p-img-2" class="w-full h-44 object-cover rounded bg-slate-100" src="">
+                <p class="text-[11px] text-slate-500 mt-1">Gambar 2</p>
+              </div>
+              <div class="border border-slate-200 rounded p-1 text-center">
+                <img id="p-img-3" class="w-full h-44 object-cover rounded bg-slate-100" src="">
+                <p class="text-[11px] text-slate-500 mt-1">Gambar 3</p>
+              </div>
+              <div class="border border-slate-200 rounded p-1 text-center">
+                <img id="p-img-4" class="w-full h-44 object-cover rounded bg-slate-100" src="">
+                <p class="text-[11px] text-slate-500 mt-1">Gambar 4</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tandatangan Pengesahan -->
+          <div class="grid grid-cols-2 gap-8 pt-8 text-sm">
+            <div>
+              <p class="font-medium">Disediakan Oleh:</p>
+              <div class="h-16"></div>
+              <p class="border-t border-slate-400 w-48 font-semibold">Guru Penasihat</p>
+            </div>
+            <div>
+              <p class="font-medium">Disahkan Oleh:</p>
+              <div class="h-16"></div>
+              <p class="border-t border-slate-400 w-48 font-semibold">GPK Kokurikulum SMKKA</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
+    const GOOGLE_SCRIPT_URL = "GANTIKAN_DENGAN_GOOGLE_SCRIPT_WEB_APP_URL";
+
+    let storedReports = [];
+    const base64Images = ["", "", "", ""];
+
+    // Inisialisasi ikon
+    lucide.createIcons();
+
+    // Tukar Menu Tab
+    function switchTab(tab) {
+      ['form', 'dashboard', 'print'].forEach(t => {
+        document.getElementById(`menu-${t}`).classList.add('hidden');
+        document.getElementById(`btn-${t}`).className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 text-white hover:bg-sky-600";
+      });
+
+      document.getElementById(`menu-${tab}`).classList.remove('hidden');
+      document.getElementById(`btn-${tab}`).className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 bg-white text-sky-800 shadow";
+
+      if (tab === 'dashboard' || tab === 'print') {
+        loadDataFromSheets();
+      }
+    }
+
+    // Kira Hari Secara Automatik
+    function autoFillDay(dateStr) {
+      if (!dateStr) return;
+      const days = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+      const date = new Date(dateStr);
+      document.getElementById('hari').value = days[date.getDay()];
+    }
+
+    // Preview dan Convert Gambar ke Base64
+    function previewImage(input, index) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById(`prev-${index}`).src = e.target.result;
+          document.getElementById(`prev-${index}`).classList.remove('hidden');
+          document.getElementById(`txt-${index}`).classList.add('hidden');
+          base64Images[index - 1] = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    // Hantar data ke Google Apps Script
+    async function submitForm(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      btn.innerText = "Sedang menghantar...";
+
+      const payload = {
+        tarikh: document.getElementById('tarikh').value,
+        hari: document.getElementById('hari').value,
+        aktiviti: document.getElementById('aktiviti').value,
+        penerangan: document.getElementById('penerangan').value,
+        hasil: document.getElementById('hasil').value,
+        images: base64Images
+      };
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        alert("Laporan berjaya disimpan ke Google Sheets & Google Drive!");
+        document.getElementById('laporanForm').reset();
+        for (let i = 1; i <= 4; i++) {
+          document.getElementById(`prev-${i}`).classList.add('hidden');
+          document.getElementById(`txt-${i}`).classList.remove('hidden');
+          base64Images[i - 1] = "";
+        }
+        switchTab('dashboard');
+      } catch (error) {
+        alert("Ralat semasa penghantaran: " + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> Hantar Laporan ke Google`;
+        lucide.createIcons();
+      }
+    }
+
+    // Muat Turun Data dari Google Sheets
+    async function loadDataFromSheets() {
+      try {
+        const response = await fetch(GOOGLE_SCRIPT_URL);
+        storedReports = await response.json();
+        
+        // Render Jadual Dashboard
+        const tbody = document.getElementById('dashboardTableBody');
+        tbody.innerHTML = '';
+
+        // Render Select Box untuk Cetakan
+        const select = document.getElementById('selectRecordToPrint');
+        select.innerHTML = '<option value="">-- Pilih Aktiviti --</option>';
+
+        if (storedReports.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Tiada rekod laporan dijumpai.</td></tr>`;
+          return;
+        }
+
+        storedReports.forEach((item, index) => {
+          // Tambah ke table
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-50";
+          tr.innerHTML = `
+            <td class="p-3 font-semibold">${item.Tarikh}<br><span class="text-xs font-normal text-slate-500">${item.Hari}</span></td>
+            <td class="p-3 font-medium text-slate-800">${item.Aktiviti}</td>
+            <td class="p-3 max-w-xs truncate">${item.Penerangan}</td>
+            <td class="p-3 max-w-xs truncate">${item.Hasil}</td>
+            <td class="p-3 text-center">
+              <button onclick="goToPrintRecord(${index})" class="text-xs bg-sky-100 hover:bg-sky-200 text-sky-700 px-2.5 py-1 rounded font-medium">Lihat/Cetak</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+
+          // Tambah ke select dropdown
+          const opt = document.createElement('option');
+          opt.value = index;
+          opt.textContent = `${item.Tarikh} - ${item.Aktiviti}`;
+          select.appendChild(opt);
+        });
+
+      } catch (err) {
+        console.error("Gagal memuat data", err);
+      }
+    }
+
+    function goToPrintRecord(index) {
+      switchTab('print');
+      document.getElementById('selectRecordToPrint').value = index;
+      renderPrintTemplate(index);
+    }
+
+    function renderPrintTemplate(index) {
+      if (index === "" || !storedReports[index]) {
+        document.getElementById('printContentPlaceholder').classList.remove('hidden');
+        document.getElementById('printContentDetails').classList.add('hidden');
+        return;
+      }
+
+      const d = storedReports[index];
+      document.getElementById('p-aktiviti').textContent = d.Aktiviti;
+      document.getElementById('p-tarikh').textContent = `${d.Tarikh} (${d.Hari})`;
+      document.getElementById('p-penerangan').textContent = d.Penerangan;
+      document.getElementById('p-hasil').textContent = d.Hasil;
+
+      for (let i = 1; i <= 4; i++) {
+        const imgKey = `Gambar ${i}`;
+        const el = document.getElementById(`p-img-${i}`);
+        if (d[imgKey]) {
+          el.src = d[imgKey];
+          el.classList.remove('hidden');
+        } else {
+          el.src = "https://via.placeholder.com/400x300?text=Tiada+Gambar";
+        }
+      }
+
+      document.getElementById('printContentPlaceholder').classList.add('hidden');
+      document.getElementById('printContentDetails').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
