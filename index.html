@@ -14,6 +14,15 @@
   
   <style>
     @media print {
+      @page {
+        size: A4 portrait;
+        margin: 10mm 12mm 10mm 12mm;
+      }
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
       body * {
         visibility: hidden;
       }
@@ -24,23 +33,31 @@
         position: absolute;
         left: 0;
         top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        box-shadow: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
         border: none !important;
+        box-shadow: none !important;
       }
       .no-print {
         display: none !important;
       }
+      /* Pastikan grafik latar belakang & warna header dicetak sepenuhnya */
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
     }
+
+    /* Reka bentuk bingkai helaian A4 dalam mod skrin */
+    .sheet-a4 {
+      width: 210mm;
+      min-height: 275mm;
+      box-sizing: border-box;
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
 
   <!-- HEADER SISTEM -->
   <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50 no-print border-b border-slate-700">
@@ -72,7 +89,7 @@
   <main class="max-w-7xl mx-auto p-4 md:p-6 flex-1 w-full">
 
     <!-- 1. MENU: BORANG PELAPORAN -->
-    <section id="menu-form" class="max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200">
+    <section id="menu-form" class="max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
       
       <!-- Pemberitahuan Mod Kemaskini -->
       <div id="editModeAlert" class="hidden mb-5 p-3.5 bg-amber-50 border border-amber-300 rounded-lg flex items-center justify-between">
@@ -110,7 +127,7 @@
             <option value="Pentadbiran">Pentadbiran</option>
             <option value="Lain-lain">Lain-lain</option>
           </select>
-          <p class="text-[11px] text-slate-500 mt-1">Warna tema pada kepala cetakan laporan rasmi dijana mengikut unit yang dipilih.</p>
+          <p class="text-[11px] text-slate-500 mt-1">Warna tema dan corak grafik kepala cetakan akan dijanakan secara pintar mengikut unit.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -126,7 +143,7 @@
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Aktiviti / Program <span class="text-red-500">*</span></label>
-          <input type="text" id="aktiviti" required placeholder="cth: Perjumpaan Kadet Remaja Sekolah / Program Motivasi Calon SPM" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          <input type="text" id="aktiviti" required placeholder="cth: Perjumpaan Kadet Remaja Sekolah / Kursus Kepimpinan Pengawas" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
         </div>
 
         <div>
@@ -136,16 +153,15 @@
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Hasil / Dapatan Aktiviti <span class="text-red-500">*</span></label>
-          <textarea id="hasil" rows="3" required placeholder="Penglibatan murid, pencapaian objektif, kemahiran yang dikuasai, atau refleksi program..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <textarea id="hasil" rows="3" required placeholder="Penglibatan murid, pencapaian objektif, kemahiran yang dikuasai, atau refleksi..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
-        <!-- UPLOAD GAMBAR DOKUMENTASI (DIMENSI PENUH / FIT DALAM KOTAK) -->
+        <!-- UPLOAD GAMBAR DOKUMENTASI -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Muat Naik Gambar Dokumentasi (1 hingga 4 Keping)</label>
-          <p class="text-xs text-slate-500 mb-2">Gambar 1 <span class="text-red-500 font-semibold">*Wajib</span>. Semua saiz gambar akan dimuatkan penuh ke dalam kotak tanpa terpotong.</p>
+          <p class="text-xs text-slate-500 mb-2">Gambar 1 <span class="text-red-500 font-semibold">*Wajib</span>. Semua saiz gambar akan diselaraskan penuh ke dalam frame cetakan.</p>
           
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <!-- Gambar 1 -->
             <div class="border-2 border-dashed border-sky-400 bg-sky-50/40 rounded-lg p-2 text-center flex flex-col items-center justify-center relative h-36">
               <input type="file" id="file-1" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 1)">
               <img id="prev-1" class="hidden w-full h-full object-contain rounded mb-1">
@@ -154,7 +170,6 @@
               </span>
             </div>
 
-            <!-- Gambar 2 -->
             <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative h-36 bg-slate-50">
               <input type="file" id="file-2" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 2)">
               <img id="prev-2" class="hidden w-full h-full object-contain rounded mb-1">
@@ -163,7 +178,6 @@
               </span>
             </div>
 
-            <!-- Gambar 3 -->
             <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative h-36 bg-slate-50">
               <input type="file" id="file-3" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 3)">
               <img id="prev-3" class="hidden w-full h-full object-contain rounded mb-1">
@@ -172,7 +186,6 @@
               </span>
             </div>
 
-            <!-- Gambar 4 -->
             <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative h-36 bg-slate-50">
               <input type="file" id="file-4" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 4)">
               <img id="prev-4" class="hidden w-full h-full object-contain rounded mb-1">
@@ -192,7 +205,7 @@
 
     <!-- 2. MENU: DASHBOARD -->
     <section id="menu-dashboard" class="hidden space-y-5">
-      <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200">
+      <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
         <div>
           <h2 class="text-xl font-bold text-slate-800">Senarai Laporan Aktiviti Sekolah</h2>
           <p class="text-xs text-slate-500">Papar dan tapis rekod mengikut Aktiviti Unit serta kemas kini laporan sedia ada.</p>
@@ -235,7 +248,7 @@
       </div>
     </section>
 
-    <!-- 3. MENU: CETAKAN PELAPORAN (SATU MUKA) -->
+    <!-- 3. MENU: CETAKAN PELAPORAN (SATU MUKA A4 BEAUTIFIED) -->
     <section id="menu-print" class="hidden space-y-6">
       <div class="flex flex-wrap justify-between items-center gap-4 no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200">
         <div>
@@ -245,84 +258,118 @@
           </select>
         </div>
         <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg shadow text-sm font-bold flex items-center gap-2 transition">
-          <i data-lucide="printer" class="w-4 h-4"></i> Cetak Laporan (Satu Muka)
+          <i data-lucide="printer" class="w-4 h-4"></i> Cetak Laporan (Satu Muka A4)
         </button>
       </div>
 
-      <!-- TEMPLAT CETAKAN SATU MUKA A4 -->
-      <div id="printArea" class="bg-white p-6 rounded-xl shadow-sm max-w-4xl mx-auto border border-slate-200">
+      <!-- TEMPLAT CETAKAN SATU MUKA A4 (AUTOFIT & FLEXIBLE EXPANSION) -->
+      <div id="printArea" class="sheet-a4 mx-auto bg-white p-7 rounded-2xl shadow-md border border-slate-200 flex flex-col justify-between relative overflow-hidden">
         
-        <!-- KEPALA SURAT BERWARNA MENGIKUT UNIT -->
-        <div id="printUnitHeader" class="text-white p-3 rounded-t-lg mb-3 flex items-center justify-between transition-colors" style="background-color: #800000;">
-          <div class="flex items-center gap-3">
-            <img src="logo.png" alt="Logo SMKKA" class="w-14 h-14 object-contain bg-white rounded-full p-1 shadow">
-            <div>
-              <h2 class="text-base font-black uppercase tracking-wider text-white">SMK KAMARUL ARIFFIN</h2>
-              <p class="text-[11px] text-white/90">Jalan Tenang, 85300 Labis, Johor Darul Ta'zim | Kod Sekolah: JEA7039 | Tel: 07-9255793</p>
-              <h3 id="p-unit-badge" class="text-xs font-bold uppercase tracking-wide mt-0.5 text-amber-200">
-                LAPORAN AKTIVITI KOKURIKULUM
-              </h3>
-            </div>
-          </div>
-          <div class="text-right hidden sm:block">
-            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-black/25 rounded border border-white/20">Format Satu Muka</span>
-          </div>
+        <!-- PANDUAN KOSONG SEBELUM PILIH REKOD -->
+        <div id="printContentPlaceholder" class="m-auto text-center py-24 text-slate-400 flex flex-col items-center">
+          <i data-lucide="file-search" class="w-12 h-12 mb-3 text-slate-300"></i>
+          <p class="text-sm font-medium">Sila pilih aktiviti daripada senarai pilihan di atas untuk memaparkan format cetakan A4 rasmi.</p>
         </div>
 
-        <div id="printContentPlaceholder" class="text-center py-12 text-slate-400">
-          Sila pilih rekod aktiviti dari senarai di atas untuk memaparkan format cetakan.
-        </div>
-
-        <div id="printContentDetails" class="hidden space-y-3">
-          <!-- JADUAL MAKLUMAT AKTIVITI -->
-          <table class="w-full text-xs border-collapse border border-slate-300">
-            <tr>
-              <td class="border border-slate-300 p-1.5 font-bold bg-slate-100 w-1/4">Nama Aktiviti / Program</td>
-              <td id="p-aktiviti" class="border border-slate-300 p-1.5 font-bold text-slate-900 text-xs"></td>
-            </tr>
-            <tr>
-              <td class="border border-slate-300 p-1.5 font-bold bg-slate-100">Unit Terlibat</td>
-              <td id="p-unit-text" class="border border-slate-300 p-1.5 font-semibold"></td>
-            </tr>
-            <tr>
-              <td class="border border-slate-300 p-1.5 font-bold bg-slate-100">Tarikh & Hari</td>
-              <td id="p-tarikh" class="border border-slate-300 p-1.5"></td>
-            </tr>
-            <tr>
-              <td class="border border-slate-300 p-1.5 font-bold bg-slate-100">Penerangan Aktiviti</td>
-              <td id="p-penerangan" class="border border-slate-300 p-1.5 whitespace-pre-line leading-relaxed"></td>
-            </tr>
-            <tr>
-              <td class="border border-slate-300 p-1.5 font-bold bg-slate-100">Hasil / Dapatan</td>
-              <td id="p-hasil" class="border border-slate-300 p-1.5 whitespace-pre-line leading-relaxed"></td>
-            </tr>
-          </table>
-
-          <!-- DOKUMENTASI BERGAMBAR (BEKAS GAMBAR FIT PENUH) -->
-          <div>
-            <h4 class="font-bold text-xs text-slate-800 mb-1 uppercase tracking-wide flex items-center gap-1.5">
-              <i data-lucide="image" class="w-3.5 h-3.5 text-slate-600"></i> Dokumentasi Bergambar:
-            </h4>
-            <div id="printImagesContainer" class="grid grid-cols-2 gap-2.5"></div>
-          </div>
-
-          <!-- RUANGAN TANDATANGAN PENGESAHAN -->
-          <div class="grid grid-cols-2 gap-8 pt-3 text-xs border-t border-slate-200 mt-2">
-            <div>
-              <p class="font-semibold text-slate-700">Disediakan Oleh:</p>
-              <div class="h-12"></div>
-              <p class="border-t border-slate-400 w-44 font-bold text-slate-800">Guru Bertugas / Penasihat</p>
-            </div>
-            <div>
-              <p class="font-semibold text-slate-700">Disahkan Oleh:</p>
-              <div class="h-12"></div>
-              <p id="p-cop-pengesah" class="border-t border-slate-400 w-44 font-bold text-slate-800">Penolong Kanan / Pentadbir</p>
-            </div>
-          </div>
+        <!-- KANDUNGAN CETAKAN SEBENAR -->
+        <div id="printContentDetails" class="hidden flex-1 flex flex-col justify-between h-full">
           
-          <div class="text-[9px] text-slate-400 text-right pt-0.5">
-            Dicetak melalui Sistem Pelaporan Satu Muka SMKKA | Kemaskini: <span id="p-last-update">-</span>
+          <div>
+            <!-- KEPALA SURAT KREATIF DENGAN GRAPHICAL MOTIF & UNIT HEADER -->
+            <div id="printUnitHeader" class="relative text-white p-4 rounded-xl shadow-sm mb-3.5 flex items-center justify-between overflow-hidden" style="background-color: #800000;">
+              
+              <!-- Hiasan Geometrik Latar Belakang -->
+              <div class="absolute -right-8 -bottom-10 w-44 h-44 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+              <div class="absolute right-20 top-2 w-24 h-24 bg-black/10 rounded-full pointer-events-none"></div>
+
+              <div class="flex items-center gap-3.5 relative z-10">
+                <img src="logo.png" alt="Logo SMKKA" class="w-14 h-14 object-contain bg-white rounded-xl p-1 shadow">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h2 class="text-base font-black uppercase tracking-wider text-white drop-shadow-sm">SMK KAMARUL ARIFFIN</h2>
+                    <span id="p-unit-tag" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-white/20 tracking-wider text-white border border-white/25">
+                      KOKURIKULUM
+                    </span>
+                  </div>
+                  <p class="text-[11px] text-white/90 leading-tight">Jalan Tenang, 85300 Labis, Johor Darul Ta'zim | Kod Sekolah: JEA7039 | Tel: 07-9255793</p>
+                  <h3 id="p-unit-badge" class="text-xs font-bold uppercase tracking-wide mt-1 text-amber-200 flex items-center gap-1.5">
+                    <span id="p-unit-icon"><i data-lucide="award" class="w-3.5 h-3.5 inline"></i></span>
+                    <span id="p-unit-title">LAPORAN AKTIVITI KOKURIKULUM</span>
+                  </h3>
+                </div>
+              </div>
+
+              <div class="text-right relative z-10 hidden sm:flex flex-col items-end">
+                <div class="flex items-center gap-1 px-2.5 py-1 bg-black/25 rounded-md border border-white/20 text-[10px] font-bold text-white uppercase tracking-wider">
+                  <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-300"></i> Format Satu Muka
+                </div>
+                <span class="text-[9px] text-white/75 mt-1 font-mono">Dokumen Rasmi Sekolah</span>
+              </div>
+            </div>
+
+            <!-- JADUAL MAKLUMAT AKTIVITI (COMPACT & MODERN CARD TABLE) -->
+            <table class="w-full text-xs border-collapse border border-slate-300 rounded-lg overflow-hidden mb-3">
+              <tr>
+                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 w-1/4">Nama Aktiviti / Program</td>
+                <td id="p-aktiviti" class="border border-slate-300 p-2 font-black text-slate-900 text-xs tracking-wide"></td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700">Unit / Sektor</td>
+                <td id="p-unit-text" class="border border-slate-300 p-2 font-semibold text-slate-800"></td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700">Tarikh & Hari Pelaksanaan</td>
+                <td id="p-tarikh" class="border border-slate-300 p-2 text-slate-800 font-medium"></td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 align-top">Penerangan / Pengisian Aktiviti</td>
+                <td id="p-penerangan" class="border border-slate-300 p-2 whitespace-pre-line leading-relaxed text-slate-800 font-normal"></td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 align-top">Hasil / Impak / Dapatan</td>
+                <td id="p-hasil" class="border border-slate-300 p-2 whitespace-pre-line leading-relaxed text-slate-800 font-normal"></td>
+              </tr>
+            </table>
           </div>
+
+          <!-- DOKUMENTASI BERGAMBAR: AUTO-FLEX CONTAINER UNTUK MENGISI RUANG KERTAS A4 -->
+          <div class="flex-1 flex flex-col justify-start my-2 min-h-[120mm]">
+            <div class="flex items-center justify-between border-b-2 pb-1 mb-2 border-slate-200">
+              <h4 class="font-black text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="camera" class="w-3.5 h-3.5 text-slate-600"></i> Evidens & Dokumentasi Bergambar:
+              </h4>
+              <span class="text-[10px] font-semibold text-slate-500 italic">Bukti Pelaksanaan Aktiviti</span>
+            </div>
+
+            <!-- BEKAS GAMBAR YANG MEMBESAR MENGIKUT BAKI RUANG KERTAS -->
+            <div id="printImagesContainer" class="flex-1 grid gap-2.5 w-full items-stretch">
+              <!-- Dijana secara dinamik oleh JavaScript -->
+            </div>
+          </div>
+
+          <!-- RUANGAN PENGESAHAN BAWAH & WATERMARK SEKOLAH -->
+          <div class="pt-2 border-t border-slate-300">
+            <div class="grid grid-cols-2 gap-8 text-xs">
+              <div>
+                <p class="font-semibold text-slate-700">Disediakan Oleh:</p>
+                <div class="h-10"></div>
+                <p class="border-t border-slate-500 w-44 font-bold text-slate-900 pt-0.5">Guru Bertugas / Penasihat</p>
+                <p class="text-[10px] text-slate-500">SMK Kamarul Ariffin</p>
+              </div>
+              <div>
+                <p class="font-semibold text-slate-700">Disahkan Oleh:</p>
+                <div class="h-10"></div>
+                <p id="p-cop-pengesah" class="border-t border-slate-500 w-48 font-bold text-slate-900 pt-0.5">GPK Kokurikulum SMKKA</p>
+                <p class="text-[10px] text-slate-500">SMK Kamarul Ariffin</p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[9px] text-slate-400 pt-2.5 mt-2 border-t border-slate-100">
+              <span>Sistem Pelaporan Satu Muka SMK Kamarul Ariffin &bull; Versi Digital 2026</span>
+              <span>Tarikh Cetakan: <span id="p-print-date">-</span> &bull; Rekod: <span id="p-last-update">-</span></span>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -336,14 +383,56 @@
     let currentFilter = "SEMUA";
     const base64Images = ["", "", "", ""];
 
-    // Skim Warna Rasmi Mengikut Unit
-    const UNIT_COLORS = {
-      'Kokurikulum': { bg: '#800000', label: 'Maroon', badge: 'bg-red-900 text-white' },
-      'Koakademik': { bg: '#c2410c', label: 'Jingga', badge: 'bg-orange-700 text-white' },
-      'Kurikulum': { bg: '#1d4ed8', label: 'Biru Diraja', badge: 'bg-blue-700 text-white' },
-      'Hem': { bg: '#4338ca', label: 'Indigo', badge: 'bg-indigo-700 text-white' },
-      'Pentadbiran': { bg: '#047857', label: 'Hijau Zamrud', badge: 'bg-emerald-700 text-white' },
-      'Lain-lain': { bg: '#334155', label: 'Kelabu Gelap', badge: 'bg-slate-700 text-white' }
+    // Skim Warna & Grafik Ikon Mengikut Unit
+    const UNIT_CONFIG = {
+      'Kokurikulum': { 
+        bg: '#800000', 
+        icon: 'trophy', 
+        label: 'Kokurikulum', 
+        badge: 'bg-red-900 text-white',
+        title: 'LAPORAN AKTIVITI KOKURIKULUM',
+        cop: 'GPK Kokurikulum SMKKA'
+      },
+      'Koakademik': { 
+        bg: '#c2410c', 
+        icon: 'sparkles', 
+        label: 'Koakademik', 
+        badge: 'bg-orange-700 text-white',
+        title: 'LAPORAN AKTIVITI KOAKADEMIK',
+        cop: 'GPK Kokurikulum / Koakademik SMKKA'
+      },
+      'Kurikulum': { 
+        bg: '#1d4ed8', 
+        icon: 'book-open', 
+        label: 'Kurikulum', 
+        badge: 'bg-blue-700 text-white',
+        title: 'LAPORAN PROGRAM KURIKULUM & AKADEMIK',
+        cop: 'GPK Pentadbiran & Kurikulum SMKKA'
+      },
+      'Hem': { 
+        bg: '#4338ca', 
+        icon: 'shield-check', 
+        label: 'HEM', 
+        badge: 'bg-indigo-700 text-white',
+        title: 'LAPORAN HAL EHWAL MURID (HEM)',
+        cop: 'GPK Hal Ehwal Murid SMKKA'
+      },
+      'Pentadbiran': { 
+        bg: '#047857', 
+        icon: 'building-2', 
+        label: 'Pentadbiran', 
+        badge: 'bg-emerald-700 text-white',
+        title: 'LAPORAN PROGRAM PENTADBIRAN & PENGURUSAN',
+        cop: 'Pengetua / Pentadbir SMKKA'
+      },
+      'Lain-lain': { 
+        bg: '#334155', 
+        icon: 'folder-kanban', 
+        label: 'Lain-lain', 
+        badge: 'bg-slate-700 text-white',
+        title: 'LAPORAN DOKUMENTASI PROGRAM SEKOLAH',
+        cop: 'Pentadbir SMKKA'
+      }
     };
 
     lucide.createIcons();
@@ -369,7 +458,7 @@
       document.getElementById('hari').value = days[date.getDay()];
     }
 
-    // Fungsi automatik: Kecilkan dimensi gambar besar dan muat penuh tanpa terpotong
+    // Auto resize & mampatkan gambar
     function previewImage(input, index) {
       if (input.files && input.files[0]) {
         const file = input.files[0];
@@ -378,8 +467,7 @@
         reader.onload = function(e) {
           const img = new Image();
           img.onload = function() {
-            // Skalakan gambar besar kepada dimensi maksimum 1000px agar muat dan ringan
-            const maxDim = 1000;
+            const maxDim = 1100;
             let width = img.width;
             let height = img.height;
 
@@ -397,7 +485,7 @@
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
 
-            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.88);
 
             const prevEl = document.getElementById(`prev-${index}`);
             prevEl.src = compressedBase64;
@@ -411,7 +499,7 @@
       }
     }
 
-    // Hantar Borang
+    // Hantar data ke Google Apps Script
     async function submitForm(e) {
       e.preventDefault();
 
@@ -459,7 +547,7 @@
       }
     }
 
-    // Muat Turun Data dari Google Sheets
+    // Muat data dari Google Sheets (JSONP kalis CORS)
     function loadDataFromSheets() {
       const tbody = document.getElementById('dashboardTableBody');
       tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500"><i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Sedang memuat data dari Google Sheets...</td></tr>`;
@@ -518,13 +606,13 @@
       filtered.forEach(item => {
         const rawIndex = storedReports.findIndex(orig => orig['ID'] === item['ID']);
         const unitName = item['Unit'] || 'Kokurikulum';
-        const colorCfg = UNIT_COLORS[unitName] || UNIT_COLORS['Lain-lain'];
+        const cfg = UNIT_CONFIG[unitName] || UNIT_CONFIG['Lain-lain'];
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50/80 border-b transition";
         tr.innerHTML = `
           <td class="p-3.5">
-            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${colorCfg.badge}">
+            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${cfg.badge}">
               ${unitName}
             </span>
           </td>
@@ -620,7 +708,7 @@
       renderPrintTemplate(index);
     }
 
-    // Papar Lembaran Cetakan dengan Gambar yang Dikecilkan Tanpa Terpotong (object-contain)
+    // RENDERING CETAKAN A4: MEMBESARKAN RUANG GAMBAR SECARA PINTAR
     function renderPrintTemplate(index) {
       if (index === "" || !storedReports[index]) {
         document.getElementById('printContentPlaceholder').classList.remove('hidden');
@@ -630,23 +718,17 @@
 
       const d = storedReports[index];
       const unitName = d['Unit'] || 'Kokurikulum';
-      const colorCfg = UNIT_COLORS[unitName] || UNIT_COLORS['Lain-lain'];
+      const cfg = UNIT_CONFIG[unitName] || UNIT_CONFIG['Lain-lain'];
 
+      // Kemaskini Tajuk, Header, dan Lencana Visual Unit
       const headerEl = document.getElementById('printUnitHeader');
-      headerEl.style.backgroundColor = colorCfg.bg;
-      document.getElementById('p-unit-badge').textContent = `LAPORAN AKTIVITI ${unitName.toUpperCase()}`;
-      document.getElementById('p-unit-text').textContent = unitName;
+      headerEl.style.backgroundColor = cfg.bg;
+      document.getElementById('p-unit-tag').textContent = cfg.label.toUpperCase();
+      document.getElementById('p-unit-title').textContent = cfg.title;
+      document.getElementById('p-unit-text').textContent = `${unitName} (SMK Kamarul Ariffin)`;
+      document.getElementById('p-cop-pengesah').textContent = cfg.cop;
 
-      const copEl = document.getElementById('p-cop-pengesah');
-      if (unitName === 'Kokurikulum' || unitName === 'Koakademik') {
-        copEl.textContent = "GPK Kokurikulum SMKKA";
-      } else if (unitName === 'Kurikulum') {
-        copEl.textContent = "GPK Pentadbiran & Kurikulum SMKKA";
-      } else if (unitName === 'Hem') {
-        copEl.textContent = "GPK Hal Ehwal Murid SMKKA";
-      } else {
-        copEl.textContent = "Pengetua / Pentadbir SMKKA";
-      }
+      document.getElementById('p-unit-icon').innerHTML = `<i data-lucide="${cfg.icon}" class="w-4 h-4 inline text-amber-200"></i>`;
 
       document.getElementById('p-aktiviti').textContent = d['Aktiviti'] || '-';
       document.getElementById('p-tarikh').textContent = `${d['Tarikh'] || '-'} (${d['Hari'] || '-'})`;
@@ -654,35 +736,87 @@
       document.getElementById('p-hasil').textContent = d['Hasil'] || '-';
       document.getElementById('p-last-update').textContent = d['Kemaskini Terakhir'] || 'Asal';
 
+      const now = new Date();
+      document.getElementById('p-print-date').textContent = now.toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+      // Susun atur gambar dokumentasi (mengisi ruang mengikut jumlah gambar)
       const container = document.getElementById('printImagesContainer');
       container.innerHTML = '';
 
-      let count = 0;
+      const validImages = [];
       for (let i = 1; i <= 4; i++) {
-        const imgKey = `Gambar ${i}`;
-        if (d[imgKey] && d[imgKey].trim() !== "") {
-          count++;
-          const div = document.createElement('div');
-          // Kotak seragam dengan h-44 dan object-contain supaya gambar penuh muat tanpa terpotong
-          div.className = "border border-slate-300 rounded p-1.5 text-center bg-slate-100 flex flex-col items-center justify-between";
-          div.innerHTML = `
-            <div class="w-full h-36 flex items-center justify-center bg-white rounded overflow-hidden">
-              <img class="max-w-full max-h-full object-contain" src="${d[imgKey]}" alt="Gambar ${count}">
-            </div>
-            <p class="text-[10px] text-slate-700 mt-1 font-semibold">Gambar ${count}</p>
-          `;
-          container.appendChild(div);
+        const key = `Gambar ${i}`;
+        if (d[key] && d[key].trim() !== '') {
+          validImages.push(d[key]);
         }
       }
 
-      if (count === 1) {
-        container.className = "grid grid-cols-1 max-w-sm mx-auto gap-2.5";
+      const totalImg = validImages.length;
+
+      // Konfigurasi Grid & Ketinggian Frame Gambar
+      if (totalImg === 1) {
+        // Jika 1 gambar: jadikan hero frame besar di tengah-tengah
+        container.className = "flex-1 flex flex-col items-center justify-center w-full";
+        const div = document.createElement('div');
+        div.className = "w-full max-w-xl h-full max-h-[145mm] border-2 border-slate-300 rounded-xl p-2 bg-slate-50 shadow-inner flex flex-col justify-between";
+        div.innerHTML = `
+          <div class="w-full flex-1 flex items-center justify-center bg-white rounded-lg overflow-hidden">
+            <img class="max-w-full max-h-full object-contain" src="${validImages[0]}" alt="Evidens Bergambar 1">
+          </div>
+          <p class="text-[11px] text-slate-600 text-center mt-1.5 font-bold tracking-wide uppercase">DOKUMENTASI FOKUS PROGRAM</p>
+        `;
+        container.appendChild(div);
+
+      } else if (totalImg === 2) {
+        // Jika 2 gambar: paparkan bersebelahan atau dua kad menegak tinggi
+        container.className = "flex-1 grid grid-cols-2 gap-3.5 items-stretch";
+        validImages.forEach((url, i) => {
+          const div = document.createElement('div');
+          div.className = "border border-slate-300 rounded-xl p-2 bg-slate-50 shadow-sm flex flex-col justify-between h-full";
+          div.innerHTML = `
+            <div class="w-full flex-1 flex items-center justify-center bg-white rounded-lg overflow-hidden min-h-[110mm]">
+              <img class="max-w-full max-h-full object-contain" src="${url}" alt="Gambar ${i + 1}">
+            </div>
+            <p class="text-[10px] text-slate-700 text-center mt-1 font-bold">Gambar Dokumentasi ${i + 1}</p>
+          `;
+          container.appendChild(div);
+        });
+
+      } else if (totalImg === 3) {
+        // Jika 3 gambar: 1 gambar atas lebar, 2 gambar bawah seimbang
+        container.className = "flex-1 grid grid-cols-2 gap-2.5 items-stretch";
+        validImages.forEach((url, i) => {
+          const div = document.createElement('div');
+          const spanClass = (i === 0) ? "col-span-2 min-h-[70mm]" : "col-span-1 min-h-[55mm]";
+          div.className = `border border-slate-300 rounded-xl p-1.5 bg-slate-50 shadow-sm flex flex-col justify-between ${spanClass}`;
+          div.innerHTML = `
+            <div class="w-full flex-1 flex items-center justify-center bg-white rounded-lg overflow-hidden">
+              <img class="max-w-full max-h-full object-contain" src="${url}" alt="Gambar ${i + 1}">
+            </div>
+            <p class="text-[10px] text-slate-700 text-center mt-1 font-semibold">Gambar Dokumentasi ${i + 1}</p>
+          `;
+          container.appendChild(div);
+        });
+
       } else {
-        container.className = "grid grid-cols-2 gap-2.5";
+        // Jika 4 gambar: grid seimbang 2x2 memenuhi ruang kertas
+        container.className = "flex-1 grid grid-cols-2 gap-2.5 items-stretch";
+        validImages.forEach((url, i) => {
+          const div = document.createElement('div');
+          div.className = "border border-slate-300 rounded-xl p-1.5 bg-slate-50 shadow-sm flex flex-col justify-between min-h-[55mm]";
+          div.innerHTML = `
+            <div class="w-full flex-1 flex items-center justify-center bg-white rounded-lg overflow-hidden">
+              <img class="max-w-full max-h-full object-contain" src="${url}" alt="Gambar ${i + 1}">
+            </div>
+            <p class="text-[10px] text-slate-700 text-center mt-1 font-semibold">Gambar Dokumentasi ${i + 1}</p>
+          `;
+          container.appendChild(div);
+        });
       }
 
       document.getElementById('printContentPlaceholder').classList.add('hidden');
       document.getElementById('printContentDetails').classList.remove('hidden');
+      lucide.createIcons();
     }
   </script>
 </body>
