@@ -33,7 +33,6 @@
       .no-print {
         display: none !important;
       }
-      /* Pastikan warna latar cetakan keluar */
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -81,7 +80,7 @@
           <i data-lucide="edit-3" class="w-5 h-5 text-amber-600"></i>
           <span>Mod Kemaskini: Anda sedang menyunting laporan <b><span id="editReportIdText"></span></b></span>
         </div>
-        <button onclick="cancelEditMode()" class="text-xs bg-amber-200 hover:bg-amber-300 text-amber-900 px-2.5 py-1 rounded font-semibold transition">Batal</button>
+        <button type="button" onclick="cancelEditMode()" class="text-xs bg-amber-200 hover:bg-amber-300 text-amber-900 px-2.5 py-1 rounded font-semibold transition">Batal</button>
       </div>
 
       <div class="border-b pb-4 mb-6 flex items-center justify-between">
@@ -97,7 +96,7 @@
       <form id="laporanForm" onsubmit="submitForm(event)" class="space-y-5">
         <input type="hidden" id="reportId" value="">
 
-        <!-- DATA PILIHAN: AKTIVITI UNIT (PALING ATAS) -->
+        <!-- DATA PILIHAN: AKTIVITI UNIT -->
         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
           <label class="block text-sm font-bold text-slate-800 mb-1 flex items-center gap-1.5">
             <i data-lucide="layers" class="w-4 h-4 text-sky-600"></i> Aktiviti Unit <span class="text-red-500">*</span>
@@ -184,8 +183,10 @@
           </div>
         </div>
 
+        <!-- BUTANG HANTAR (DIBETULKAN DENGAN SPAN BER-ID btnSubmitText) -->
         <button type="submit" id="btnSubmit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-lg shadow transition flex justify-center items-center gap-2">
-          <i data-lucide="send" class="w-4 h-4"></i> <span id="btnSubmitText">Simpan Laporan ke Google</span>
+          <i data-lucide="send" class="w-4 h-4"></i>
+          <span id="btnSubmitText">Simpan Laporan ke Google</span>
         </button>
       </form>
     </section>
@@ -394,7 +395,8 @@
 
       const btn = document.getElementById('btnSubmit');
       btn.disabled = true;
-      btn.innerText = existingId ? "Sedang mengemas kini laporan..." : "Sedang menyimpan laporan...";
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span>${existingId ? 'Sedang mengemas kini...' : 'Sedang menyimpan...'}</span>`;
+      lucide.createIcons();
 
       const payload = {
         id: existingId,
@@ -422,7 +424,9 @@
         alert("Ralat semasa penghantaran: " + error.message);
       } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> <span id="btnSubmitText">${existingId ? 'Simpan Kemaskini' : 'Simpan Laporan ke Google'}</span>`;
+        const currentId = document.getElementById('reportId') ? document.getElementById('reportId').value : '';
+        const labelText = currentId ? 'Simpan Kemaskini' : 'Simpan Laporan ke Google';
+        btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> <span id="btnSubmitText">${labelText}</span>`;
         lucide.createIcons();
       }
     }
@@ -566,7 +570,8 @@
         }
       }
 
-      document.getElementById('btnSubmitText').textContent = "Kemaskini Rekod Laporan Ini";
+      const btnText = document.getElementById('btnSubmitText');
+      if (btnText) btnText.textContent = "Kemaskini Rekod Laporan Ini";
       lucide.createIcons();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -576,7 +581,9 @@
       document.getElementById('laporanForm').reset();
       document.getElementById('reportId').value = "";
       document.getElementById('editModeAlert').classList.add('hidden');
-      document.getElementById('btnSubmitText').textContent = "Simpan Laporan ke Google";
+      
+      const btnText = document.getElementById('btnSubmitText');
+      if (btnText) btnText.textContent = "Simpan Laporan ke Google";
 
       for (let i = 1; i <= 4; i++) {
         document.getElementById(`prev-${i}`).classList.add('hidden');
