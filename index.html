@@ -3,10 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Pelaporan Kokurikulum SMK Kamarul Ariffin</title>
+  <title>Sistem Pelaporan Satu Muka - SMK Kamarul Ariffin</title>
+  
+  <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="logo.png">
+  
   <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  
   <style>
     @media print {
       body * {
@@ -22,35 +27,42 @@
         width: 100%;
         margin: 0;
         padding: 0;
+        box-shadow: none !important;
+        border: none !important;
       }
       .no-print {
         display: none !important;
+      }
+      /* Pastikan warna latar cetakan keluar */
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
     }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
-  <!-- HEADER -->
-  <header class="bg-sky-700 text-white shadow-md sticky top-0 z-50 no-print">
+  <!-- HEADER SISTEM -->
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50 no-print border-b border-slate-700">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
       <div class="flex items-center space-x-3">
-        <img src="logo.png" alt="Logo SMKKA" class="w-12 h-12 object-contain bg-white rounded-full p-1 shadow">
+        <img src="logo.png" alt="Logo SMKKA" class="w-11 h-11 object-contain bg-white rounded-full p-1 shadow">
         <div>
-          <h1 class="text-lg font-bold tracking-wide">SMK KAMARUL ARIFFIN</h1>
-          <p class="text-xs text-sky-200">Sistem Pelaporan & Pemantauan Kokurikulum</p>
+          <h1 class="text-lg font-extrabold tracking-wide uppercase">Sistem Pelaporan Satu Muka</h1>
+          <p class="text-xs text-sky-300 font-medium">SMK Kamarul Ariffin, Labis, Johor</p>
         </div>
       </div>
 
-      <!-- NAVIGASI 3 MENU -->
-      <nav class="flex space-x-2 bg-sky-800/60 p-1 rounded-lg">
-        <button onclick="switchTab('form')" id="btn-form" class="nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 bg-white text-sky-800 shadow">
-          <i data-lucide="plus-circle" class="w-4 h-4"></i> Pelaporan Aktiviti
+      <!-- 3 MENU UTAMA -->
+      <nav class="flex space-x-2 bg-slate-800/80 p-1 rounded-lg border border-slate-700">
+        <button onclick="switchTab('form')" id="btn-form" class="nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 bg-white text-slate-900 shadow">
+          <i data-lucide="plus-circle" class="w-4 h-4 text-sky-600"></i> Pelaporan Aktiviti
         </button>
-        <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 text-white hover:bg-sky-600">
+        <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-700">
           <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
         </button>
-        <button onclick="switchTab('print')" id="btn-print" class="nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 text-white hover:bg-sky-600">
+        <button onclick="switchTab('print')" id="btn-print" class="nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-700">
           <i data-lucide="printer" class="w-4 h-4"></i> Cetakan Pelaporan
         </button>
       </nav>
@@ -61,57 +73,89 @@
   <main class="max-w-7xl mx-auto p-4 md:p-6 flex-1 w-full">
 
     <!-- 1. MENU: BORANG PELAPORAN -->
-    <section id="menu-form" class="max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow border border-slate-100">
-      <div class="border-b pb-4 mb-6">
-        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <i data-lucide="file-pen" class="text-sky-600"></i> Borang Pelaporan Aktiviti Mingguan
-        </h2>
-        <p class="text-xs text-slate-500">Sila lengkapkan maklumat aktiviti. Gambar 1 adalah wajib manakala Gambar 2 hingga 4 adalah pilihan.</p>
+    <section id="menu-form" class="max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200">
+      
+      <!-- Pemberitahuan Mod Kemaskini -->
+      <div id="editModeAlert" class="hidden mb-5 p-3.5 bg-amber-50 border border-amber-300 rounded-lg flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sm text-amber-800 font-medium">
+          <i data-lucide="edit-3" class="w-5 h-5 text-amber-600"></i>
+          <span>Mod Kemaskini: Anda sedang menyunting laporan <b><span id="editReportIdText"></span></b></span>
+        </div>
+        <button onclick="cancelEditMode()" class="text-xs bg-amber-200 hover:bg-amber-300 text-amber-900 px-2.5 py-1 rounded font-semibold transition">Batal</button>
+      </div>
+
+      <div class="border-b pb-4 mb-6 flex items-center justify-between">
+        <div>
+          <h2 id="formTitle" class="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <i data-lucide="file-pen-line" class="text-sky-600"></i> Borang Pelaporan Aktiviti SMK Kamarul Ariffin
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">Sila isikan maklumat aktiviti dengan lengkap. Gambar 1 adalah wajib (maksimum 4).</p>
+        </div>
+        <img src="logo.png" alt="Logo SMKKA" class="w-10 h-10 object-contain hidden sm:block opacity-80">
       </div>
 
       <form id="laporanForm" onsubmit="submitForm(event)" class="space-y-5">
+        <input type="hidden" id="reportId" value="">
+
+        <!-- DATA PILIHAN: AKTIVITI UNIT (PALING ATAS) -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <label class="block text-sm font-bold text-slate-800 mb-1 flex items-center gap-1.5">
+            <i data-lucide="layers" class="w-4 h-4 text-sky-600"></i> Aktiviti Unit <span class="text-red-500">*</span>
+          </label>
+          <select id="aktivitiUnit" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm bg-white font-semibold focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <option value="">-- Sila Pilih Unit --</option>
+            <option value="Kokurikulum">Kokurikulum</option>
+            <option value="Koakademik">Koakademik</option>
+            <option value="Kurikulum">Kurikulum</option>
+            <option value="Hem">HEM (Hal Ehwal Murid)</option>
+            <option value="Pentadbiran">Pentadbiran</option>
+            <option value="Lain-lain">Lain-lain</option>
+          </select>
+          <p class="text-[11px] text-slate-500 mt-1">Warna tema pada kepala cetakan laporan rasmi dijana mengikut unit yang dipilih.</p>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1">Tarikh Aktiviti <span class="text-red-500">*</span></label>
-            <input type="date" id="tarikh" required onchange="autoFillDay(this.value)" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <input type="date" id="tarikh" required onchange="autoFillDay(this.value)" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
           </div>
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1">Hari</label>
-            <input type="text" id="hari" readonly placeholder="cth: Rabu" class="w-full bg-slate-100 border rounded-lg p-2.5 text-sm font-medium text-slate-600">
+            <input type="text" id="hari" readonly placeholder="cth: Rabu" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-2.5 text-sm font-medium text-slate-600">
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Aktiviti / Unit <span class="text-red-500">*</span></label>
-          <input type="text" id="aktiviti" required placeholder="cth: Perjumpaan Kadet Remaja Sekolah / Kelab Bola Jaring" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Aktiviti / Program <span class="text-red-500">*</span></label>
+          <input type="text" id="aktiviti" required placeholder="cth: Perjumpaan Kadet Remaja Sekolah / Program Motivasi Calon SPM" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Penerangan Aktiviti <span class="text-red-500">*</span></label>
-          <textarea id="penerangan" rows="3" required placeholder="Nyatakan perjalanan atau modul aktiviti yang telah dijalankan..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <textarea id="penerangan" rows="3" required placeholder="Nyatakan perjalanan program, agenda, atau modul yang telah dijalankan..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Hasil / Dapatan Aktiviti <span class="text-red-500">*</span></label>
-          <textarea id="hasil" rows="3" required placeholder="Pencapaian murid, penguasaan kemahiran, atau refleksi program..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <textarea id="hasil" rows="3" required placeholder="Penglibatan murid, pencapaian objektif, kemahiran yang dikuasai, atau refleksi program..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
-        <!-- UPLOAD GAMBAR (1 WAJIB, 3 PILIHAN) -->
+        <!-- UPLOAD GAMBAR DOKUMENTASI (1 WAJIB, 3 PILIHAN) -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Muat Naik Gambar Dokumentasi (1 hingga 4 Keping)</label>
-          <p class="text-xs text-slate-500 mb-2">Gambar 1 <span class="text-red-500 font-semibold">*Wajib</span>, Gambar 2-4 adalah pilihan (maksimum 4).</p>
+          <p class="text-xs text-slate-500 mb-2">Gambar 1 <span class="text-red-500 font-semibold">*Wajib</span>. Semasa mod kemaskini, biarkan kosong jika ingin mengekalkan gambar sedia ada.</p>
           
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <!-- Gambar 1 (Wajib) -->
+            <!-- Gambar 1 -->
             <div class="border-2 border-dashed border-sky-400 bg-sky-50/40 rounded-lg p-2 text-center flex flex-col items-center justify-center relative min-h-[140px]">
-              <input type="file" id="file-1" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 1)" required>
+              <input type="file" id="file-1" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 1)">
               <img id="prev-1" class="hidden w-full h-24 object-cover rounded mb-1">
               <span id="txt-1" class="text-xs text-slate-600 flex flex-col items-center">
                 <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-sky-600"></i> Gambar 1 <span class="text-[10px] text-red-500 font-bold">(Wajib)</span>
               </span>
             </div>
 
-            <!-- Gambar 2 (Pilihan) -->
+            <!-- Gambar 2 -->
             <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative min-h-[140px] bg-slate-50">
               <input type="file" id="file-2" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 2)">
               <img id="prev-2" class="hidden w-full h-24 object-cover rounded mb-1">
@@ -120,7 +164,7 @@
               </span>
             </div>
 
-            <!-- Gambar 3 (Pilihan) -->
+            <!-- Gambar 3 -->
             <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative min-h-[140px] bg-slate-50">
               <input type="file" id="file-3" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 3)">
               <img id="prev-3" class="hidden w-full h-24 object-cover rounded mb-1">
@@ -129,7 +173,7 @@
               </span>
             </div>
 
-            <!-- Gambar 4 (Pilihan) -->
+            <!-- Gambar 4 -->
             <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative min-h-[140px] bg-slate-50">
               <input type="file" id="file-4" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 4)">
               <img id="prev-4" class="hidden w-full h-24 object-cover rounded mb-1">
@@ -140,112 +184,144 @@
           </div>
         </div>
 
-        <button type="submit" id="btnSubmit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 rounded-lg shadow transition flex justify-center items-center gap-2">
-          <i data-lucide="send" class="w-4 h-4"></i> Hantar Laporan ke Google
+        <button type="submit" id="btnSubmit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-lg shadow transition flex justify-center items-center gap-2">
+          <i data-lucide="send" class="w-4 h-4"></i> <span id="btnSubmitText">Simpan Laporan ke Google</span>
         </button>
       </form>
     </section>
 
-    <!-- 2. MENU: DASHBOARD -->
-    <section id="menu-dashboard" class="hidden space-y-6">
-      <div class="flex justify-between items-center">
+    <!-- 2. MENU: DASHBOARD (MENGIKUT UNIT) -->
+    <section id="menu-dashboard" class="hidden space-y-5">
+      <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200">
         <div>
-          <h2 class="text-xl font-bold text-slate-800">Senarai Laporan Aktiviti</h2>
-          <p class="text-xs text-slate-500">Rekod data dimuat turun daripada Google Sheets.</p>
+          <h2 class="text-xl font-bold text-slate-800">Senarai Laporan Aktiviti Sekolah</h2>
+          <p class="text-xs text-slate-500">Papar dan tapis rekod mengikut Aktiviti Unit serta kemas kini laporan sedia ada.</p>
         </div>
-        <button onclick="loadDataFromSheets()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 rounded text-xs font-semibold flex items-center gap-1 transition">
+        <button onclick="loadDataFromSheets()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Segar Semula
         </button>
       </div>
 
-      <div class="bg-white rounded-xl shadow border border-slate-200 overflow-x-auto">
+      <!-- PENAPIS UNIT (FILTER TABS) -->
+      <div class="flex flex-wrap gap-2 pt-1">
+        <button onclick="filterByUnit('SEMUA')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold transition bg-slate-800 text-white shadow-sm" data-unit="SEMUA">Semua Unit</button>
+        <button onclick="filterByUnit('Kokurikulum')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Kokurikulum">Kokurikulum</button>
+        <button onclick="filterByUnit('Koakademik')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Koakademik">Koakademik</button>
+        <button onclick="filterByUnit('Kurikulum')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Kurikulum">Kurikulum</button>
+        <button onclick="filterByUnit('Hem')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Hem">HEM</button>
+        <button onclick="filterByUnit('Pentadbiran')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Pentadbiran">Pentadbiran</button>
+        <button onclick="filterByUnit('Lain-lain')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Lain-lain">Lain-lain</button>
+      </div>
+
+      <!-- JADUAL DASHBOARD -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
         <table class="w-full text-left text-sm">
-          <thead class="bg-slate-100 border-b text-slate-700 uppercase text-xs font-semibold">
+          <thead class="bg-slate-100/80 border-b text-slate-700 uppercase text-xs font-bold">
             <tr>
-              <th class="p-3">Tarikh / Hari</th>
-              <th class="p-3">Aktiviti</th>
-              <th class="p-3">Penerangan</th>
-              <th class="p-3">Hasil / Dapatan</th>
-              <th class="p-3 text-center">Tindakan</th>
+              <th class="p-3.5">Unit</th>
+              <th class="p-3.5">Tarikh & Hari</th>
+              <th class="p-3.5">Aktiviti / Program</th>
+              <th class="p-3.5">Penerangan Ringkas</th>
+              <th class="p-3.5">Kemaskini Terakhir</th>
+              <th class="p-3.5 text-center">Tindakan</th>
             </tr>
           </thead>
           <tbody id="dashboardTableBody" class="divide-y text-slate-600">
             <tr>
-              <td colspan="5" class="p-4 text-center text-slate-400">Memuat data dari Google Sheets...</td>
+              <td colspan="6" class="p-5 text-center text-slate-400">Memuat data dari Google Sheets...</td>
             </tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- 3. MENU: CETAKAN PELAPORAN -->
+    <!-- 3. MENU: CETAKAN PELAPORAN (SATU MUKA) -->
     <section id="menu-print" class="hidden space-y-6">
-      <div class="flex flex-wrap justify-between items-center gap-4 no-print bg-white p-4 rounded-xl shadow border">
+      <div class="flex flex-wrap justify-between items-center gap-4 no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200">
         <div>
           <label class="text-sm font-semibold text-slate-700 block mb-1">Pilih Rekod Laporan untuk Dicetak:</label>
-          <select id="selectRecordToPrint" onchange="renderPrintTemplate(this.value)" class="border rounded-md p-2 text-sm min-w-[280px]">
+          <select id="selectRecordToPrint" onchange="renderPrintTemplate(this.value)" class="border border-slate-300 rounded-lg p-2 text-sm min-w-[280px] bg-white font-medium">
             <option value="">-- Pilih Aktiviti --</option>
           </select>
         </div>
-        <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg shadow text-sm font-semibold flex items-center gap-2">
-          <i data-lucide="printer" class="w-4 h-4"></i> Cetak Dokumen / Simpan PDF
+        <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg shadow text-sm font-bold flex items-center gap-2 transition">
+          <i data-lucide="printer" class="w-4 h-4"></i> Cetak Laporan (Satu Muka)
         </button>
       </div>
 
-      <!-- TEMPLAT CETAKAN A4 RASMI -->
-      <div id="printArea" class="bg-white p-8 md:p-12 rounded-xl shadow max-w-4xl mx-auto border border-slate-200">
-        <!-- Kepala Surat Rasmi SMKKA -->
-        <div class="flex items-center gap-6 border-b-2 border-slate-800 pb-4 mb-6">
-          <img src="logo.png" alt="Logo SMKKA" class="w-24 h-24 object-contain">
-          <div>
-            <h2 class="text-xl font-bold uppercase text-slate-900 tracking-wide">SMK KAMARUL ARIFFIN</h2>
-            <p class="text-xs text-slate-600">Jalan Tenang, 85300 Labis, Johor Darul Ta'zim</p>
-            <p class="text-xs text-slate-600">Kod Sekolah: JEA7039 | Tel: 07-9255793</p>
-            <p class="text-sm font-bold text-sky-800 mt-1 uppercase">Laporan Dokumentasi Aktiviti Kokurikulum</p>
+      <!-- TEMPLAT CETAKAN SATU MUKA A4 -->
+      <div id="printArea" class="bg-white p-8 rounded-xl shadow-sm max-w-4xl mx-auto border border-slate-200">
+        
+        <!-- KEPALA SURAT DENGAN HEADER BERWARNA MENGIKUT UNIT -->
+        <div id="printUnitHeader" class="text-white p-4 rounded-t-lg mb-4 flex items-center justify-between transition-colors" style="background-color: #800000;">
+          <div class="flex items-center gap-4">
+            <img src="logo.png" alt="Logo SMKKA" class="w-16 h-16 object-contain bg-white rounded-full p-1 shadow">
+            <div>
+              <h2 class="text-lg font-black uppercase tracking-wider text-white">SMK KAMARUL ARIFFIN</h2>
+              <p class="text-xs text-white/90">Jalan Tenang, 85300 Labis, Johor Darul Ta'zim | Kod Sekolah: JEA7039 | Tel: 07-9255793</p>
+              <h3 id="p-unit-badge" class="text-sm font-bold uppercase tracking-wide mt-1 text-amber-200">
+                LAPORAN AKTIVITI KOKURIKULUM
+              </h3>
+            </div>
+          </div>
+          <div class="text-right hidden sm:block">
+            <span class="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 bg-black/25 rounded border border-white/20">Format Satu Muka</span>
           </div>
         </div>
 
         <div id="printContentPlaceholder" class="text-center py-12 text-slate-400">
-          Sila pilih rekod laporan dari menu atas untuk memaparkan lembaran cetakan rasmi.
+          Sila pilih rekod aktiviti dari senarai di atas untuk memaparkan format cetakan.
         </div>
 
-        <div id="printContentDetails" class="hidden space-y-6">
-          <table class="w-full text-sm border-collapse border border-slate-300">
+        <div id="printContentDetails" class="hidden space-y-4">
+          <!-- JADUAL MAKLUMAT AKTIVITI -->
+          <table class="w-full text-xs border-collapse border border-slate-300">
             <tr>
-              <td class="border border-slate-300 p-2 font-bold bg-slate-50 w-1/4">Nama Aktiviti / Unit</td>
-              <td id="p-aktiviti" class="border border-slate-300 p-2 font-semibold text-slate-800"></td>
+              <td class="border border-slate-300 p-2 font-bold bg-slate-100 w-1/4">Nama Aktiviti / Program</td>
+              <td id="p-aktiviti" class="border border-slate-300 p-2 font-bold text-slate-900 text-sm"></td>
             </tr>
             <tr>
-              <td class="border border-slate-300 p-2 font-bold bg-slate-50">Tarikh & Hari</td>
+              <td class="border border-slate-300 p-2 font-bold bg-slate-100">Unit Terlibat</td>
+              <td id="p-unit-text" class="border border-slate-300 p-2 font-semibold"></td>
+            </tr>
+            <tr>
+              <td class="border border-slate-300 p-2 font-bold bg-slate-100">Tarikh & Hari</td>
               <td id="p-tarikh" class="border border-slate-300 p-2"></td>
             </tr>
             <tr>
-              <td class="border border-slate-300 p-2 font-bold bg-slate-50">Penerangan Aktiviti</td>
+              <td class="border border-slate-300 p-2 font-bold bg-slate-100">Penerangan Aktiviti</td>
               <td id="p-penerangan" class="border border-slate-300 p-2 whitespace-pre-line leading-relaxed"></td>
             </tr>
             <tr>
-              <td class="border border-slate-300 p-2 font-bold bg-slate-50">Hasil / Dapatan</td>
+              <td class="border border-slate-300 p-2 font-bold bg-slate-100">Hasil / Dapatan</td>
               <td id="p-hasil" class="border border-slate-300 p-2 whitespace-pre-line leading-relaxed"></td>
             </tr>
           </table>
 
+          <!-- DOKUMENTASI BERGAMBAR -->
           <div>
-            <h4 class="font-bold text-sm text-slate-800 mb-2 border-b pb-1">DOKUMENTASI BERGAMBAR:</h4>
-            <div id="printImagesContainer" class="grid grid-cols-2 gap-4"></div>
+            <h4 class="font-bold text-xs text-slate-800 mb-1.5 uppercase tracking-wide flex items-center gap-1.5">
+              <i data-lucide="image" class="w-3.5 h-3.5 text-slate-600"></i> Dokumentasi Bergambar:
+            </h4>
+            <div id="printImagesContainer" class="grid grid-cols-2 gap-3"></div>
           </div>
 
-          <!-- Tandatangan Pengesahan -->
-          <div class="grid grid-cols-2 gap-8 pt-8 text-sm">
+          <!-- RUANGAN TANDATANGAN PENGESAHAN -->
+          <div class="grid grid-cols-2 gap-8 pt-4 text-xs border-t border-slate-200 mt-3">
             <div>
-              <p class="font-medium">Disediakan Oleh:</p>
-              <div class="h-16"></div>
-              <p class="border-t border-slate-400 w-48 font-semibold">Guru Penasihat</p>
+              <p class="font-semibold text-slate-700">Disediakan Oleh:</p>
+              <div class="h-14"></div>
+              <p class="border-t border-slate-400 w-48 font-bold text-slate-800">Guru Bertugas / Penasihat</p>
             </div>
             <div>
-              <p class="font-medium">Disahkan Oleh:</p>
-              <div class="h-16"></div>
-              <p class="border-t border-slate-400 w-48 font-semibold">GPK Kokurikulum SMKKA</p>
+              <p class="font-semibold text-slate-700">Disahkan Oleh:</p>
+              <div class="h-14"></div>
+              <p id="p-cop-pengesah" class="border-t border-slate-400 w-48 font-bold text-slate-800">Penolong Kanan / Pentadbir</p>
             </div>
+          </div>
+          
+          <div class="text-[10px] text-slate-400 text-right pt-1">
+            Dicetak melalui Sistem Pelaporan Satu Muka SMKKA | Kemaskini: <span id="p-last-update">-</span>
           </div>
         </div>
       </div>
@@ -254,22 +330,32 @@
   </main>
 
   <script>
-    // URL WEB APP TERKINI DENGAN ID DEPLOYMENT ANDA
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzede3L7tgU4zUwW_qwOENAZdMAuEdjWSNZ_t6zqvTQRRZz0qHrbRgfPiVNUZxGiP7Ulw/exec";
 
     let storedReports = [];
+    let currentFilter = "SEMUA";
     const base64Images = ["", "", "", ""];
+
+    // Skim Warna Rasmi Mengikut Unit
+    const UNIT_COLORS = {
+      'Kokurikulum': { bg: '#800000', label: 'Maroon', badge: 'bg-red-900 text-white' },
+      'Koakademik': { bg: '#c2410c', label: 'Jingga', badge: 'bg-orange-700 text-white' },
+      'Kurikulum': { bg: '#1d4ed8', label: 'Biru Diraja', badge: 'bg-blue-700 text-white' },
+      'Hem': { bg: '#4338ca', label: 'Indigo', badge: 'bg-indigo-700 text-white' },
+      'Pentadbiran': { bg: '#047857', label: 'Hijau Zamrud', badge: 'bg-emerald-700 text-white' },
+      'Lain-lain': { bg: '#334155', label: 'Kelabu Gelap', badge: 'bg-slate-700 text-white' }
+    };
 
     lucide.createIcons();
 
     function switchTab(tab) {
       ['form', 'dashboard', 'print'].forEach(t => {
         document.getElementById(`menu-${t}`).classList.add('hidden');
-        document.getElementById(`btn-${t}`).className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 text-white hover:bg-sky-600";
+        document.getElementById(`btn-${t}`).className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-700";
       });
 
       document.getElementById(`menu-${tab}`).classList.remove('hidden');
-      document.getElementById(`btn-${tab}`).className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 bg-white text-sky-800 shadow";
+      document.getElementById(`btn-${tab}`).className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 bg-white text-slate-900 shadow";
 
       if (tab === 'dashboard' || tab === 'print') {
         loadDataFromSheets();
@@ -296,19 +382,23 @@
       }
     }
 
+    // Hantar Borang (Tambah Rekod Baharu atau Kemaskini Terus Rekod Sedia Ada)
     async function submitForm(e) {
       e.preventDefault();
 
-      if (!base64Images[0]) {
+      const existingId = document.getElementById('reportId').value;
+      if (!existingId && !base64Images[0]) {
         alert("Sila muat naik sekurang-kurangnya Gambar 1!");
         return;
       }
 
       const btn = document.getElementById('btnSubmit');
       btn.disabled = true;
-      btn.innerText = "Sedang menyimpan laporan ke Google Drive & Sheets...";
+      btn.innerText = existingId ? "Sedang mengemas kini laporan..." : "Sedang menyimpan laporan...";
 
       const payload = {
+        id: existingId,
+        unit: document.getElementById('aktivitiUnit').value,
         tarikh: document.getElementById('tarikh').value,
         hari: document.getElementById('hari').value,
         aktiviti: document.getElementById('aktiviti').value,
@@ -325,27 +415,22 @@
           body: JSON.stringify(payload)
         });
 
-        alert("Laporan berjaya dihantar dan disimpan ke Google Sheets!");
-        document.getElementById('laporanForm').reset();
-        for (let i = 1; i <= 4; i++) {
-          document.getElementById(`prev-${i}`).classList.add('hidden');
-          document.getElementById(`txt-${i}`).classList.remove('hidden');
-          base64Images[i - 1] = "";
-        }
+        alert(existingId ? "Laporan berjaya dikemaskini!" : "Laporan berjaya disimpan ke Google Sheets!");
+        cancelEditMode();
         switchTab('dashboard');
       } catch (error) {
-        alert("Ralat penghantaran: " + error.message);
+        alert("Ralat semasa penghantaran: " + error.message);
       } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> Hantar Laporan ke Google`;
+        btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> <span id="btnSubmitText">${existingId ? 'Simpan Kemaskini' : 'Simpan Laporan ke Google'}</span>`;
         lucide.createIcons();
       }
     }
 
-    // Fungsi muat data kalis sekatan CORS (JSONP)
+    // Muat Turun Data dari Google Sheets Menggunakan JSONP
     function loadDataFromSheets() {
       const tbody = document.getElementById('dashboardTableBody');
-      tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Sedang memuat data dari Google Sheets...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500"><i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Sedang memuat data dari Google Sheets...</td></tr>`;
       lucide.createIcons();
 
       const oldScript = document.getElementById('jsonp-script');
@@ -357,57 +442,148 @@
       script.onerror = function() {
         tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="p-6 text-center text-red-600">
+            <td colspan="6" class="p-6 text-center text-red-600">
               <p class="font-bold">Gagal berhubung dengan Google Apps Script!</p>
-              <p class="text-xs text-slate-500 mt-1">Pastikan deployment Web App ditetapkan dengan <b>Who has access: Anyone</b>.</p>
+              <p class="text-xs text-slate-500 mt-1">Pastikan deployment Web App ditetapkan kepada <b>Who has access: Anyone</b>.</p>
             </td>
           </tr>`;
       };
       document.body.appendChild(script);
     }
 
-    // Callback JSONP penerima data
+    // Callback Terima Data daripada Google Sheets
     window.handleSheetsData = function(data) {
-      const tbody = document.getElementById('dashboardTableBody');
-      const select = document.getElementById('selectRecordToPrint');
-
-      if (data && data.error) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-red-600 font-semibold">${data.error}</td></tr>`;
-        return;
-      }
-
       storedReports = Array.isArray(data) ? data : [];
-      tbody.innerHTML = '';
-      select.innerHTML = '<option value="">-- Pilih Aktiviti --</option>';
+      renderDashboardTable();
+      populatePrintDropdown();
+    };
 
-      if (storedReports.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Tiada rekod laporan dijumpai. Sila hantar laporan baharu.</td></tr>`;
+    // Fungsi Penapis Unit
+    function filterByUnit(unit) {
+      currentFilter = unit;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        if (btn.getAttribute('data-unit') === unit) {
+          btn.className = "filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold transition bg-slate-800 text-white shadow-sm";
+        } else {
+          btn.className = "filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100";
+        }
+      });
+      renderDashboardTable();
+    }
+
+    // Papar Rekod pada Jadual Dashboard
+    function renderDashboardTable() {
+      const tbody = document.getElementById('dashboardTableBody');
+      tbody.innerHTML = '';
+
+      let filtered = storedReports;
+      if (currentFilter !== "SEMUA") {
+        filtered = storedReports.filter(item => (item['Unit'] || '').toLowerCase() === currentFilter.toLowerCase());
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Tiada rekod laporan untuk kategori "${currentFilter}".</td></tr>`;
         return;
       }
 
-      // Susun rekod aktiviti ke dalam jadual dashboard
-      storedReports.forEach((item, index) => {
+      filtered.forEach(item => {
+        const rawIndex = storedReports.findIndex(orig => orig['ID'] === item['ID']);
+        const unitName = item['Unit'] || 'Kokurikulum';
+        const colorCfg = UNIT_COLORS[unitName] || UNIT_COLORS['Lain-lain'];
+
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50 border-b";
+        tr.className = "hover:bg-slate-50/80 border-b transition";
         tr.innerHTML = `
-          <td class="p-3 font-semibold text-slate-800">${item['Tarikh'] || '-'}<br><span class="text-xs font-normal text-slate-500">${item['Hari'] || ''}</span></td>
-          <td class="p-3 font-medium text-sky-900">${item['Aktiviti'] || '-'}</td>
-          <td class="p-3 max-w-xs text-xs line-clamp-2">${item['Penerangan'] || '-'}</td>
-          <td class="p-3 max-w-xs text-xs line-clamp-2">${item['Hasil'] || '-'}</td>
-          <td class="p-3 text-center">
-            <button onclick="goToPrintRecord(${index})" class="text-xs bg-sky-100 hover:bg-sky-200 text-sky-800 font-semibold px-3 py-1.5 rounded transition shadow-sm">
-              Lihat / Cetak
-            </button>
+          <td class="p-3.5">
+            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${colorCfg.badge}">
+              ${unitName}
+            </span>
+          </td>
+          <td class="p-3.5 font-semibold text-slate-800">
+            ${item['Tarikh'] || '-'}<br>
+            <span class="text-xs font-normal text-slate-500">${item['Hari'] || ''}</span>
+          </td>
+          <td class="p-3.5 font-bold text-slate-800 max-w-[200px] truncate">${item['Aktiviti'] || '-'}</td>
+          <td class="p-3.5 max-w-xs text-xs line-clamp-2 text-slate-600">${item['Penerangan'] || '-'}</td>
+          <td class="p-3.5 text-xs text-slate-500 font-mono">${item['Kemaskini Terakhir'] || item['ID'] || '-'}</td>
+          <td class="p-3.5 text-center">
+            <div class="flex items-center justify-center gap-1.5">
+              <button onclick="editReport(${rawIndex})" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2.5 py-1.5 rounded transition flex items-center gap-1">
+                <i data-lucide="edit" class="w-3 h-3"></i> Kemaskini
+              </button>
+              <button onclick="goToPrintRecord(${rawIndex})" class="text-xs bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold px-2.5 py-1.5 rounded transition flex items-center gap-1">
+                <i data-lucide="printer" class="w-3 h-3"></i> Cetak
+              </button>
+            </div>
           </td>
         `;
         tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
 
+    function populatePrintDropdown() {
+      const select = document.getElementById('selectRecordToPrint');
+      select.innerHTML = '<option value="">-- Pilih Aktiviti --</option>';
+      storedReports.forEach((item, index) => {
         const opt = document.createElement('option');
         opt.value = index;
-        opt.textContent = `${item['Tarikh']} - ${item['Aktiviti']}`;
+        opt.textContent = `[${item['Unit'] || 'Koko'}] ${item['Tarikh']} - ${item['Aktiviti']}`;
         select.appendChild(opt);
       });
-    };
+    }
+
+    // Fungsi Mengisi Data untuk Kemaskini (In-place Edit)
+    function editReport(index) {
+      const d = storedReports[index];
+      if (!d) return;
+
+      switchTab('form');
+
+      document.getElementById('reportId').value = d['ID'] || '';
+      document.getElementById('editReportIdText').textContent = `${d['ID']} (${d['Aktiviti']})`;
+      document.getElementById('editModeAlert').classList.remove('hidden');
+
+      document.getElementById('aktivitiUnit').value = d['Unit'] || '';
+      document.getElementById('tarikh').value = d['Tarikh'] || '';
+      document.getElementById('hari').value = d['Hari'] || '';
+      document.getElementById('aktiviti').value = d['Aktiviti'] || '';
+      document.getElementById('penerangan').value = d['Penerangan'] || '';
+      document.getElementById('hasil').value = d['Hasil'] || '';
+
+      // Set semula preview gambar dengan gambar sedia ada
+      for (let i = 1; i <= 4; i++) {
+        const imgKey = `Gambar ${i}`;
+        const existingImg = d[imgKey] || '';
+        base64Images[i - 1] = existingImg;
+        if (existingImg.trim() !== '') {
+          document.getElementById(`prev-${i}`).src = existingImg;
+          document.getElementById(`prev-${i}`).classList.remove('hidden');
+          document.getElementById(`txt-${i}`).classList.add('hidden');
+        } else {
+          document.getElementById(`prev-${i}`).classList.add('hidden');
+          document.getElementById(`txt-${i}`).classList.remove('hidden');
+        }
+      }
+
+      document.getElementById('btnSubmitText').textContent = "Kemaskini Rekod Laporan Ini";
+      lucide.createIcons();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Batal Mod Kemaskini
+    function cancelEditMode() {
+      document.getElementById('laporanForm').reset();
+      document.getElementById('reportId').value = "";
+      document.getElementById('editModeAlert').classList.add('hidden');
+      document.getElementById('btnSubmitText').textContent = "Simpan Laporan ke Google";
+
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById(`prev-${i}`).classList.add('hidden');
+        document.getElementById(`txt-${i}`).classList.remove('hidden');
+        base64Images[i - 1] = "";
+      }
+    }
 
     function goToPrintRecord(index) {
       switchTab('print');
@@ -415,6 +591,7 @@
       renderPrintTemplate(index);
     }
 
+    // Papar Lembaran Cetakan dengan Skim Warna Unit
     function renderPrintTemplate(index) {
       if (index === "" || !storedReports[index]) {
         document.getElementById('printContentPlaceholder').classList.remove('hidden');
@@ -423,11 +600,34 @@
       }
 
       const d = storedReports[index];
+      const unitName = d['Unit'] || 'Kokurikulum';
+      const colorCfg = UNIT_COLORS[unitName] || UNIT_COLORS['Lain-lain'];
+
+      // Tukar warna header cetakan mengikut unit
+      const headerEl = document.getElementById('printUnitHeader');
+      headerEl.style.backgroundColor = colorCfg.bg;
+      document.getElementById('p-unit-badge').textContent = `LAPORAN AKTIVITI ${unitName.toUpperCase()}`;
+      document.getElementById('p-unit-text').textContent = unitName;
+
+      // Sesuaikan jawatan pengesah mengikut unit
+      const copEl = document.getElementById('p-cop-pengesah');
+      if (unitName === 'Kokurikulum' || unitName === 'Koakademik') {
+        copEl.textContent = "GPK Kokurikulum SMKKA";
+      } else if (unitName === 'Kurikulum') {
+        copEl.textContent = "GPK Pentadbiran & Kurikulum SMKKA";
+      } else if (unitName === 'Hem') {
+        copEl.textContent = "GPK Hal Ehwal Murid SMKKA";
+      } else {
+        copEl.textContent = "Pengetua / Pentadbir SMKKA";
+      }
+
       document.getElementById('p-aktiviti').textContent = d['Aktiviti'] || '-';
       document.getElementById('p-tarikh').textContent = `${d['Tarikh'] || '-'} (${d['Hari'] || '-'})`;
       document.getElementById('p-penerangan').textContent = d['Penerangan'] || '-';
       document.getElementById('p-hasil').textContent = d['Hasil'] || '-';
+      document.getElementById('p-last-update').textContent = d['Kemaskini Terakhir'] || 'Asal';
 
+      // Susun atur gambar cetakan
       const container = document.getElementById('printImagesContainer');
       container.innerHTML = '';
 
@@ -437,19 +637,19 @@
         if (d[imgKey] && d[imgKey].trim() !== "") {
           count++;
           const div = document.createElement('div');
-          div.className = "border border-slate-200 rounded p-1 text-center bg-slate-50";
+          div.className = "border border-slate-300 rounded p-1 text-center bg-slate-50";
           div.innerHTML = `
-            <img class="w-full h-44 object-cover rounded bg-white" src="${d[imgKey]}" alt="Gambar ${count}">
-            <p class="text-[11px] text-slate-500 mt-1 font-medium">Gambar ${count}</p>
+            <img class="w-full h-36 object-cover rounded bg-white" src="${d[imgKey]}" alt="Bukti Bergambar ${count}">
+            <p class="text-[10px] text-slate-600 mt-1 font-semibold">Gambar ${count}</p>
           `;
           container.appendChild(div);
         }
       }
 
       if (count === 1) {
-        container.className = "grid grid-cols-1 max-w-md mx-auto gap-4";
+        container.className = "grid grid-cols-1 max-w-sm mx-auto gap-3";
       } else {
-        container.className = "grid grid-cols-2 gap-4";
+        container.className = "grid grid-cols-2 gap-3";
       }
 
       document.getElementById('printContentPlaceholder').classList.add('hidden');
