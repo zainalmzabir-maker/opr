@@ -16,7 +16,7 @@
     @media print {
       @page {
         size: A4 portrait;
-        margin: 10mm 12mm 10mm 12mm;
+        margin: 8mm 10mm 8mm 10mm;
       }
       body {
         background: #ffffff !important;
@@ -50,20 +50,8 @@
 
     .sheet-a4 {
       width: 210mm;
-      min-height: 275mm;
+      min-height: 280mm;
       box-sizing: border-box;
-    }
-
-    /* Lapisan Watermark Latar Belakang */
-    .watermark-layer {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
   </style>
 </head>
@@ -137,6 +125,7 @@
             <option value="Pentadbiran">Pentadbiran</option>
             <option value="Lain-lain">Lain-lain</option>
           </select>
+          <p class="text-[11px] text-slate-500 mt-1">Setiap unit mempunyai susun atur format cetakan poster komersial yang berbeza.</p>
         </div>
 
         <!-- TARIKH, HARI & MASA -->
@@ -278,7 +267,7 @@
       </div>
     </section>
 
-    <!-- 3. MENU: CETAKAN PELAPORAN (DENGAN WATERMARK MOTIF MENGIKUT UNIT) -->
+    <!-- 3. MENU: CETAKAN PELAPORAN KOMERSIAL A4 -->
     <section id="menu-print" class="hidden space-y-6">
       <div class="flex flex-wrap justify-between items-center gap-4 no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200">
         <div>
@@ -292,116 +281,17 @@
         </button>
       </div>
 
-      <!-- LEMBARAN CETAKAN SATU MUKA A4 DENGAN WATERMARK -->
-      <div id="printArea" class="sheet-a4 mx-auto bg-white p-7 rounded-2xl shadow-md border border-slate-200 flex flex-col justify-between relative overflow-hidden">
+      <!-- LEMBARAN CETAKAN SATU MUKA A4 BERSTRUKTUR KOMERSIAL -->
+      <div id="printArea" class="sheet-a4 mx-auto bg-white p-6 rounded-2xl shadow-md border border-slate-200 flex flex-col justify-between relative overflow-hidden">
         
-        <!-- CORAK WATERMARK LATAR BELAKANG MENGIKUT UNIT (DIJANA DINAMIK) -->
-        <div id="unitWatermarkContainer" class="watermark-layer"></div>
-
-        <div id="printContentPlaceholder" class="m-auto text-center py-24 text-slate-400 flex flex-col items-center relative z-10">
+        <div id="printContentPlaceholder" class="m-auto text-center py-24 text-slate-400 flex flex-col items-center">
           <i data-lucide="file-search" class="w-12 h-12 mb-3 text-slate-300"></i>
-          <p class="text-sm font-medium">Sila pilih aktiviti daripada senarai pilihan di atas untuk memaparkan lembaran cetakan.</p>
+          <p class="text-sm font-medium">Sila pilih aktiviti daripada senarai di atas untuk memaparkan format cetakan komersial.</p>
         </div>
 
-        <div id="printContentDetails" class="hidden flex-1 flex flex-col justify-between h-full relative z-10">
-          
-          <div>
-            <!-- KEPALA SURAT RASMI -->
-            <div id="printUnitHeader" class="relative text-white p-4 rounded-xl shadow-sm mb-3 flex items-center justify-between overflow-hidden" style="background-color: #800000;">
-              
-              <div class="absolute -right-8 -bottom-10 w-44 h-44 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
-
-              <div class="flex items-center gap-3.5 relative z-10">
-                <img src="logo.png" alt="Logo SMKKA" class="w-14 h-14 object-contain bg-white rounded-xl p-1 shadow">
-                <div>
-                  <div class="flex items-center gap-2">
-                    <h2 class="text-base font-black uppercase tracking-wider text-white drop-shadow-sm">SMK KAMARUL ARIFFIN</h2>
-                    <span id="p-unit-tag" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-white/20 tracking-wider text-white border border-white/25">
-                      KOKURIKULUM
-                    </span>
-                  </div>
-                  <p class="text-[11px] text-white/90 leading-tight">Jalan Tenang, 85300 Labis, Johor Darul Ta'zim | Kod Sekolah: JEA7039 | Tel: 07-9255793</p>
-                  <h3 id="p-unit-badge" class="text-xs font-bold uppercase tracking-wide mt-1 text-amber-200 flex items-center gap-1.5">
-                    <span id="p-unit-icon"><i data-lucide="award" class="w-3.5 h-3.5 inline"></i></span>
-                    <span id="p-unit-title">LAPORAN AKTIVITI KOKURIKULUM</span>
-                  </h3>
-                </div>
-              </div>
-
-              <div class="text-right relative z-10 hidden sm:flex flex-col items-end">
-                <div class="flex items-center gap-1 px-2.5 py-1 bg-black/25 rounded-md border border-white/20 text-[10px] font-bold text-white uppercase tracking-wider">
-                  <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-300"></i> Format Satu Muka
-                </div>
-                <span class="text-[9px] text-white/75 mt-1 font-mono">Dokumen Rasmi Sekolah</span>
-              </div>
-            </div>
-
-            <!-- JADUAL BUTIRAN AKTIVITI & PELAPOR (TRANSPARENT BG TO SHOW WATERMARK ELEGANTLY) -->
-            <table class="w-full text-xs border-collapse border border-slate-300 rounded-lg overflow-hidden mb-2.5 bg-white/90 backdrop-blur-[1px]">
-              <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100/90 text-slate-700 w-1/4">Nama Aktiviti / Program</td>
-                <td id="p-aktiviti" class="border border-slate-300 p-2 font-black text-slate-900 text-xs tracking-wide" colspan="3"></td>
-              </tr>
-              <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100/90 text-slate-700">Unit / Sektor</td>
-                <td id="p-unit-text" class="border border-slate-300 p-2 font-semibold" colspan="3"></td>
-              </tr>
-              <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100/90 text-slate-700">Tarikh & Hari</td>
-                <td id="p-tarikh" class="border border-slate-300 p-2 text-slate-800 font-medium w-1/4"></td>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100/90 text-slate-700 w-1/6">Masa Aktiviti</td>
-                <td id="p-masa" class="border border-slate-300 p-2 text-slate-800 font-medium"></td>
-              </tr>
-              <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100/90 text-slate-700 align-top">Penerangan Aktiviti</td>
-                <td id="p-penerangan" class="border border-slate-300 p-2 whitespace-pre-line leading-relaxed text-slate-800 font-normal" colspan="3"></td>
-              </tr>
-              <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100/90 text-slate-700 align-top">Hasil / Dapatan</td>
-                <td id="p-hasil" class="border border-slate-300 p-2 whitespace-pre-line leading-relaxed text-slate-800 font-normal" colspan="3"></td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- DOKUMENTASI BERGAMBAR (AUTO-EXPAND MEMENUHI RUANG) -->
-          <div class="flex-1 flex flex-col justify-start my-1.5 min-h-[125mm]">
-            <div class="flex items-center justify-between border-b-2 pb-1 mb-2 border-slate-200 bg-white/70 backdrop-blur-[1px] px-1">
-              <h4 class="font-black text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                <i data-lucide="camera" class="w-3.5 h-3.5 text-slate-600"></i> Evidens & Dokumentasi Bergambar:
-              </h4>
-              <span class="text-[10px] font-semibold text-slate-500 italic">Dokumentasi Pelaksanaan Aktiviti</span>
-            </div>
-
-            <div id="printImagesContainer" class="flex-1 grid gap-2.5 w-full items-stretch"></div>
-          </div>
-
-          <!-- MAKLUMAT PELAPOR BAWAH (TIADA RUANGAN PENGESAHAN) -->
-          <div class="pt-2 border-t border-slate-300">
-            <div class="bg-white/95 backdrop-blur-[1px] border border-slate-200 rounded-lg p-2.5 flex items-center justify-between text-xs shadow-sm">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-700 font-bold shadow-inner">
-                  <i data-lucide="user-check" class="w-4 h-4"></i>
-                </div>
-                <div>
-                  <p class="text-[10px] text-slate-500 uppercase font-bold">Disediakan Oleh:</p>
-                  <p id="p-pelapor-nama" class="font-black text-slate-900 text-xs">-</p>
-                  <p id="p-pelapor-jawatan" class="text-[11px] text-slate-600 font-medium">-</p>
-                </div>
-              </div>
-              <div class="text-right">
-                <span class="inline-block px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded text-[10px] font-bold uppercase tracking-wide">
-                  Laporan Lengkap
-                </span>
-                <p class="text-[9px] text-slate-400 mt-1">Dicetak pada: <span id="p-print-date">-</span></p>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between text-[9px] text-slate-400 pt-1.5 mt-1 border-t border-slate-100">
-              <span>Sistem Pelaporan Satu Muka SMK Kamarul Ariffin &bull; Versi Digital 2026</span>
-              <span>Rekod ID: <span id="p-last-update">-</span></span>
-            </div>
-          </div>
-
+        <!-- KANDUNGAN DINAMIK MENGIKUT GAYA UNIT -->
+        <div id="printContentDetails" class="hidden flex-1 flex flex-col justify-between h-full">
+          <!-- Keseluruhan kandungan akan dijanakan oleh fungsi JavaScript renderPrintTemplate() -->
         </div>
       </div>
     </section>
@@ -414,78 +304,6 @@
     let storedReports = [];
     let currentFilter = "SEMUA";
     const base64Images = ["", "", "", ""];
-
-    // CORAK WATERMARK VEKTOR SVG MENGIKUT UNIT (OPACITY LEMBUT & ELEGAN)
-    const WATERMARK_SVGS = {
-      // 1. Kokurikulum: Motif Piala/Trofi Kemenangan, Bintang Kejayaan & Trek Sukan
-      'Kokurikulum': `
-        <svg class="w-[140mm] h-[140mm] text-red-900 opacity-[0.06] transform -rotate-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-          <path d="M4 22h16"/>
-          <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-          <circle cx="12" cy="7" r="1.5" fill="currentColor"/>
-        </svg>
-      `,
-      // 2. Koakademik: Motif Mentol Kreativiti, Sinaran Inovasi & Atom Ilmu
-      'Koakademik': `
-        <svg class="w-[140mm] h-[140mm] text-orange-950 opacity-[0.06] transform rotate-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
-          <path d="M9 18h6"/>
-          <path d="M10 22h4"/>
-          <path d="M12 2v2"/>
-          <path d="M4.93 4.93l1.41 1.41"/>
-          <path d="M2 12h2"/>
-          <path d="M20 12h2"/>
-          <path d="M17.66 6.34l1.41-1.41"/>
-          <circle cx="12" cy="11" r="2" fill="currentColor"/>
-        </svg>
-      `,
-      // 3. Kurikulum: Motif Topi Graduasi / Ijazah & Buku Falsafah Ilmu
-      'Kurikulum': `
-        <svg class="w-[145mm] h-[145mm] text-blue-950 opacity-[0.06] transform -rotate-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-          <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
-          <path d="M6 6h10"/>
-          <path d="M6 10h10"/>
-        </svg>
-      `,
-      // 4. HEM (Hal Ehwal Murid): Motif Perisai Perlindungan, Sahsiah & Hati Penyayang
-      'Hem': `
-        <svg class="w-[145mm] h-[145mm] text-indigo-950 opacity-[0.06] transform rotate-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor"/>
-        </svg>
-      `,
-      // 5. Pentadbiran: Motif Bangunan Berwibawa & Struktur Pengurusan Cemerlang
-      'Pentadbiran': `
-        <svg class="w-[140mm] h-[140mm] text-emerald-950 opacity-[0.06] transform rotate-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/>
-          <path d="M6 12H4a2 2 0 0 0-2 2v8h4"/>
-          <path d="M18 9h2a2 2 0 0 1 2 2v11h-4"/>
-          <path d="M10 6h4"/>
-          <path d="M10 10h4"/>
-          <path d="M10 14h4"/>
-          <path d="M10 18h4"/>
-        </svg>
-      `,
-      // 6. Lain-lain: Tera Air Monokrom Logo SMKKA
-      'Lain-lain': `
-        <img src="logo.png" class="w-[120mm] h-[120mm] object-contain opacity-[0.05] grayscale transform rotate-3 pointer-events-none" alt="Watermark Logo SMKKA">
-      `
-    };
-
-    const UNIT_CONFIG = {
-      'Kokurikulum': { bg: '#800000', icon: 'trophy', label: 'Kokurikulum', badge: 'bg-red-900 text-white', title: 'LAPORAN AKTIVITI KOKURIKULUM' },
-      'Koakademik': { bg: '#c2410c', icon: 'sparkles', label: 'Koakademik', badge: 'bg-orange-700 text-white', title: 'LAPORAN AKTIVITI KOAKADEMIK' },
-      'Kurikulum': { bg: '#1d4ed8', icon: 'book-open', label: 'Kurikulum', badge: 'bg-blue-700 text-white', title: 'LAPORAN PROGRAM KURIKULUM & AKADEMIK' },
-      'Hem': { bg: '#4338ca', icon: 'shield-check', label: 'HEM', badge: 'bg-indigo-700 text-white', title: 'LAPORAN HAL EHWAL MURID (HEM)' },
-      'Pentadbiran': { bg: '#047857', icon: 'building-2', label: 'Pentadbiran', badge: 'bg-emerald-700 text-white', title: 'LAPORAN PROGRAM PENTADBIRAN & PENGURUSAN' },
-      'Lain-lain': { bg: '#334155', icon: 'folder-kanban', label: 'Lain-lain', badge: 'bg-slate-700 text-white', title: 'LAPORAN DOKUMENTASI PROGRAM SEKOLAH' }
-    };
 
     lucide.createIcons();
 
@@ -518,7 +336,7 @@
         reader.onload = function(e) {
           const img = new Image();
           img.onload = function() {
-            const maxDim = 1100;
+            const maxDim = 1200;
             let width = img.width;
             let height = img.height;
 
@@ -655,16 +473,25 @@
         return;
       }
 
+      const unitBadges = {
+        'Kokurikulum': 'bg-red-950 text-red-100',
+        'Koakademik': 'bg-amber-900 text-amber-100',
+        'Kurikulum': 'bg-blue-900 text-blue-100',
+        'Hem': 'bg-indigo-900 text-indigo-100',
+        'Pentadbiran': 'bg-emerald-900 text-emerald-100',
+        'Lain-lain': 'bg-slate-800 text-slate-100'
+      };
+
       filtered.forEach(item => {
         const rawIndex = storedReports.findIndex(orig => orig['ID'] === item['ID']);
         const unitName = item['Unit'] || 'Kokurikulum';
-        const cfg = UNIT_CONFIG[unitName] || UNIT_CONFIG['Lain-lain'];
+        const badgeClass = unitBadges[unitName] || unitBadges['Lain-lain'];
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50/80 border-b transition";
         tr.innerHTML = `
           <td class="p-3.5">
-            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${cfg.badge}">
+            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${badgeClass}">
               ${unitName}
             </span>
           </td>
@@ -766,118 +593,476 @@
       renderPrintTemplate(index);
     }
 
-    // RENDERING CETAKAN DENGAN WATERMARK MOTIF MENGIKUT UNIT
+    // HELPER: Jana Galeri Gambar Komersial yang Memenuhi Ruang
+    function generateCommercialImageGrid(images, unitThemeColor) {
+      const count = images.length;
+      if (count === 0) return '';
+
+      if (count === 1) {
+        return `
+          <div class="flex-1 w-full h-full min-h-[140mm] rounded-2xl overflow-hidden border-2 border-slate-200 shadow-sm flex flex-col bg-slate-50 p-2">
+            <div class="flex-1 w-full flex items-center justify-center bg-white rounded-xl overflow-hidden">
+              <img src="${images[0]}" class="max-w-full max-h-full object-contain" alt="Evidens Utama">
+            </div>
+            <div class="text-center pt-2 text-[11px] font-black uppercase tracking-widest text-slate-600">Dokumentasi Utama Aktiviti</div>
+          </div>
+        `;
+      } else if (count === 2) {
+        return `
+          <div class="flex-1 grid grid-cols-2 gap-3 h-full min-h-[125mm]">
+            ${images.map((img, i) => `
+              <div class="rounded-xl border border-slate-300 p-2 flex flex-col justify-between bg-slate-50 shadow-sm">
+                <div class="flex-1 w-full flex items-center justify-center bg-white rounded-lg overflow-hidden">
+                  <img src="${img}" class="max-w-full max-h-full object-contain" alt="Evidens ${i+1}">
+                </div>
+                <div class="text-center pt-1.5 text-[10px] font-bold text-slate-700">Evidens ${i+1}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (count === 3) {
+        return `
+          <div class="flex-1 grid grid-cols-2 gap-2.5 h-full min-h-[120mm]">
+            <div class="col-span-2 rounded-xl border border-slate-300 p-1.5 flex flex-col justify-between bg-slate-50 shadow-sm h-[65mm]">
+              <div class="flex-1 w-full flex items-center justify-center bg-white rounded-lg overflow-hidden">
+                <img src="${images[0]}" class="max-w-full max-h-full object-contain" alt="Evidens 1">
+              </div>
+              <div class="text-center pt-1 text-[9px] font-bold text-slate-700">Evidens Utama</div>
+            </div>
+            ${images.slice(1).map((img, i) => `
+              <div class="col-span-1 rounded-xl border border-slate-300 p-1.5 flex flex-col justify-between bg-slate-50 shadow-sm h-[50mm]">
+                <div class="flex-1 w-full flex items-center justify-center bg-white rounded-lg overflow-hidden">
+                  <img src="${img}" class="max-w-full max-h-full object-contain" alt="Evidens ${i+2}">
+                </div>
+                <div class="text-center pt-1 text-[9px] font-bold text-slate-700">Evidens ${i+2}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        return `
+          <div class="flex-1 grid grid-cols-2 gap-2.5 h-full min-h-[120mm]">
+            ${images.map((img, i) => `
+              <div class="rounded-xl border border-slate-300 p-1.5 flex flex-col justify-between bg-slate-50 shadow-sm min-h-[55mm]">
+                <div class="flex-1 w-full flex items-center justify-center bg-white rounded-lg overflow-hidden">
+                  <img src="${img}" class="max-w-full max-h-full object-contain" alt="Evidens ${i+1}">
+                </div>
+                <div class="text-center pt-1 text-[9px] font-bold text-slate-700">Evidens ${i+1}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    }
+
+    // JANA REKA BENTUK KOMERSIAL MENGIKUT UNIT
     function renderPrintTemplate(index) {
       if (index === "" || !storedReports[index]) {
         document.getElementById('printContentPlaceholder').classList.remove('hidden');
         document.getElementById('printContentDetails').classList.add('hidden');
-        document.getElementById('unitWatermarkContainer').innerHTML = '';
         return;
       }
 
       const d = storedReports[index];
-      const unitName = d['Unit'] || 'Kokurikulum';
-      const cfg = UNIT_CONFIG[unitName] || UNIT_CONFIG['Lain-lain'];
-
-      // MASUKKAN CORAK WATERMARK LATAR BELAKANG KHUSUS UNIT
-      const watermarkEl = document.getElementById('unitWatermarkContainer');
-      watermarkEl.innerHTML = WATERMARK_SVGS[unitName] || WATERMARK_SVGS['Lain-lain'];
-
-      // Kemaskini Header & Tajuk
-      const headerEl = document.getElementById('printUnitHeader');
-      headerEl.style.backgroundColor = cfg.bg;
-      document.getElementById('p-unit-tag').textContent = cfg.label.toUpperCase();
-      document.getElementById('p-unit-title').textContent = cfg.title;
-      document.getElementById('p-unit-text').textContent = `${unitName} (SMK Kamarul Ariffin)`;
-      document.getElementById('p-unit-icon').innerHTML = `<i data-lucide="${cfg.icon}" class="w-4 h-4 inline text-amber-200"></i>`;
-
-      document.getElementById('p-aktiviti').textContent = d['Aktiviti'] || '-';
-      document.getElementById('p-tarikh').textContent = `${d['Tarikh'] || '-'} (${d['Hari'] || '-'})`;
-      document.getElementById('p-masa').textContent = d['Masa'] || '-';
-      document.getElementById('p-penerangan').textContent = d['Penerangan'] || '-';
-      document.getElementById('p-hasil').textContent = d['Hasil'] || '-';
-      
-      // Maklumat Pelapor di Bawah
-      document.getElementById('p-pelapor-nama').textContent = d['Nama Pelapor'] || '-';
-      document.getElementById('p-pelapor-jawatan').textContent = d['Jawatan'] || '-';
-
-      document.getElementById('p-last-update').textContent = d['ID'] || '-';
-
-      const now = new Date();
-      document.getElementById('p-print-date').textContent = now.toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-      // Susunan Gambar Fleksibel Mengikut Jumlah Gambar
-      const container = document.getElementById('printImagesContainer');
-      container.innerHTML = '';
+      const unit = d['Unit'] || 'Kokurikulum';
+      const container = document.getElementById('printContentDetails');
 
       const validImages = [];
       for (let i = 1; i <= 4; i++) {
         const key = `Gambar ${i}`;
-        if (d[key] && d[key].trim() !== '') {
-          validImages.push(d[key]);
-        }
+        if (d[key] && d[key].trim() !== '') validImages.push(d[key]);
       }
 
-      const totalImg = validImages.length;
+      const imgHTML = generateCommercialImageGrid(validImages, unit);
+      const printDate = new Date().toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-      if (totalImg === 1) {
-        container.className = "flex-1 flex flex-col items-center justify-center w-full";
-        const div = document.createElement('div');
-        div.className = "w-full max-w-xl h-full max-h-[145mm] border border-slate-300 rounded-xl p-2 bg-white/90 backdrop-blur-[1px] shadow-sm flex flex-col justify-between";
-        div.innerHTML = `
-          <div class="w-full flex-1 flex items-center justify-center bg-slate-50 rounded-lg overflow-hidden border border-slate-200">
-            <img class="max-w-full max-h-full object-contain" src="${validImages[0]}" alt="Evidens Bergambar 1">
+      let layoutHTML = '';
+
+      // =========================================================================
+      // 1. KOKURIKULUM: GAYA SPORTS MAGAZINE / DYNAMIC POSTER (MAROON & GOLD)
+      // =========================================================================
+      if (unit === 'Kokurikulum') {
+        layoutHTML = `
+          <div class="flex flex-col h-full justify-between">
+            <!-- Header Poster Sukan -->
+            <div class="bg-gradient-to-r from-red-950 via-red-900 to-amber-900 text-white p-5 rounded-2xl shadow-md border-b-4 border-amber-400 relative overflow-hidden">
+              <div class="flex justify-between items-center relative z-10">
+                <div class="flex items-center gap-4">
+                  <img src="logo.png" class="w-16 h-16 object-contain bg-white rounded-2xl p-1 shadow-lg">
+                  <div>
+                    <span class="bg-amber-400 text-red-950 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider">SMK KAMARUL ARIFFIN</span>
+                    <h1 class="text-xl font-black uppercase tracking-tight text-white mt-1">${d['Aktiviti'] || '-'}</h1>
+                    <p class="text-xs text-amber-200/90 font-medium">Laporan Rasmi Kokurikulum & Pembangunan Bakat Murid</p>
+                  </div>
+                </div>
+                <div class="text-right border-l border-white/20 pl-4">
+                  <div class="text-amber-300 text-xs font-black uppercase">JEA7039</div>
+                  <div class="text-[10px] text-white/80">07-9255793</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kad Skor Maklumat Modular -->
+            <div class="grid grid-cols-3 gap-3 my-3">
+              <div class="bg-red-50 border-l-4 border-red-900 p-2.5 rounded-r-xl">
+                <p class="text-[9px] font-extrabold uppercase text-red-900">Tarikh & Hari</p>
+                <p class="text-xs font-black text-slate-800">${d['Tarikh']} (${d['Hari']})</p>
+              </div>
+              <div class="bg-amber-50 border-l-4 border-amber-600 p-2.5 rounded-r-xl">
+                <p class="text-[9px] font-extrabold uppercase text-amber-800">Masa Aktiviti</p>
+                <p class="text-xs font-black text-slate-800">${d['Masa']}</p>
+              </div>
+              <div class="bg-slate-50 border-l-4 border-slate-700 p-2.5 rounded-r-xl">
+                <p class="text-[9px] font-extrabold uppercase text-slate-600">Unit / Kategori</p>
+                <p class="text-xs font-black text-slate-800">Kokurikulum</p>
+              </div>
+            </div>
+
+            <!-- Penerangan & Dapatan Gaya Majalah -->
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                <h4 class="text-[11px] font-black uppercase text-red-950 flex items-center gap-1.5 mb-1">
+                  <i data-lucide="compass" class="w-3.5 h-3.5 text-red-800"></i> Pengisian Modul Aktiviti
+                </h4>
+                <p class="text-xs text-slate-700 whitespace-pre-line leading-relaxed">${d['Penerangan'] || '-'}</p>
+              </div>
+              <div class="bg-amber-50/50 rounded-xl p-3 border border-amber-200">
+                <h4 class="text-[11px] font-black uppercase text-amber-900 flex items-center gap-1.5 mb-1">
+                  <i data-lucide="trophy" class="w-3.5 h-3.5 text-amber-700"></i> Hasil & Pencapaian Murid
+                </h4>
+                <p class="text-xs text-slate-700 whitespace-pre-line leading-relaxed">${d['Hasil'] || '-'}</p>
+              </div>
+            </div>
+
+            <!-- Galeri Evidens -->
+            <div class="flex-1 flex flex-col mb-3">
+              <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-1 flex items-center gap-1">
+                <i data-lucide="camera" class="w-3.5 h-3.5 text-red-800"></i> Galeri Sorotan Aktiviti
+              </div>
+              ${imgHTML}
+            </div>
+
+            <!-- Profil Pelapor -->
+            <div class="bg-slate-900 text-white rounded-xl p-2.5 flex justify-between items-center">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-red-800 flex items-center justify-center font-black text-xs text-white">KO</div>
+                <div>
+                  <p class="text-[9px] text-amber-400 font-bold uppercase tracking-wider">Disediakan Oleh:</p>
+                  <p class="text-xs font-black text-white">${d['NamaPelapor'] || d['Nama Pelapor'] || '-'}</p>
+                  <p class="text-[10px] text-slate-300">${d['Jawatan'] || '-'}</p>
+                </div>
+              </div>
+              <div class="text-right text-[9px] text-slate-400">
+                <span>SMK Kamarul Ariffin &bull; ${d['ID']}</span><br>
+                <span>Tarikh Cetak: ${printDate}</span>
+              </div>
+            </div>
           </div>
-          <p class="text-[11px] text-slate-600 text-center mt-1 font-bold uppercase tracking-wider">DOKUMENTASI FOKUS PROGRAM</p>
         `;
-        container.appendChild(div);
 
-      } else if (totalImg === 2) {
-        container.className = "flex-1 grid grid-cols-2 gap-3 items-stretch";
-        validImages.forEach((url, i) => {
-          const div = document.createElement('div');
-          div.className = "border border-slate-300 rounded-xl p-2 bg-white/90 backdrop-blur-[1px] shadow-sm flex flex-col justify-between h-full";
-          div.innerHTML = `
-            <div class="w-full flex-1 flex items-center justify-center bg-slate-50 rounded-lg overflow-hidden min-h-[110mm] border border-slate-200">
-              <img class="max-w-full max-h-full object-contain" src="${url}" alt="Gambar ${i + 1}">
+      // =========================================================================
+      // 2. KOAKADEMIK: GAYA TECH & INNOVATION SHOWCASE (JINGGA / AMBER)
+      // =========================================================================
+      } else if (unit === 'Koakademik') {
+        layoutHTML = `
+          <div class="flex flex-col h-full justify-between">
+            <div class="border-2 border-orange-500 rounded-2xl p-4 bg-gradient-to-r from-orange-50 via-white to-amber-50 mb-3 shadow-sm">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3.5">
+                  <img src="logo.png" class="w-14 h-14 object-contain">
+                  <div>
+                    <div class="inline-block bg-orange-600 text-white text-[9px] font-black px-2 py-0.5 rounded tracking-widest uppercase">Pentas Inovasi Koakademik</div>
+                    <h1 class="text-lg font-black text-slate-900 mt-0.5 tracking-tight">${d['Aktiviti']}</h1>
+                    <p class="text-[11px] text-slate-600">SMK Kamarul Ariffin &bull; Jalan Tenang, 85300 Labis, Johor</p>
+                  </div>
+                </div>
+                <div class="bg-orange-600 text-white px-3 py-1.5 rounded-xl text-center shadow">
+                  <span class="block text-[9px] font-bold uppercase">Sesi</span>
+                  <span class="text-xs font-black">${d['Hari']}</span>
+                </div>
+              </div>
             </div>
-            <p class="text-[10px] text-slate-700 text-center mt-1 font-bold">Gambar Dokumentasi ${i + 1}</p>
-          `;
-          container.appendChild(div);
-        });
 
-      } else if (totalImg === 3) {
-        container.className = "flex-1 grid grid-cols-2 gap-2.5 items-stretch";
-        validImages.forEach((url, i) => {
-          const div = document.createElement('div');
-          const spanClass = (i === 0) ? "col-span-2 min-h-[70mm]" : "col-span-1 min-h-[55mm]";
-          div.className = `border border-slate-300 rounded-xl p-1.5 bg-white/90 backdrop-blur-[1px] shadow-sm flex flex-col justify-between ${spanClass}`;
-          div.innerHTML = `
-            <div class="w-full flex-1 flex items-center justify-center bg-slate-50 rounded-lg overflow-hidden border border-slate-200">
-              <img class="max-w-full max-h-full object-contain" src="${url}" alt="Gambar ${i + 1}">
+            <!-- Bar Parameter Data -->
+            <div class="flex gap-2 mb-3 text-xs">
+              <div class="flex-1 bg-white border border-slate-300 rounded-xl p-2 text-center">
+                <span class="text-[9px] font-bold text-slate-400 uppercase block">Tarikh</span>
+                <span class="font-black text-orange-700">${d['Tarikh']}</span>
+              </div>
+              <div class="flex-1 bg-white border border-slate-300 rounded-xl p-2 text-center">
+                <span class="text-[9px] font-bold text-slate-400 uppercase block">Masa</span>
+                <span class="font-black text-orange-700">${d['Masa']}</span>
+              </div>
+              <div class="flex-1 bg-white border border-slate-300 rounded-xl p-2 text-center">
+                <span class="text-[9px] font-bold text-slate-400 uppercase block">Fokus</span>
+                <span class="font-black text-orange-700">Koakademik & Bakat</span>
+              </div>
             </div>
-            <p class="text-[10px] text-slate-700 text-center mt-1 font-semibold">Gambar Dokumentasi ${i + 1}</p>
-          `;
-          container.appendChild(div);
-        });
 
+            <!-- Kad Penerangan & Dapatan -->
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div class="p-3 rounded-xl border border-orange-200 bg-orange-50/40">
+                <span class="text-[10px] font-black text-orange-800 uppercase block mb-1">Modul & Pengisian Program</span>
+                <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line">${d['Penerangan'] || '-'}</p>
+              </div>
+              <div class="p-3 rounded-xl border border-slate-200 bg-slate-50/80">
+                <span class="text-[10px] font-black text-slate-800 uppercase block mb-1">Impak / Hasil Pembelajaran</span>
+                <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line">${d['Hasil'] || '-'}</p>
+              </div>
+            </div>
+
+            <div class="flex-1 flex flex-col mb-3">
+              <span class="text-[10px] font-black text-orange-700 uppercase tracking-wider mb-1">Dokumentasi Visual</span>
+              ${imgHTML}
+            </div>
+
+            <div class="border-t-2 border-orange-500 pt-2 flex justify-between items-center text-xs">
+              <div>
+                <p class="text-[9px] text-slate-400 uppercase font-bold">Pegawai Pelapor:</p>
+                <p class="font-black text-slate-900">${d['NamaPelapor'] || d['Nama Pelapor'] || '-'}</p>
+                <p class="text-[10px] text-orange-700 font-bold">${d['Jawatan'] || '-'}</p>
+              </div>
+              <div class="text-right text-[10px] text-slate-500">
+                <span class="font-mono">ID: ${d['ID']}</span><br>
+                <span>Dicetak: ${printDate}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+      // =========================================================================
+      // 3. KURIKULUM: GAYA EXECUTIVE BRIEFING (BIRU DIRAJA & MODERN CLEAN)
+      // =========================================================================
+      } else if (unit === 'Kurikulum') {
+        layoutHTML = `
+          <div class="flex flex-col h-full justify-between">
+            <div class="border-l-8 border-blue-800 bg-slate-900 text-white p-4 rounded-r-2xl mb-3 flex justify-between items-center shadow-sm">
+              <div class="flex items-center gap-4">
+                <img src="logo.png" class="w-14 h-14 object-contain bg-white rounded-xl p-1">
+                <div>
+                  <span class="text-[9px] font-extrabold tracking-widest text-blue-300 uppercase">KURIKULUM & KECEMERLANGAN AKADEMIK</span>
+                  <h1 class="text-lg font-black text-white mt-0.5 uppercase">${d['Aktiviti']}</h1>
+                  <p class="text-[11px] text-slate-300">SMK Kamarul Ariffin &bull; Jalan Tenang, 85300 Labis, Johor</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-[9px] font-mono bg-blue-700 px-2 py-0.5 rounded text-white font-bold">AKADEMIK</span>
+                <p class="text-[10px] text-slate-300 mt-1">${d['Tarikh']}</p>
+              </div>
+            </div>
+
+            <div class="bg-blue-50/60 rounded-xl p-2.5 border border-blue-100 grid grid-cols-2 gap-2 mb-3 text-xs">
+              <div><span class="font-bold text-blue-900">Hari & Masa:</span> ${d['Hari']} &bull; ${d['Masa']}</div>
+              <div><span class="font-bold text-blue-900">Sektor:</span> Pengurusan Kurikulum Sekolah</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div class="border border-slate-200 rounded-xl p-3 bg-white shadow-sm">
+                <h4 class="text-[11px] font-bold text-blue-900 uppercase border-b pb-1 mb-1">Agenda & Pelaksanaan</h4>
+                <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line">${d['Penerangan'] || '-'}</p>
+              </div>
+              <div class="border border-blue-200 rounded-xl p-3 bg-blue-50/30 shadow-sm">
+                <h4 class="text-[11px] font-bold text-blue-900 uppercase border-b border-blue-200 pb-1 mb-1">Sasaran & Pencapaian</h4>
+                <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line">${d['Hasil'] || '-'}</p>
+              </div>
+            </div>
+
+            <div class="flex-1 flex flex-col mb-3">
+              <span class="text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Evidens Pelaksanaan Akademik</span>
+              ${imgHTML}
+            </div>
+
+            <div class="bg-slate-100 rounded-xl p-2.5 flex justify-between items-center border border-slate-200 text-xs">
+              <div>
+                <p class="text-[9px] text-slate-500 font-bold uppercase">Pegawai Pelapor:</p>
+                <p class="font-black text-slate-800">${d['NamaPelapor'] || d['Nama Pelapor'] || '-'}</p>
+                <p class="text-[10px] text-slate-600">${d['Jawatan'] || '-'}</p>
+              </div>
+              <div class="text-right text-[10px] text-slate-500">
+                <span>Dokumen Rasmi Kurikulum</span><br>
+                <span>${d['ID']} &bull; ${printDate}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+      // =========================================================================
+      // 4. HEM: GAYA COMMUNITY NEWSLETTER (INDIGO & SAHSIAH)
+      // =========================================================================
+      } else if (unit === 'Hem') {
+        layoutHTML = `
+          <div class="flex flex-col h-full justify-between">
+            <div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 text-white p-4 rounded-2xl mb-3 shadow">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3.5">
+                  <img src="logo.png" class="w-14 h-14 object-contain bg-white rounded-xl p-1 shadow">
+                  <div>
+                    <span class="bg-purple-300 text-indigo-950 text-[9px] font-black px-2 py-0.5 rounded-full uppercase">HAL EHWAL MURID (HEM)</span>
+                    <h1 class="text-lg font-black text-white mt-1 uppercase">${d['Aktiviti']}</h1>
+                    <p class="text-[11px] text-indigo-200">SMK Kamarul Ariffin &bull; Sahsiah, Disiplin & Kebajikan Murid</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] font-mono text-purple-200">${d['Tarikh']}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kad Maklumat Sahsiah -->
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div class="bg-indigo-50/50 p-3 rounded-xl border border-indigo-200">
+                <p class="text-[9px] font-black text-indigo-900 uppercase tracking-wide">Masa & Hari</p>
+                <p class="text-xs font-bold text-slate-800">${d['Hari']} &bull; ${d['Masa']}</p>
+                <div class="mt-2 border-t border-indigo-200 pt-1.5">
+                  <p class="text-[9px] font-black text-indigo-900 uppercase tracking-wide mb-0.5">Pengisian Program</p>
+                  <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line">${d['Penerangan'] || '-'}</p>
+                </div>
+              </div>
+              <div class="bg-purple-50/40 p-3 rounded-xl border border-purple-200 flex flex-col justify-between">
+                <div>
+                  <p class="text-[9px] font-black text-purple-900 uppercase tracking-wide mb-1">Impak Kebajikan & Sahsiah Murid</p>
+                  <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line">${d['Hasil'] || '-'}</p>
+                </div>
+                <div class="bg-white p-2 rounded-lg border border-purple-100 text-[10px] text-purple-900 font-semibold mt-2">
+                  Komitmen: Membina Kemenjadian Murid Seimbang
+                </div>
+              </div>
+            </div>
+
+            <div class="flex-1 flex flex-col mb-3">
+              <span class="text-xs font-black text-indigo-950 uppercase mb-1">Galeri Kebajikan & Aktiviti HEM</span>
+              ${imgHTML}
+            </div>
+
+            <div class="bg-indigo-950 text-white p-3 rounded-xl flex justify-between items-center text-xs">
+              <div>
+                <p class="text-[9px] text-purple-300 font-bold uppercase">Disediakan Oleh:</p>
+                <p class="font-bold text-white">${d['NamaPelapor'] || d['Nama Pelapor'] || '-'}</p>
+                <p class="text-[10px] text-slate-300">${d['Jawatan'] || '-'}</p>
+              </div>
+              <div class="text-right text-[9px] text-slate-400">
+                <span>Unit Hal Ehwal Murid SMKKA</span><br>
+                <span>${d['ID']} &bull; ${printDate}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+      // =========================================================================
+      // 5. PENTADBIRAN: GAYA CORPORATE ANNUAL REPORT (HIJAU ZAMRUD)
+      // =========================================================================
+      } else if (unit === 'Pentadbiran') {
+        layoutHTML = `
+          <div class="flex flex-col h-full justify-between">
+            <div class="border-b-4 border-emerald-700 pb-3 mb-3 flex justify-between items-center">
+              <div class="flex items-center gap-4">
+                <img src="logo.png" class="w-14 h-14 object-contain">
+                <div>
+                  <span class="text-[9px] font-black tracking-widest text-emerald-800 uppercase">PENTADBIRAN & PENGURUSAN SEKOLAH</span>
+                  <h1 class="text-lg font-black text-slate-900 mt-0.5 uppercase">${d['Aktiviti']}</h1>
+                  <p class="text-[11px] text-slate-600">SMK Kamarul Ariffin, Jalan Tenang, 85300 Labis, Johor</p>
+                </div>
+              </div>
+              <div class="bg-emerald-800 text-white px-3 py-2 rounded-xl text-right">
+                <span class="text-[9px] uppercase font-bold block text-emerald-200">Tarikh Program</span>
+                <span class="text-xs font-black">${d['Tarikh']}</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 mb-3 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+              <div><span class="font-bold text-emerald-900">Hari:</span> ${d['Hari']}</div>
+              <div><span class="font-bold text-emerald-900">Masa:</span> ${d['Masa']}</div>
+              <div><span class="font-bold text-emerald-900">Sektor:</span> Pentadbiran Am</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div class="border-t-2 border-emerald-600 pt-2">
+                <span class="text-[10px] font-black uppercase text-emerald-900 block mb-1">Perjalanan & Agenda Pentadbiran</span>
+                <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line">${d['Penerangan'] || '-'}</p>
+              </div>
+              <div class="border-t-2 border-emerald-600 pt-2">
+                <span class="text-[10px] font-black uppercase text-emerald-900 block mb-1">Dapatan & Tindakan Susulan</span>
+                <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line">${d['Hasil'] || '-'}</p>
+              </div>
+            </div>
+
+            <div class="flex-1 flex flex-col mb-3">
+              <span class="text-xs font-black text-slate-800 uppercase mb-1">Dokumentasi Bergambar Pentadbiran</span>
+              ${imgHTML}
+            </div>
+
+            <div class="border-t border-slate-300 pt-2 flex justify-between items-center text-xs">
+              <div>
+                <p class="text-[9px] text-slate-400 font-bold uppercase">Pelapor:</p>
+                <p class="font-black text-slate-900">${d['NamaPelapor'] || d['Nama Pelapor'] || '-'}</p>
+                <p class="text-[10px] text-slate-600">${d['Jawatan'] || '-'}</p>
+              </div>
+              <div class="text-right text-[10px] text-slate-400">
+                <span>Pengurusan & Pentadbiran SMKKA</span><br>
+                <span>${d['ID']} &bull; ${printDate}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+      // =========================================================================
+      // 6. LAIN-LAIN: GAYA MODERN CATALOG / PROMOSI KOMERSIAL (SLATE & NEUTRAL)
+      // =========================================================================
       } else {
-        container.className = "flex-1 grid grid-cols-2 gap-2.5 items-stretch";
-        validImages.forEach((url, i) => {
-          const div = document.createElement('div');
-          div.className = "border border-slate-300 rounded-xl p-1.5 bg-white/90 backdrop-blur-[1px] shadow-sm flex flex-col justify-between min-h-[55mm]";
-          div.innerHTML = `
-            <div class="w-full flex-1 flex items-center justify-center bg-slate-50 rounded-lg overflow-hidden border border-slate-200">
-              <img class="max-w-full max-h-full object-contain" src="${url}" alt="Gambar ${i + 1}">
+        layoutHTML = `
+          <div class="flex flex-col h-full justify-between">
+            <div class="bg-slate-900 text-white p-4 rounded-2xl mb-3 flex justify-between items-center shadow">
+              <div class="flex items-center gap-3.5">
+                <img src="logo.png" class="w-14 h-14 object-contain bg-white rounded-xl p-1">
+                <div>
+                  <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">DOKUMENTASI PROGRAM SEKOLAH</span>
+                  <h1 class="text-lg font-black text-white mt-0.5 uppercase">${d['Aktiviti']}</h1>
+                  <p class="text-[11px] text-slate-300">SMK Kamarul Ariffin, Labis, Johor</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="bg-slate-800 text-xs px-2.5 py-1 rounded-md text-slate-200 font-mono">${d['Tarikh']}</span>
+              </div>
             </div>
-            <p class="text-[10px] text-slate-700 text-center mt-1 font-semibold">Gambar Dokumentasi ${i + 1}</p>
-          `;
-          container.appendChild(div);
-        });
+
+            <div class="flex gap-2 mb-3 text-xs">
+              <div class="bg-slate-100 p-2 rounded-lg flex-1 font-medium"><b>Hari:</b> ${d['Hari']}</div>
+              <div class="bg-slate-100 p-2 rounded-lg flex-1 font-medium"><b>Masa:</b> ${d['Masa']}</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div class="border border-slate-200 rounded-xl p-3 bg-white">
+                <span class="text-[10px] font-bold uppercase text-slate-800 block mb-1">Pengisian Program</span>
+                <p class="text-xs text-slate-700 whitespace-pre-line leading-relaxed">${d['Penerangan'] || '-'}</p>
+              </div>
+              <div class="border border-slate-200 rounded-xl p-3 bg-white">
+                <span class="text-[10px] font-bold uppercase text-slate-800 block mb-1">Dapatan / Hasil</span>
+                <p class="text-xs text-slate-700 whitespace-pre-line leading-relaxed">${d['Hasil'] || '-'}</p>
+              </div>
+            </div>
+
+            <div class="flex-1 flex flex-col mb-3">
+              <span class="text-xs font-bold text-slate-700 uppercase mb-1">Evidens Bergambar</span>
+              ${imgHTML}
+            </div>
+
+            <div class="border-t border-slate-200 pt-2 flex justify-between items-center text-xs">
+              <div>
+                <p class="text-[9px] text-slate-400 uppercase font-bold">Disediakan Oleh:</p>
+                <p class="font-bold text-slate-800">${d['NamaPelapor'] || d['Nama Pelapor'] || '-'}</p>
+                <p class="text-[10px] text-slate-500">${d['Jawatan'] || '-'}</p>
+              </div>
+              <div class="text-right text-[10px] text-slate-400">
+                <span>${d['ID']} &bull; ${printDate}</span>
+              </div>
+            </div>
+          </div>
+        `;
       }
 
+      container.innerHTML = layoutHTML;
       document.getElementById('printContentPlaceholder').classList.add('hidden');
-      document.getElementById('printContentDetails').classList.remove('hidden');
+      container.classList.remove('hidden');
       lucide.createIcons();
     }
   </script>
