@@ -53,6 +53,18 @@
       min-height: 275mm;
       box-sizing: border-box;
     }
+
+    /* Lapisan Watermark Latar Belakang */
+    .watermark-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
@@ -266,7 +278,7 @@
       </div>
     </section>
 
-    <!-- 3. MENU: CETAKAN PELAPORAN (SATU MUKA A4 - TIADA PENGESAHAN) -->
+    <!-- 3. MENU: CETAKAN PELAPORAN (DENGAN WATERMARK MOTIF MENGIKUT UNIT) -->
     <section id="menu-print" class="hidden space-y-6">
       <div class="flex flex-wrap justify-between items-center gap-4 no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200">
         <div>
@@ -280,15 +292,18 @@
         </button>
       </div>
 
-      <!-- TEMPLAT CETAKAN SATU MUKA A4 -->
+      <!-- LEMBARAN CETAKAN SATU MUKA A4 DENGAN WATERMARK -->
       <div id="printArea" class="sheet-a4 mx-auto bg-white p-7 rounded-2xl shadow-md border border-slate-200 flex flex-col justify-between relative overflow-hidden">
         
-        <div id="printContentPlaceholder" class="m-auto text-center py-24 text-slate-400 flex flex-col items-center">
+        <!-- CORAK WATERMARK LATAR BELAKANG MENGIKUT UNIT (DIJANA DINAMIK) -->
+        <div id="unitWatermarkContainer" class="watermark-layer"></div>
+
+        <div id="printContentPlaceholder" class="m-auto text-center py-24 text-slate-400 flex flex-col items-center relative z-10">
           <i data-lucide="file-search" class="w-12 h-12 mb-3 text-slate-300"></i>
           <p class="text-sm font-medium">Sila pilih aktiviti daripada senarai pilihan di atas untuk memaparkan lembaran cetakan.</p>
         </div>
 
-        <div id="printContentDetails" class="hidden flex-1 flex flex-col justify-between h-full">
+        <div id="printContentDetails" class="hidden flex-1 flex flex-col justify-between h-full relative z-10">
           
           <div>
             <!-- KEPALA SURAT RASMI -->
@@ -321,28 +336,28 @@
               </div>
             </div>
 
-            <!-- JADUAL BUTIRAN AKTIVITI & PELAPOR -->
-            <table class="w-full text-xs border-collapse border border-slate-300 rounded-lg overflow-hidden mb-2.5">
+            <!-- JADUAL BUTIRAN AKTIVITI & PELAPOR (TRANSPARENT BG TO SHOW WATERMARK ELEGANTLY) -->
+            <table class="w-full text-xs border-collapse border border-slate-300 rounded-lg overflow-hidden mb-2.5 bg-white/90 backdrop-blur-[1px]">
               <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 w-1/4">Nama Aktiviti / Program</td>
+                <td class="border border-slate-300 p-2 font-bold bg-slate-100/90 text-slate-700 w-1/4">Nama Aktiviti / Program</td>
                 <td id="p-aktiviti" class="border border-slate-300 p-2 font-black text-slate-900 text-xs tracking-wide" colspan="3"></td>
               </tr>
               <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700">Unit / Sektor</td>
-                <td id="p-unit-text" class="border border-slate-300 p-2 font-semibold text-slate-800" colspan="3"></td>
+                <td class="border border-slate-300 p-2 font-bold bg-slate-100/90 text-slate-700">Unit / Sektor</td>
+                <td id="p-unit-text" class="border border-slate-300 p-2 font-semibold" colspan="3"></td>
               </tr>
               <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700">Tarikh & Hari</td>
+                <td class="border border-slate-300 p-2 font-bold bg-slate-100/90 text-slate-700">Tarikh & Hari</td>
                 <td id="p-tarikh" class="border border-slate-300 p-2 text-slate-800 font-medium w-1/4"></td>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 w-1/6">Masa Aktiviti</td>
+                <td class="border border-slate-300 p-2 font-bold bg-slate-100/90 text-slate-700 w-1/6">Masa Aktiviti</td>
                 <td id="p-masa" class="border border-slate-300 p-2 text-slate-800 font-medium"></td>
               </tr>
               <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 align-top">Penerangan Aktiviti</td>
+                <td class="border border-slate-300 p-2 font-bold bg-slate-100/90 text-slate-700 align-top">Penerangan Aktiviti</td>
                 <td id="p-penerangan" class="border border-slate-300 p-2 whitespace-pre-line leading-relaxed text-slate-800 font-normal" colspan="3"></td>
               </tr>
               <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 align-top">Hasil / Dapatan</td>
+                <td class="border border-slate-300 p-2 font-bold bg-slate-100/90 text-slate-700 align-top">Hasil / Dapatan</td>
                 <td id="p-hasil" class="border border-slate-300 p-2 whitespace-pre-line leading-relaxed text-slate-800 font-normal" colspan="3"></td>
               </tr>
             </table>
@@ -350,7 +365,7 @@
 
           <!-- DOKUMENTASI BERGAMBAR (AUTO-EXPAND MEMENUHI RUANG) -->
           <div class="flex-1 flex flex-col justify-start my-1.5 min-h-[125mm]">
-            <div class="flex items-center justify-between border-b-2 pb-1 mb-2 border-slate-200">
+            <div class="flex items-center justify-between border-b-2 pb-1 mb-2 border-slate-200 bg-white/70 backdrop-blur-[1px] px-1">
               <h4 class="font-black text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                 <i data-lucide="camera" class="w-3.5 h-3.5 text-slate-600"></i> Evidens & Dokumentasi Bergambar:
               </h4>
@@ -362,9 +377,9 @@
 
           <!-- MAKLUMAT PELAPOR BAWAH (TIADA RUANGAN PENGESAHAN) -->
           <div class="pt-2 border-t border-slate-300">
-            <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 flex items-center justify-between text-xs">
+            <div class="bg-white/95 backdrop-blur-[1px] border border-slate-200 rounded-lg p-2.5 flex items-center justify-between text-xs shadow-sm">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">
+                <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-700 font-bold shadow-inner">
                   <i data-lucide="user-check" class="w-4 h-4"></i>
                 </div>
                 <div>
@@ -399,6 +414,69 @@
     let storedReports = [];
     let currentFilter = "SEMUA";
     const base64Images = ["", "", "", ""];
+
+    // CORAK WATERMARK VEKTOR SVG MENGIKUT UNIT (OPACITY LEMBUT & ELEGAN)
+    const WATERMARK_SVGS = {
+      // 1. Kokurikulum: Motif Piala/Trofi Kemenangan, Bintang Kejayaan & Trek Sukan
+      'Kokurikulum': `
+        <svg class="w-[140mm] h-[140mm] text-red-900 opacity-[0.06] transform -rotate-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+          <path d="M4 22h16"/>
+          <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+          <circle cx="12" cy="7" r="1.5" fill="currentColor"/>
+        </svg>
+      `,
+      // 2. Koakademik: Motif Mentol Kreativiti, Sinaran Inovasi & Atom Ilmu
+      'Koakademik': `
+        <svg class="w-[140mm] h-[140mm] text-orange-950 opacity-[0.06] transform rotate-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+          <path d="M9 18h6"/>
+          <path d="M10 22h4"/>
+          <path d="M12 2v2"/>
+          <path d="M4.93 4.93l1.41 1.41"/>
+          <path d="M2 12h2"/>
+          <path d="M20 12h2"/>
+          <path d="M17.66 6.34l1.41-1.41"/>
+          <circle cx="12" cy="11" r="2" fill="currentColor"/>
+        </svg>
+      `,
+      // 3. Kurikulum: Motif Topi Graduasi / Ijazah & Buku Falsafah Ilmu
+      'Kurikulum': `
+        <svg class="w-[145mm] h-[145mm] text-blue-950 opacity-[0.06] transform -rotate-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+          <path d="M6 6h10"/>
+          <path d="M6 10h10"/>
+        </svg>
+      `,
+      // 4. HEM (Hal Ehwal Murid): Motif Perisai Perlindungan, Sahsiah & Hati Penyayang
+      'Hem': `
+        <svg class="w-[145mm] h-[145mm] text-indigo-950 opacity-[0.06] transform rotate-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor"/>
+        </svg>
+      `,
+      // 5. Pentadbiran: Motif Bangunan Berwibawa & Struktur Pengurusan Cemerlang
+      'Pentadbiran': `
+        <svg class="w-[140mm] h-[140mm] text-emerald-950 opacity-[0.06] transform rotate-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/>
+          <path d="M6 12H4a2 2 0 0 0-2 2v8h4"/>
+          <path d="M18 9h2a2 2 0 0 1 2 2v11h-4"/>
+          <path d="M10 6h4"/>
+          <path d="M10 10h4"/>
+          <path d="M10 14h4"/>
+          <path d="M10 18h4"/>
+        </svg>
+      `,
+      // 6. Lain-lain: Tera Air Monokrom Logo SMKKA
+      'Lain-lain': `
+        <img src="logo.png" class="w-[120mm] h-[120mm] object-contain opacity-[0.05] grayscale transform rotate-3 pointer-events-none" alt="Watermark Logo SMKKA">
+      `
+    };
 
     const UNIT_CONFIG = {
       'Kokurikulum': { bg: '#800000', icon: 'trophy', label: 'Kokurikulum', badge: 'bg-red-900 text-white', title: 'LAPORAN AKTIVITI KOKURIKULUM' },
@@ -472,7 +550,6 @@
       }
     }
 
-    // Hantar Borang (Termasuk Masa, Nama Pelapor & Jawatan)
     async function submitForm(e) {
       e.preventDefault();
 
@@ -628,7 +705,6 @@
       });
     }
 
-    // Isi Semula Data Borang untuk Kemaskini
     function editReport(index) {
       const d = storedReports[index];
       if (!d) return;
@@ -690,11 +766,12 @@
       renderPrintTemplate(index);
     }
 
-    // Paparan Lembaran Cetakan A4 (Tiada Pengesahan)
+    // RENDERING CETAKAN DENGAN WATERMARK MOTIF MENGIKUT UNIT
     function renderPrintTemplate(index) {
       if (index === "" || !storedReports[index]) {
         document.getElementById('printContentPlaceholder').classList.remove('hidden');
         document.getElementById('printContentDetails').classList.add('hidden');
+        document.getElementById('unitWatermarkContainer').innerHTML = '';
         return;
       }
 
@@ -702,6 +779,11 @@
       const unitName = d['Unit'] || 'Kokurikulum';
       const cfg = UNIT_CONFIG[unitName] || UNIT_CONFIG['Lain-lain'];
 
+      // MASUKKAN CORAK WATERMARK LATAR BELAKANG KHUSUS UNIT
+      const watermarkEl = document.getElementById('unitWatermarkContainer');
+      watermarkEl.innerHTML = WATERMARK_SVGS[unitName] || WATERMARK_SVGS['Lain-lain'];
+
+      // Kemaskini Header & Tajuk
       const headerEl = document.getElementById('printUnitHeader');
       headerEl.style.backgroundColor = cfg.bg;
       document.getElementById('p-unit-tag').textContent = cfg.label.toUpperCase();
@@ -741,9 +823,9 @@
       if (totalImg === 1) {
         container.className = "flex-1 flex flex-col items-center justify-center w-full";
         const div = document.createElement('div');
-        div.className = "w-full max-w-xl h-full max-h-[145mm] border-2 border-slate-300 rounded-xl p-2 bg-slate-50 shadow-inner flex flex-col justify-between";
+        div.className = "w-full max-w-xl h-full max-h-[145mm] border border-slate-300 rounded-xl p-2 bg-white/90 backdrop-blur-[1px] shadow-sm flex flex-col justify-between";
         div.innerHTML = `
-          <div class="w-full flex-1 flex items-center justify-center bg-white rounded-lg overflow-hidden">
+          <div class="w-full flex-1 flex items-center justify-center bg-slate-50 rounded-lg overflow-hidden border border-slate-200">
             <img class="max-w-full max-h-full object-contain" src="${validImages[0]}" alt="Evidens Bergambar 1">
           </div>
           <p class="text-[11px] text-slate-600 text-center mt-1 font-bold uppercase tracking-wider">DOKUMENTASI FOKUS PROGRAM</p>
@@ -754,9 +836,9 @@
         container.className = "flex-1 grid grid-cols-2 gap-3 items-stretch";
         validImages.forEach((url, i) => {
           const div = document.createElement('div');
-          div.className = "border border-slate-300 rounded-xl p-2 bg-slate-50 shadow-sm flex flex-col justify-between h-full";
+          div.className = "border border-slate-300 rounded-xl p-2 bg-white/90 backdrop-blur-[1px] shadow-sm flex flex-col justify-between h-full";
           div.innerHTML = `
-            <div class="w-full flex-1 flex items-center justify-center bg-white rounded-lg overflow-hidden min-h-[110mm]">
+            <div class="w-full flex-1 flex items-center justify-center bg-slate-50 rounded-lg overflow-hidden min-h-[110mm] border border-slate-200">
               <img class="max-w-full max-h-full object-contain" src="${url}" alt="Gambar ${i + 1}">
             </div>
             <p class="text-[10px] text-slate-700 text-center mt-1 font-bold">Gambar Dokumentasi ${i + 1}</p>
@@ -769,9 +851,9 @@
         validImages.forEach((url, i) => {
           const div = document.createElement('div');
           const spanClass = (i === 0) ? "col-span-2 min-h-[70mm]" : "col-span-1 min-h-[55mm]";
-          div.className = `border border-slate-300 rounded-xl p-1.5 bg-slate-50 shadow-sm flex flex-col justify-between ${spanClass}`;
+          div.className = `border border-slate-300 rounded-xl p-1.5 bg-white/90 backdrop-blur-[1px] shadow-sm flex flex-col justify-between ${spanClass}`;
           div.innerHTML = `
-            <div class="w-full flex-1 flex items-center justify-center bg-white rounded-lg overflow-hidden">
+            <div class="w-full flex-1 flex items-center justify-center bg-slate-50 rounded-lg overflow-hidden border border-slate-200">
               <img class="max-w-full max-h-full object-contain" src="${url}" alt="Gambar ${i + 1}">
             </div>
             <p class="text-[10px] text-slate-700 text-center mt-1 font-semibold">Gambar Dokumentasi ${i + 1}</p>
@@ -783,9 +865,9 @@
         container.className = "flex-1 grid grid-cols-2 gap-2.5 items-stretch";
         validImages.forEach((url, i) => {
           const div = document.createElement('div');
-          div.className = "border border-slate-300 rounded-xl p-1.5 bg-slate-50 shadow-sm flex flex-col justify-between min-h-[55mm]";
+          div.className = "border border-slate-300 rounded-xl p-1.5 bg-white/90 backdrop-blur-[1px] shadow-sm flex flex-col justify-between min-h-[55mm]";
           div.innerHTML = `
-            <div class="w-full flex-1 flex items-center justify-center bg-white rounded-lg overflow-hidden">
+            <div class="w-full flex-1 flex items-center justify-center bg-slate-50 rounded-lg overflow-hidden border border-slate-200">
               <img class="max-w-full max-h-full object-contain" src="${url}" alt="Gambar ${i + 1}">
             </div>
             <p class="text-[10px] text-slate-700 text-center mt-1 font-semibold">Gambar Dokumentasi ${i + 1}</p>
