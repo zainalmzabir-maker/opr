@@ -103,7 +103,7 @@
           <h2 id="formTitle" class="text-xl font-bold text-slate-800 flex items-center gap-2">
             <i data-lucide="file-pen-line" class="text-sky-600"></i> Borang Pelaporan Aktiviti SMK Kamarul Ariffin
           </h2>
-          <p class="text-xs text-slate-500 mt-0.5">Sila lengkapkan maklumat aktiviti, masa, dan maklumat pelapor.</p>
+          <p class="text-xs text-slate-500 mt-0.5">Sila lengkapkan maklumat aktiviti, masa, tempat, dan butiran pelapor.</p>
         </div>
         <img src="logo.png" alt="Logo SMKKA" class="w-10 h-10 object-contain hidden sm:block opacity-80">
       </div>
@@ -127,8 +127,8 @@
           </select>
         </div>
 
-        <!-- TARIKH, HARI & MASA -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- TARIKH, HARI, MASA & TEMPAT -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1">Tarikh Aktiviti <span class="text-red-500">*</span></label>
             <input type="date" id="tarikh" required onchange="autoFillDay(this.value)" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
@@ -137,9 +137,16 @@
             <label class="block text-sm font-semibold text-slate-700 mb-1">Hari</label>
             <input type="text" id="hari" readonly placeholder="cth: Rabu" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-2.5 text-sm font-medium text-slate-600">
           </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1">Masa Aktiviti <span class="text-red-500">*</span></label>
             <input type="text" id="masa" required placeholder="cth: 2.00 petang - 4.30 petang" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Tempat Aktiviti <span class="text-red-500">*</span></label>
+            <input type="text" id="tempat" required placeholder="cth: Dewan Seri Ariffin / Padang Sekolah / Makmal Komputer" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
           </div>
         </div>
 
@@ -250,7 +257,7 @@
           <thead class="bg-slate-100/80 border-b text-slate-700 uppercase text-xs font-bold">
             <tr>
               <th class="p-3.5">Unit</th>
-              <th class="p-3.5">Tarikh, Hari & Masa</th>
+              <th class="p-3.5">Tarikh, Masa & Tempat</th>
               <th class="p-3.5">Aktiviti / Program</th>
               <th class="p-3.5">Pelapor & Jawatan</th>
               <th class="p-3.5">Kemaskini Terakhir</th>
@@ -266,7 +273,7 @@
       </div>
     </section>
 
-    <!-- 3. MENU: CETAKAN PELAPORAN (SATU MUKA A4 - TIADA PENGESAHAN) -->
+    <!-- 3. MENU: CETAKAN PELAPORAN OPR (SATU MUKA A4 - TIADA PENGESAHAN) -->
     <section id="menu-print" class="hidden space-y-6">
       <div class="flex flex-wrap justify-between items-center gap-4 no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200">
         <div>
@@ -321,7 +328,7 @@
               </div>
             </div>
 
-            <!-- JADUAL BUTIRAN AKTIVITI & PELAPOR -->
+            <!-- JADUAL BUTIRAN AKTIVITI & PELAPOR (TERMASUK TEMPAT) -->
             <table class="w-full text-xs border-collapse border border-slate-300 rounded-lg overflow-hidden mb-2.5">
               <tr>
                 <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 w-1/4">Nama Aktiviti / Program</td>
@@ -336,6 +343,10 @@
                 <td id="p-tarikh" class="border border-slate-300 p-2 text-slate-800 font-medium w-1/4"></td>
                 <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 w-1/6">Masa Aktiviti</td>
                 <td id="p-masa" class="border border-slate-300 p-2 text-slate-800 font-medium"></td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700">Tempat / Lokasi</td>
+                <td id="p-tempat" class="border border-slate-300 p-2 text-slate-800 font-medium" colspan="3"></td>
               </tr>
               <tr>
                 <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 align-top">Penerangan Aktiviti</td>
@@ -472,7 +483,7 @@
       }
     }
 
-    // Hantar Borang (Termasuk Masa, Nama Pelapor & Jawatan)
+    // Hantar Borang (Termasuk Tempat)
     async function submitForm(e) {
       e.preventDefault();
 
@@ -493,6 +504,7 @@
         tarikh: document.getElementById('tarikh').value,
         hari: document.getElementById('hari').value,
         masa: document.getElementById('masa').value,
+        tempat: document.getElementById('tempat').value,
         aktiviti: document.getElementById('aktiviti').value,
         namaPelapor: document.getElementById('namaPelapor').value,
         jawatan: document.getElementById('jawatan').value,
@@ -593,7 +605,8 @@
           </td>
           <td class="p-3.5 font-semibold text-slate-800">
             ${item['Tarikh'] || '-'}<br>
-            <span class="text-xs font-normal text-slate-500">${item['Hari'] || ''} (${item['Masa'] || '-'})</span>
+            <span class="text-xs font-normal text-slate-500">${item['Hari'] || ''} (${item['Masa'] || '-'})</span><br>
+            <span class="text-[11px] font-medium text-slate-600"><i data-lucide="map-pin" class="w-3 h-3 inline text-slate-400"></i> ${item['Tempat'] || '-'}</span>
           </td>
           <td class="p-3.5 font-bold text-slate-800 max-w-[200px] truncate">${item['Aktiviti'] || '-'}</td>
           <td class="p-3.5 text-xs text-slate-700">
@@ -628,7 +641,7 @@
       });
     }
 
-    // Isi Semula Data Borang untuk Kemaskini
+    // Isi Semula Data Borang untuk Kemaskini (Termasuk Tempat)
     function editReport(index) {
       const d = storedReports[index];
       if (!d) return;
@@ -643,6 +656,7 @@
       document.getElementById('tarikh').value = d['Tarikh'] || '';
       document.getElementById('hari').value = d['Hari'] || '';
       document.getElementById('masa').value = d['Masa'] || '';
+      document.getElementById('tempat').value = d['Tempat'] || '';
       document.getElementById('namaPelapor').value = d['Nama Pelapor'] || '';
       document.getElementById('jawatan').value = d['Jawatan'] || '';
       document.getElementById('aktiviti').value = d['Aktiviti'] || '';
@@ -690,7 +704,7 @@
       renderPrintTemplate(index);
     }
 
-    // Paparan Lembaran Cetakan A4 (Tiada Pengesahan)
+    // Paparan Lembaran Cetakan OPR (Satu Muka A4 - Termasuk Ruangan Tempat)
     function renderPrintTemplate(index) {
       if (index === "" || !storedReports[index]) {
         document.getElementById('printContentPlaceholder').classList.remove('hidden');
@@ -712,6 +726,7 @@
       document.getElementById('p-aktiviti').textContent = d['Aktiviti'] || '-';
       document.getElementById('p-tarikh').textContent = `${d['Tarikh'] || '-'} (${d['Hari'] || '-'})`;
       document.getElementById('p-masa').textContent = d['Masa'] || '-';
+      document.getElementById('p-tempat').textContent = d['Tempat'] || '-';
       document.getElementById('p-penerangan').textContent = d['Penerangan'] || '-';
       document.getElementById('p-hasil').textContent = d['Hasil'] || '-';
       
