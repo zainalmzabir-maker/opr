@@ -64,7 +64,7 @@
         <img src="logo.png" alt="Logo SMKKA" class="w-11 h-11 object-contain bg-white rounded-full p-1 shadow">
         <div>
           <h1 class="text-lg font-extrabold tracking-wide uppercase">Sistem Pelaporan Satu Muka</h1>
-          <p class="text-xs text-sky-300 font-medium">SMK Kamarul Ariffin, Labis, Johor &bull; opr.smekar.com</p>
+          <p class="text-xs text-sky-300 font-medium">SMK Kamarul Ariffin, Labis, Johor &bull; opr.semekar.com</p>
         </div>
       </div>
 
@@ -330,7 +330,7 @@
                 <div class="flex items-center gap-1 px-2.5 py-1 bg-black/25 rounded-md border border-white/20 text-[10px] font-bold text-white uppercase tracking-wider">
                   <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-300"></i> Format Satu Muka
                 </div>
-                <span class="text-[9px] text-white/75 mt-1 font-mono">opr.smekar.com</span>
+                <span class="text-[9px] text-white/75 mt-1 font-mono">opr.semekar.com</span>
               </div>
             </div>
 
@@ -398,7 +398,7 @@
               </div>
             </div>
 
-            <!-- RUJUKAN PAUTAN RASMI OPR.SMEKAR.COM -->
+            <!-- RUJUKAN PAUTAN RASMI OPR.SEMEKAR.COM -->
             <div class="flex items-center justify-between text-[9px] text-slate-400 pt-1.5 mt-1 border-t border-slate-100">
               <span>Sistem Pelaporan Satu Muka SMK Kamarul Ariffin &bull; Versi Digital 2026</span>
               <span class="truncate max-w-[60%]">Pautan Rujukan: <b id="p-ref-link" class="text-slate-600 font-mono">-</b></span>
@@ -414,10 +414,10 @@
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzede3L7tgU4zUwW_qwOENAZdMAuEdjWSNZ_t6zqvTQRRZz0qHrbRgfPiVNUZxGiP7Ulw/exec";
 
-    // DOMAIN PAUTAN ASAS RASMI ANDA
-    const BASE_DOMAIN_URL = "https://opr.smekar.com";
+    // DOMAIN PAUTAN ASAS RASMI ANDA: OPR.SEMEKAR.COM
+    const BASE_DOMAIN_URL = "https://opr.semekar.com";
 
-    // Muat data segera dari LocalStorage jika ada (Kalis Loading / Instant Render)
+    // Muat data awal dari cache localStorage jika wujud (membantu buka pautan dengan serta-merta)
     let storedReports = [];
     try {
       const cached = localStorage.getItem('smkka_reports_cache');
@@ -439,9 +439,9 @@
 
     lucide.createIcons();
 
-    // Membina Pautan Alamat Menggunakan Domain Rasmi opr.smekar.com
+    // Membina Pautan Alamat Menggunakan Domain Rasmi opr.semekar.com
     function getReportUniqueUrl(reportId) {
-      return `${BASE_DOMAIN_URL}/#id=${encodeURIComponent(reportId.trim())}`;
+      return `${BASE_DOMAIN_URL}/#id=${encodeURIComponent((reportId || '').trim())}`;
     }
 
     // Fungsi Salin Pautan ke Clipboard
@@ -474,7 +474,6 @@
       document.getElementById(`menu-${tab}`).classList.remove('hidden');
       document.getElementById(`btn-${tab}`).className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 bg-white text-slate-900 shadow";
 
-      // Jika berpindah ke print biasa (bukan dari pautan terus), dan belum pilih apa-apa
       if (tab === 'print' && !preserveDetails) {
         const selectVal = document.getElementById('selectRecordToPrint').value;
         if (selectVal === "") {
@@ -630,7 +629,7 @@
       renderDashboardTable();
       populatePrintDropdown();
 
-      // Semak jika pengguna datang dengan pautan URL terus
+      // Semak jika pengguna datang terus melalui pautan URL unik
       checkUrlForDirectReport();
     };
 
@@ -652,10 +651,10 @@
       const targetId = getReportIdFromUrl();
       if (!targetId) return;
 
-      // Terus buka tab print dan kekalkan ruangan
+      // Terus buka tab print dan kekalkan paparan
       switchTab('print', true);
 
-      // Cari indeks laporan dengan pembersihan teks
+      // Cari indeks laporan secara tepat
       const cleanTarget = targetId.toLowerCase().replace(/[^a-z0-9_-]/g, '');
       const index = storedReports.findIndex(item => {
         const itemId = String(item['ID'] || '').toLowerCase().replace(/[^a-z0-9_-]/g, '');
@@ -842,7 +841,7 @@
       const unitName = d['Unit'] || 'Kokurikulum';
       const cfg = UNIT_CONFIG[unitName] || UNIT_CONFIG['Lain-lain'];
 
-      // Kemaskini URL hash secara senyap tanpa reload
+      // Kemaskini URL hash browser secara halus tanpa reload
       window.history.replaceState(null, null, `#id=${encodeURIComponent(d['ID'])}`);
       if (copyBtn) copyBtn.classList.remove('hidden');
 
@@ -863,7 +862,7 @@
       document.getElementById('p-pelapor-nama').textContent = d['Nama Pelapor'] || '-';
       document.getElementById('p-pelapor-jawatan').textContent = d['Jawatan'] || '-';
 
-      // Paparan pautan rasmi berasaskan domain opr.smekar.com
+      // Paparan pautan rasmi berasaskan domain opr.semekar.com
       const uniqueUrl = getReportUniqueUrl(d['ID']);
       document.getElementById('p-ref-link').textContent = uniqueUrl;
 
@@ -947,13 +946,10 @@
 
     // AUTOMATIK: TERUS SEMAK PAUTAN & PAPARKAN LAPORAN BILA DIBUKA
     function initializeApp() {
-      // 1. Jika URL ada ID rujukan, semak terus sama ada data ada dalam cache/memori
       const targetId = getReportIdFromUrl();
       if (targetId) {
         checkUrlForDirectReport();
       }
-
-      // 2. Muat turun data daripada Google Sheets
       loadDataFromSheets();
     }
 
