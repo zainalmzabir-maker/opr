@@ -417,7 +417,13 @@
     // DOMAIN PAUTAN ASAS RASMI ANDA
     const BASE_DOMAIN_URL = "https://opr.smekar.com";
 
+    // Muat data segera dari LocalStorage jika ada (Kalis Loading / Instant Render)
     let storedReports = [];
+    try {
+      const cached = localStorage.getItem('smkka_reports_cache');
+      if (cached) storedReports = JSON.parse(cached);
+    } catch(e) {}
+
     let currentFilter = "SEMUA";
     const base64Images = ["", "", "", ""];
     let isFetchingData = false;
@@ -435,7 +441,7 @@
 
     // Membina Pautan Alamat Menggunakan Domain Rasmi opr.smekar.com
     function getReportUniqueUrl(reportId) {
-      return `${BASE_DOMAIN_URL}/#id=${encodeURIComponent(reportId)}`;
+      return `${BASE_DOMAIN_URL}/#id=${encodeURIComponent(reportId.trim())}`;
     }
 
     // Fungsi Salin Pautan ke Clipboard
@@ -443,7 +449,7 @@
       const url = getReportUniqueUrl(reportId);
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(url).then(() => {
-          alert("Pautan rasmi laporan berjaya disalin ke papan klip!\n\n" + url);
+          alert("Pautan rasmi laporan berjaya disalin!\n\n" + url);
         }).catch(() => {
           prompt("Salin pautan laporan di bawah:", url);
         });
@@ -459,7 +465,7 @@
       }
     }
 
-    function switchTab(tab) {
+    function switchTab(tab, preserveDetails = false) {
       ['form', 'dashboard', 'print'].forEach(t => {
         document.getElementById(`menu-${t}`).classList.add('hidden');
         document.getElementById(`btn-${t}`).className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-700";
@@ -467,6 +473,15 @@
 
       document.getElementById(`menu-${tab}`).classList.remove('hidden');
       document.getElementById(`btn-${tab}`).className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 bg-white text-slate-900 shadow";
+
+      // Jika berpindah ke print biasa (bukan dari pautan terus), dan belum pilih apa-apa
+      if (tab === 'print' && !preserveDetails) {
+        const selectVal = document.getElementById('selectRecordToPrint').value;
+        if (selectVal === "") {
+          document.getElementById('printContentPlaceholder').classList.remove('hidden');
+          document.getElementById('printContentDetails').classList.add('hidden');
+        }
+      }
 
       if ((tab === 'dashboard' || tab === 'print') && storedReports.length === 0) {
         loadDataFromSheets();
@@ -559,7 +574,6 @@
 
         alert(existingId ? "Laporan berjaya dikemaskini!" : "Laporan berjaya disimpan ke Google Sheets!");
         cancelEditMode();
-        storedReports = []; // Reset cache supaya data terkini dimuat turun
         switchTab('dashboard');
         loadDataFromSheets();
       } catch (error) {
@@ -573,12 +587,12 @@
       }
     }
 
-    function loadDataFromSheets(callbackAfterLoad) {
+    function loadDataFromSheets() {
       if (isFetchingData) return;
       isFetchingData = true;
 
       const tbody = document.getElementById('dashboardTableBody');
-      if (tbody) {
+      if (tbody && storedReports.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500"><i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Sedang memuat data dari Google Sheets...</td></tr>`;
         lucide.createIcons();
       }
@@ -591,7 +605,7 @@
       script.src = `${GOOGLE_SCRIPT_URL}?callback=handleSheetsData&t=${new Date().getTime()}`;
       script.onerror = function() {
         isFetchingData = false;
-        if (tbody) {
+        if (tbody && storedReports.length === 0) {
           tbody.innerHTML = `
             <tr>
               <td colspan="6" class="p-6 text-center text-red-600">
@@ -606,7 +620,13 @@
 
     window.handleSheetsData = function(data) {
       isFetchingData = false;
-      storedReports = Array.isArray(data) ? data : [];
+      if (Array.isArray(data)) {
+        storedReports = data;
+        try {
+          localStorage.setItem('smkka_reports_cache', JSON.stringify(data));
+        } catch(e) {}
+      }
+
       renderDashboardTable();
       populatePrintDropdown();
 
@@ -614,17 +634,16 @@
       checkUrlForDirectReport();
     };
 
-    // PENGESAN PAUTAN TERUS DARI URL
+    // PENGESAN PAUTAN TERUS DARI URL (#id=... atau ?id=...)
     function getReportIdFromUrl() {
-      // 1. Semak dari hash (#id=REP-xxxx)
-      const hash = window.location.hash;
-      if (hash && hash.includes('id=')) {
-        return decodeURIComponent(hash.split('id=')[1].split('&')[0]);
+      const hash = window.location.hash || '';
+      if (hash.includes('id=')) {
+        const val = hash.split('id=')[1].split('&')[0];
+        return decodeURIComponent(val).trim();
       }
-      // 2. Semak dari query parameter (?id=REP-xxxx)
       const params = new URLSearchParams(window.location.search);
       if (params.has('id')) {
-        return params.get('id');
+        return decodeURIComponent(params.get('id')).trim();
       }
       return null;
     }
@@ -633,28 +652,31 @@
       const targetId = getReportIdFromUrl();
       if (!targetId) return;
 
-      // Tukar paparan ke tab cetakan
-      switchTab('print');
+      // Terus buka tab print dan kekalkan ruangan
+      switchTab('print', true);
 
-      if (storedReports.length === 0) {
-        // Jika data belum siap, tunjukkan status sedang memuat laporan
-        const placeholderText = document.getElementById('printPlaceholderText');
-        if (placeholderText) {
-          placeholderText.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2 text-sky-600"></i>Sedang memuat rekod laporan <b>${targetId}</b>...`;
-          lucide.createIcons();
-        }
-        return;
-      }
+      // Cari indeks laporan dengan pembersihan teks
+      const cleanTarget = targetId.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+      const index = storedReports.findIndex(item => {
+        const itemId = String(item['ID'] || '').toLowerCase().replace(/[^a-z0-9_-]/g, '');
+        return itemId === cleanTarget;
+      });
 
-      // Cari indeks laporan
-      const index = storedReports.findIndex(item => (item['ID'] || '').trim() === targetId.trim());
       if (index !== -1) {
         document.getElementById('selectRecordToPrint').value = index;
         renderPrintTemplate(index);
       } else {
-        const placeholderText = document.getElementById('printPlaceholderText');
-        if (placeholderText) {
-          placeholderText.innerHTML = `<span class="text-red-500 font-bold">Ralat: Laporan dengan No. Rujukan <b>"${targetId}"</b> tidak ditemui.</span> Sila pastikan pautan adalah betul atau pilih dari senarai di atas.`;
+        if (isFetchingData) {
+          const placeholderText = document.getElementById('printPlaceholderText');
+          if (placeholderText) {
+            placeholderText.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2 text-sky-600"></i>Sedang mendapatkan rekod <b>${targetId}</b> dari pangkalan data...`;
+            lucide.createIcons();
+          }
+        } else {
+          const placeholderText = document.getElementById('printPlaceholderText');
+          if (placeholderText) {
+            placeholderText.innerHTML = `<span class="text-red-500 font-bold">Laporan dengan No. Rujukan "${targetId}" tidak ditemui.</span> Sila pastikan pautan adalah betul atau pilih dari senarai di atas.`;
+          }
         }
       }
     }
@@ -718,7 +740,7 @@
               <button onclick="copyLinkById('${item['ID']}')" title="Salin Pautan Rasmi" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1.5 rounded transition flex items-center gap-1">
                 <i data-lucide="copy" class="w-3 h-3 text-sky-600"></i> Pautan
               </button>
-              <button onclick="editReport(${rawIndex})" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2 py-1.5 rounded transition flex items-center gap-1">
+              <button onclick="editReport(${rawIndex})" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2.5 py-1.5 rounded transition flex items-center gap-1">
                 <i data-lucide="edit" class="w-3 h-3"></i> Edit
               </button>
               <button onclick="goToPrintRecord(${rawIndex})" class="text-xs bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold px-2.5 py-1.5 rounded transition flex items-center gap-1">
@@ -801,7 +823,7 @@
     }
 
     function goToPrintRecord(index) {
-      switchTab('print');
+      switchTab('print', true);
       document.getElementById('selectRecordToPrint').value = index;
       renderPrintTemplate(index);
     }
@@ -841,6 +863,7 @@
       document.getElementById('p-pelapor-nama').textContent = d['Nama Pelapor'] || '-';
       document.getElementById('p-pelapor-jawatan').textContent = d['Jawatan'] || '-';
 
+      // Paparan pautan rasmi berasaskan domain opr.smekar.com
       const uniqueUrl = getReportUniqueUrl(d['ID']);
       document.getElementById('p-ref-link').textContent = uniqueUrl;
 
@@ -922,23 +945,21 @@
       lucide.createIcons();
     }
 
-    // AUTOMATIK MUAT DATA SEBAIK SAHAJA WEB DIBUKA
-    window.addEventListener('DOMContentLoaded', () => {
-      // Jika URL mengandungi rujukan ID, terus aktifkan tab print & tunjuk status loading
-      if (getReportIdFromUrl()) {
-        switchTab('print');
-        const placeholderText = document.getElementById('printPlaceholderText');
-        if (placeholderText) {
-          placeholderText.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2 text-sky-600"></i>Sedang menyambung ke pangkalan data Google Sheets...`;
-          lucide.createIcons();
-        }
+    // AUTOMATIK: TERUS SEMAK PAUTAN & PAPARKAN LAPORAN BILA DIBUKA
+    function initializeApp() {
+      // 1. Jika URL ada ID rujukan, semak terus sama ada data ada dalam cache/memori
+      const targetId = getReportIdFromUrl();
+      if (targetId) {
+        checkUrlForDirectReport();
       }
 
-      // Muat data dari Google Sheets serta-merta
+      // 2. Muat turun data daripada Google Sheets
       loadDataFromSheets();
-    });
+    }
 
-    // Semak jika pengguna menukar pautan hash semasa laman web sedang dibuka
+    window.addEventListener('DOMContentLoaded', initializeApp);
+
+    // Semak jika pengguna menampal pautan baharu semasa laman web sedang dibuka
     window.addEventListener('hashchange', () => {
       checkUrlForDirectReport();
     });
