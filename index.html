@@ -57,6 +57,28 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
 
+  <!-- DIALOG POP-UP STATUS KEMASKINI (MODAL OVERLAY) -->
+  <div id="progressModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] hidden flex items-center justify-center p-4 no-print transition-opacity">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-100 flex flex-col items-center transform transition-all scale-100">
+      
+      <!-- Bekas Ikon Dinamik -->
+      <div id="modalIconContainer" class="w-16 h-16 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center mb-4 transition-colors">
+        <i id="modalIcon" data-lucide="loader-2" class="w-8 h-8 animate-spin"></i>
+      </div>
+      
+      <!-- Tajuk & Mesej Dialog -->
+      <h3 id="modalTitle" class="text-base font-extrabold text-slate-800 mb-1.5">Sedang Mengemas Kini Data</h3>
+      <p id="modalMessage" class="text-xs text-slate-500 leading-relaxed">Sila tunggu sebentar. Maklumat dan gambar sedang diproses serta dihantar ke pangkalan data Google Sheets...</p>
+      
+      <!-- Butang Tindakan (Dipaparkan hanya jika Ralat atau Perlu Ditutup Manual) -->
+      <div id="modalActionBtn" class="mt-5 hidden w-full">
+        <button type="button" onclick="closeProgressModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- HEADER SISTEM -->
   <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50 no-print border-b border-slate-700">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
@@ -243,7 +265,7 @@
           <h2 class="text-xl font-bold text-slate-800">Senarai Laporan Aktiviti Sekolah</h2>
           <p class="text-xs text-slate-500">Papar, tapis rekod mengikut Aktiviti Unit, salin pautan rasmi & kemas kini laporan.</p>
         </div>
-        <button onclick="loadDataFromSheets()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+        <button onclick="loadDataFromSheets(true)" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Segar Semula
         </button>
       </div>
@@ -447,6 +469,40 @@
 
     lucide.createIcons();
 
+    // FUNGSI KAWALAN DIALOG POP-UP (MODAL)
+    function showProgressModal(title, message, isSuccess = false, isError = false) {
+      const modal = document.getElementById('progressModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalMessage = document.getElementById('modalMessage');
+      const iconContainer = document.getElementById('modalIconContainer');
+      const actionBtn = document.getElementById('modalActionBtn');
+
+      modalTitle.textContent = title;
+      modalMessage.textContent = message;
+
+      if (isSuccess) {
+        iconContainer.className = "w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 transition-colors";
+        iconContainer.innerHTML = '<i data-lucide="check-circle-2" class="w-8 h-8"></i>';
+        actionBtn.classList.add('hidden');
+      } else if (isError) {
+        iconContainer.className = "w-16 h-16 rounded-full bg-red-50 text-red-600 flex items-center justify-center mb-4 transition-colors";
+        iconContainer.innerHTML = '<i data-lucide="alert-circle" class="w-8 h-8"></i>';
+        actionBtn.classList.remove('hidden');
+      } else {
+        iconContainer.className = "w-16 h-16 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center mb-4 transition-colors";
+        iconContainer.innerHTML = '<i data-lucide="loader-2" class="w-8 h-8 animate-spin"></i>';
+        actionBtn.classList.add('hidden');
+      }
+
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeProgressModal() {
+      const modal = document.getElementById('progressModal');
+      modal.classList.add('hidden');
+    }
+
     function getReportUniqueUrl(reportId) {
       return `${BASE_DOMAIN_URL}/#id=${encodeURIComponent((reportId || '').trim())}`;
     }
@@ -455,7 +511,8 @@
       const url = getReportUniqueUrl(reportId);
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(url).then(() => {
-          alert("Pautan rasmi laporan berjaya disalin!\n\n" + url);
+          showProgressModal("Pautan Disalin!", url, true);
+          setTimeout(closeProgressModal, 2000);
         }).catch(() => {
           prompt("Salin pautan laporan di bawah:", url);
         });
@@ -549,12 +606,19 @@
         return;
       }
 
+      const isEdit = Boolean(existingId);
+      const finalReportId = isEdit && existingId.trim() !== "" ? existingId.trim() : ("REP-" + Date.now());
+
+      // PAPARKAN DIALOG MODAL SEBELUM PENGHANTARAN BERMULA
+      showProgressModal(
+        isEdit ? "Sedang Mengemas Kini Data..." : "Sedang Menyimpan Laporan...",
+        "Sila tunggu sebentar. Maklumat laporan dan fail gambar sedang dimuat naik ke Google Sheets & Google Drive..."
+      );
+
       const btn = document.getElementById('btnSubmit');
       btn.disabled = true;
-      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span>${existingId ? 'Sedang mengemas kini...' : 'Sedang menyimpan...'}</span>`;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span>${isEdit ? 'Sedang mengemas kini...' : 'Sedang menyimpan...'}</span>`;
       lucide.createIcons();
-
-      const finalReportId = existingId && existingId.trim() !== "" ? existingId.trim() : ("REP-" + Date.now());
 
       const payload = {
         id: finalReportId,
@@ -579,7 +643,12 @@
           body: JSON.stringify(payload)
         });
 
-        alert(existingId ? "Laporan berjaya dikemaskini!" : "Laporan berjaya disimpan ke Google Sheets!");
+        // TUKAR DIALOG KE STATUS BERJAYA
+        showProgressModal(
+          isEdit ? "Data Berjaya Dikemas Kini!" : "Laporan Berjaya Disimpan!",
+          "Pangkalan data Google Sheets telah dikemas kini dengan maklumat terkini.",
+          true
+        );
 
         const urlParams = new URLSearchParams(window.location.search);
         const returnUrl = urlParams.get('return_url');
@@ -587,15 +656,26 @@
         const linkLaporanOpr = getReportUniqueUrl(finalReportId);
 
         if (returnUrl) {
-          window.location.href = `${returnUrl}?status=selesai&bil=${encodeURIComponent(bilMentee || '')}&link=${encodeURIComponent(linkLaporanOpr)}`;
+          setTimeout(() => {
+            window.location.href = `${returnUrl}?status=selesai&bil=${encodeURIComponent(bilMentee || '')}&link=${encodeURIComponent(linkLaporanOpr)}`;
+          }, 1500);
           return;
         }
 
-        cancelEditMode();
-        switchTab('dashboard');
-        loadDataFromSheets();
+        setTimeout(() => {
+          closeProgressModal();
+          cancelEditMode();
+          switchTab('dashboard');
+          loadDataFromSheets();
+        }, 1500);
+
       } catch (error) {
-        alert("Ralat semasa penghantaran: " + error.message);
+        showProgressModal(
+          "Ralat Semasa Kemas Kini!",
+          "Gagal berhubung dengan pelayan: " + error.message,
+          false,
+          true
+        );
       } finally {
         btn.disabled = false;
         const currentId = document.getElementById('reportId') ? document.getElementById('reportId').value : '';
@@ -605,9 +685,16 @@
       }
     }
 
-    function loadDataFromSheets() {
+    function loadDataFromSheets(isManualRefresh = false) {
       if (isFetchingData) return;
       isFetchingData = true;
+
+      if (isManualRefresh) {
+        showProgressModal(
+          "Sedang Menyegerak Data...",
+          "Mendapatkan senarai rekod laporan terkini daripada Google Sheets..."
+        );
+      }
 
       const tbody = document.getElementById('dashboardTableBody');
       if (tbody && storedReports.length === 0) {
@@ -624,6 +711,9 @@
       script.onerror = function() {
         isFetchingData = false;
         hasFinishedInitialFetch = true;
+        if (isManualRefresh) {
+          showProgressModal("Ralat Segar Semula", "Gagal memuat turun data dari Google Sheets.", false, true);
+        }
         if (tbody && storedReports.length === 0) {
           tbody.innerHTML = `
             <tr>
@@ -640,6 +730,14 @@
     window.handleSheetsData = function(data) {
       isFetchingData = false;
       hasFinishedInitialFetch = true;
+
+      // Jika modal sedang memaparkan 'Sedang Menyegerak Data...', tutup modal secara lancar
+      const modal = document.getElementById('progressModal');
+      const modalTitle = document.getElementById('modalTitle');
+      if (modal && !modal.classList.contains('hidden') && modalTitle.textContent === "Sedang Menyegerak Data...") {
+        closeProgressModal();
+      }
+
       if (Array.isArray(data)) {
         storedReports = data;
         try {
@@ -649,8 +747,6 @@
 
       renderDashboardTable();
       populatePrintDropdown();
-
-      // Semak jika pengguna datang terus melalui pautan URL unik
       checkUrlForDirectReport();
     };
 
@@ -678,13 +774,11 @@
       const cleanTarget = targetId.toLowerCase().replace(/[^a-z0-9]/g, '');
       const targetTs = parseInt(cleanTarget.replace(/\D/g, '')) || 0;
 
-      // 1. Cari padanan tepat ID
       let index = storedReports.findIndex(item => {
         const itemId = String(item['ID'] || item['id'] || '').toLowerCase().replace(/[^a-z0-9]/g, '');
         return itemId === cleanTarget;
       });
 
-      // 2. Padanan pintar timestamp dalam lingkungan 30 saat sekiranya terdapat perbezaan masa jam peranti/pelayan
       if (index === -1 && targetTs > 1000000000000) {
         index = storedReports.findIndex(item => {
           const itemId = String(item['ID'] || item['id'] || '').toLowerCase().replace(/[^a-z0-9]/g, '');
