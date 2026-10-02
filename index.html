@@ -556,7 +556,84 @@
 
   </main>
 
-  <!-- PENGESAN MOD KEMASKINI AUTOMATIK (UNTUK OPR.SEMEKAR.COM) -->
+  <!-- ================================================================= -->
+  <!-- SKRIP KEKALKAN UNIT KEPADA HEM (UNTUK OPR.SEMEKAR.COM)           -->
+  <!-- ================================================================= -->
+  <script>
+    function kekalkanUnitKepadaHEM() {
+      const unitSelectors = [
+        'select[name="unit"]', 'select[id="unit"]',
+        'select[name="Unit"]', 'select[id="Unit"]',
+        'select[name*="unit" i]', 'select[id*="unit" i]',
+        'input[name="unit"]', 'input[id="unit"]',
+        'input[name="Unit"]', 'input[id="Unit"]',
+        'input[name*="unit" i]', 'input[id*="unit" i]',
+        '#aktiviti_unit', '#unit_aktiviti', '#kategori_unit', '#kategori'
+      ];
+
+      unitSelectors.forEach(sel => {
+        document.querySelectorAll(sel).forEach(el => {
+          if (el.tagName === 'SELECT') {
+            let dijumpai = false;
+            for (let i = 0; i < el.options.length; i++) {
+              const optText = el.options[i].text.toLowerCase();
+              const optVal = el.options[i].value.toLowerCase();
+              if (
+                optVal === 'hem' || optText === 'hem' ||
+                optVal.includes('hem') || optText.includes('hem') ||
+                optVal.includes('hal ehwal murid') || optText.includes('hal ehwal murid')
+              ) {
+                el.selectedIndex = i;
+                el.value = el.options[i].value;
+                dijumpai = true;
+                break;
+              }
+            }
+
+            if (!dijumpai && el.options.length > 0) {
+              const optBaru = new Option("HEM", "HEM", true, true);
+              el.add(optBaru);
+              el.value = "HEM";
+            }
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+
+          } else if (el.tagName === 'INPUT') {
+            el.value = 'HEM';
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        });
+      });
+    }
+
+    // JALANKAN SECARA BERTERUSAN SEHINGGA BORANG SELESAI DIMUAT TURUN
+    window.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hash = window.location.hash || '';
+      const isEditMode = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || hash.includes('mode=edit') || urlParams.get('unit') === 'HEM';
+
+      if (isEditMode) {
+        console.log("Mod Edit / Unit HEM dikesan. Mengunci Unit kepada HEM...");
+        
+        kekalkanUnitKepadaHEM();
+
+        let ulangan = 0;
+        const pemantauUnit = setInterval(function() {
+          kekalkanUnitKepadaHEM();
+          ulangan++;
+          if (ulangan > 20) clearInterval(pemantauUnit);
+        }, 300);
+
+        const borang = document.querySelector('form');
+        if (borang) {
+          borang.addEventListener('submit', function() {
+            kekalkanUnitKepadaHEM();
+          });
+        }
+      }
+    });
+  </script>
+
+  <!-- PENGESAN MOD KEMASKINI AUTOMATIK DARI URL -->
   <script>
     window.addEventListener('DOMContentLoaded', function() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -570,15 +647,13 @@
         const autoEditTimer = setInterval(function() {
           cubaan++;
 
-          // KAEDAH 1: Jika halaman mempunyai butang Edit / Kemaskini sedia ada
           const existingEditBtn = document.querySelector('button#btnEdit, button.btn-edit, a.btn-edit, [onclick*="edit"], [onclick*="kemaskini"]');
           if (existingEditBtn && existingEditBtn.offsetParent !== null) {
             clearInterval(autoEditTimer);
-            existingEditBtn.click(); // Klik butang edit secara automatik
+            existingEditBtn.click();
             return;
           }
 
-          // KAEDAH 2: Tukar paparan daripada Cetakan kepada Borang Pengisian
           const printView = document.querySelector('#viewArea, #cetakArea, #printArea, .report-view, #reportContainer');
           const formView = document.querySelector('#formArea, #borangArea, form');
 
@@ -672,7 +747,6 @@
       document.getElementById('progressModal').classList.add('hidden');
     }
 
-    // Buka Menu Pilihan Kamera / Galeri
     function openImageSourceMenu(slotIndex) {
       currentSelectingSlot = slotIndex;
       const titleEl = document.getElementById('imageSourceSlotTitle');
@@ -712,7 +786,6 @@
       removeImage(currentSelectingSlot);
     }
 
-    // Butang Pintas Terus pada Kotak Gambar
     function triggerDirectUpload(slotIndex, type, event) {
       if (event) event.stopPropagation();
       currentSelectingSlot = slotIndex;
@@ -808,7 +881,6 @@
       document.getElementById('hari').value = days[date.getDay()];
     }
 
-    // Proses Mampat & Paparan Gambar
     function previewImage(input, index) {
       if (input.files && input.files[0]) {
         const file = input.files[0];
@@ -1136,7 +1208,7 @@
               <button onclick="copyLinkById('${item['ID']}')" title="Salin Pautan Rasmi" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1.5 rounded transition flex items-center gap-1">
                 <i data-lucide="copy" class="w-3 h-3 text-sky-600"></i> Pautan
               </button>
-              <button onclick="editReport(${rawIndex})" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2 py-1.5 rounded transition flex items-center gap-1">
+              <button onclick="editReport(${rawIndex})" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2.5 py-1.5 rounded transition flex items-center gap-1">
                 <i data-lucide="edit" class="w-3 h-3"></i> Edit
               </button>
               <button onclick="goToPrintRecord(${rawIndex})" class="text-xs bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold px-2.5 py-1.5 rounded transition flex items-center gap-1">
@@ -1352,9 +1424,6 @@
       lucide.createIcons();
     }
 
-    // ==========================================
-    // INISIALISASI SISTEM
-    // ==========================================
     function initializeApp() {
       const urlParams = new URLSearchParams(window.location.search);
 
