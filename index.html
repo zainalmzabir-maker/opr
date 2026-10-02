@@ -89,6 +89,14 @@
     <!-- 1. MENU: BORANG PELAPORAN -->
     <section id="menu-form" class="max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
       
+      <!-- Pemberitahuan Integrasi Mentor Mentee -->
+      <div id="mentorMenteeAlert" class="hidden mb-5 p-3.5 bg-sky-50 border border-sky-300 rounded-lg flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sm text-sky-900 font-medium">
+          <i data-lucide="link-2" class="w-5 h-5 text-sky-600"></i>
+          <span>Data dihantar secara automatik dari Sistem Mentor Mentee. Selepas simpan, anda akan diarahkan kembali.</span>
+        </div>
+      </div>
+
       <!-- Pemberitahuan Mod Kemaskini -->
       <div id="editModeAlert" class="hidden mb-5 p-3.5 bg-amber-50 border border-amber-300 rounded-lg flex items-center justify-between">
         <div class="flex items-center gap-2 text-sm text-amber-800 font-medium">
@@ -116,7 +124,7 @@
           <label class="block text-sm font-bold text-slate-800 mb-1 flex items-center gap-1.5">
             <i data-lucide="layers" class="w-4 h-4 text-sky-600"></i> Aktiviti Unit <span class="text-red-500">*</span>
           </label>
-          <select id="aktivitiUnit" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm bg-white font-semibold focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          <select id="aktivitiUnit" name="unit" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm bg-white font-semibold focus:ring-2 focus:ring-sky-500 focus:outline-none">
             <option value="">-- Sila Pilih Unit --</option>
             <option value="Kokurikulum">Kokurikulum</option>
             <option value="Koakademik">Koakademik</option>
@@ -131,22 +139,22 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1">Tarikh Aktiviti <span class="text-red-500">*</span></label>
-            <input type="date" id="tarikh" required onchange="autoFillDay(this.value)" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <input type="date" id="tarikh" name="tarikh" required onchange="autoFillDay(this.value)" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
           </div>
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1">Hari</label>
-            <input type="text" id="hari" readonly placeholder="cth: Rabu" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-2.5 text-sm font-medium text-slate-600">
+            <input type="text" id="hari" name="hari" readonly placeholder="cth: Rabu" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-2.5 text-sm font-medium text-slate-600">
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1">Masa Aktiviti <span class="text-red-500">*</span></label>
-            <input type="text" id="masa" required placeholder="cth: 2.00 petang - 4.30 petang" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <input type="text" id="masa" name="masa" required placeholder="cth: 2.00 petang - 4.30 petang" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
           </div>
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1">Tempat Aktiviti <span class="text-red-500">*</span></label>
-            <input type="text" id="tempat" required placeholder="cth: Dewan Seri Ariffin / Padang Sekolah / Makmal Komputer" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <input type="text" id="tempat" name="tempat" required placeholder="cth: Dewan Seri Ariffin / Padang Sekolah / Makmal Komputer" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
           </div>
         </div>
 
@@ -156,29 +164,29 @@
             <label class="block text-sm font-semibold text-slate-800 mb-1 flex items-center gap-1.5">
               <i data-lucide="user" class="w-4 h-4 text-sky-600"></i> Nama Pelapor <span class="text-red-500">*</span>
             </label>
-            <input type="text" id="namaPelapor" required placeholder="cth: Cikgu Ahmad Albab bin Kassim" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <input type="text" id="namaPelapor" name="namaPelapor" required placeholder="cth: Cikgu Ahmad Albab bin Kassim" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
           </div>
           <div>
             <label class="block text-sm font-semibold text-slate-800 mb-1 flex items-center gap-1.5">
               <i data-lucide="briefcase" class="w-4 h-4 text-sky-600"></i> Jawatan Pelapor <span class="text-red-500">*</span>
             </label>
-            <input type="text" id="jawatan" required placeholder="cth: Guru Penasihat KRS / Penyelaras Program" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <input type="text" id="jawatan" name="jawatan" required placeholder="cth: Guru Penasihat KRS / Penyelaras Program" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
           </div>
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Aktiviti / Program <span class="text-red-500">*</span></label>
-          <input type="text" id="aktiviti" required placeholder="cth: Perjumpaan Kadet Remaja Sekolah / Kursus Kepimpinan Pengawas" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          <input type="text" id="aktiviti" name="aktiviti" required placeholder="cth: Perjumpaan Kadet Remaja Sekolah / Kursus Kepimpinan Pengawas" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Penerangan Aktiviti <span class="text-red-500">*</span></label>
-          <textarea id="penerangan" rows="3" required placeholder="Nyatakan perjalanan program, modul, atau agenda aktiviti..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <textarea id="penerangan" name="penerangan" rows="3" required placeholder="Nyatakan perjalanan program, modul, atau agenda aktiviti..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Hasil / Dapatan Aktiviti <span class="text-red-500">*</span></label>
-          <textarea id="hasil" rows="3" required placeholder="Penglibatan murid, penguasaan kemahiran, atau refleksi program..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <textarea id="hasil" name="hasil" rows="3" required placeholder="Penglibatan murid, penguasaan kemahiran, atau refleksi program..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
         <!-- UPLOAD GAMBAR DOKUMENTASI -->
@@ -548,6 +556,9 @@
       btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span>${existingId ? 'Sedang mengemas kini...' : 'Sedang menyimpan...'}</span>`;
       lucide.createIcons();
 
+      // Gunakan ID sedia ada atau jana ID baharu
+      const generatedId = existingId || ("REP-" + Date.now());
+
       const payload = {
         id: existingId,
         unit: document.getElementById('aktivitiUnit').value,
@@ -572,6 +583,19 @@
         });
 
         alert(existingId ? "Laporan berjaya dikemaskini!" : "Laporan berjaya disimpan ke Google Sheets!");
+
+        // SEMAK DAN URUS PAUTAN KEMBALI (RETURN URL KE MENTOR MENTEE)
+        const urlParams = new URLSearchParams(window.location.search);
+        const returnUrl = urlParams.get('return_url');
+        const bilMentee = urlParams.get('bil');
+        const linkLaporanOpr = getReportUniqueUrl(generatedId);
+
+        if (returnUrl) {
+          // Arahkan kembali semula secara automatik ke web Mentor Mentee
+          window.location.href = `${returnUrl}?status=selesai&bil=${encodeURIComponent(bilMentee || '')}&link=${encodeURIComponent(linkLaporanOpr)}`;
+          return;
+        }
+
         cancelEditMode();
         switchTab('dashboard');
         loadDataFromSheets();
@@ -739,7 +763,7 @@
               <button onclick="copyLinkById('${item['ID']}')" title="Salin Pautan Rasmi" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1.5 rounded transition flex items-center gap-1">
                 <i data-lucide="copy" class="w-3 h-3 text-sky-600"></i> Pautan
               </button>
-              <button onclick="editReport(${rawIndex})" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2.5 py-1.5 rounded transition flex items-center gap-1">
+              <button onclick="editReport(${rawIndex})" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2 py-1.5 rounded transition flex items-center gap-1">
                 <i data-lucide="edit" class="w-3 h-3"></i> Edit
               </button>
               <button onclick="goToPrintRecord(${rawIndex})" class="text-xs bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold px-2.5 py-1.5 rounded transition flex items-center gap-1">
@@ -841,7 +865,6 @@
       const unitName = d['Unit'] || 'Kokurikulum';
       const cfg = UNIT_CONFIG[unitName] || UNIT_CONFIG['Lain-lain'];
 
-      // Kemaskini URL hash browser secara halus tanpa reload
       window.history.replaceState(null, null, `#id=${encodeURIComponent(d['ID'])}`);
       if (copyBtn) copyBtn.classList.remove('hidden');
 
@@ -944,12 +967,68 @@
       lucide.createIcons();
     }
 
-    // AUTOMATIK: TERUS SEMAK PAUTAN & PAPARKAN LAPORAN BILA DIBUKA
+    // AUTOMATIK: MEMBACA PARAMETER URL MENTOR MENTEE & CHECK PAUTAN
     function initializeApp() {
+      const urlParams = new URLSearchParams(window.location.search);
+
+      // 1. Membaca parameter URL yang dihantar oleh web Mentor Mentee
+      const unitParam = urlParams.get('unit');
+      if (unitParam) {
+        const selectUnit = document.querySelector('select[name="unit"]') || document.getElementById('aktivitiUnit');
+        if (selectUnit) {
+          // Cari pilihan yang sepadan (case-insensitive, cth: "HEM" -> "Hem")
+          for (let opt of selectUnit.options) {
+            if (opt.value.toLowerCase() === unitParam.toLowerCase()) {
+              selectUnit.value = opt.value;
+              break;
+            }
+          }
+          selectUnit.dispatchEvent(new Event('change'));
+        }
+      }
+
+      // Pra-isi nama aktiviti dan maklumat jika ada
+      if (urlParams.get('aktiviti')) {
+        const aktivitiInput = document.querySelector('input[name="aktiviti"]') || document.getElementById('aktiviti');
+        if (aktivitiInput) aktivitiInput.value = urlParams.get('aktiviti');
+      }
+
+      // Pra-isi maklumat tambahan sekiranya dibekalkan (Tarikh, Masa, Tempat, Pelapor)
+      if (urlParams.get('tarikh')) {
+        const el = document.getElementById('tarikh');
+        if (el) { el.value = urlParams.get('tarikh'); autoFillDay(el.value); }
+      }
+      if (urlParams.get('masa')) {
+        const el = document.getElementById('masa');
+        if (el) el.value = urlParams.get('masa');
+      }
+      if (urlParams.get('tempat')) {
+        const el = document.getElementById('tempat');
+        if (el) el.value = urlParams.get('tempat');
+      }
+      if (urlParams.get('nama')) {
+        const el = document.getElementById('namaPelapor');
+        if (el) el.value = urlParams.get('nama');
+      }
+      if (urlParams.get('jawatan')) {
+        const el = document.getElementById('jawatan');
+        if (el) el.value = urlParams.get('jawatan');
+      }
+
+      // Jika ada parameter return_url, tunjukkan notis mentor mentee
+      if (urlParams.get('return_url')) {
+        const alertBox = document.getElementById('mentorMenteeAlert');
+        if (alertBox) alertBox.classList.remove('hidden');
+        switchTab('form');
+      }
+
+      // 2. Semak jika pengguna membuka pautan laporan sedia ada (#id=... atau ?id=...)
       const targetId = getReportIdFromUrl();
       if (targetId) {
         checkUrlForDirectReport();
       }
+
+      // 3. Muat turun data daripada Google Sheets
       loadDataFromSheets();
     }
 
@@ -959,33 +1038,6 @@
     window.addEventListener('hashchange', () => {
       checkUrlForDirectReport();
     });
-    // Membaca parameter URL yang dihantar oleh web Mentor Mentee
-const urlParams = new URLSearchParams(window.location.search);
-const unitParam = urlParams.get('unit'); // Nilai: "HEM"
-
-if (unitParam) {
-  // Pilih dropdown Unit kepada HEM secara automatik
-  const selectUnit = document.querySelector('select[name="unit"]') || document.getElementById('unit');
-  if (selectUnit) {
-    selectUnit.value = unitParam; // Automatik pilih HEM
-    selectUnit.dispatchEvent(new Event('change'));
-  }
-}
-
-// Pra-isi nama aktiviti dan maklumat jika ada
-if (urlParams.get('aktiviti')) {
-  const aktivitiInput = document.querySelector('input[name="aktiviti"]') || document.getElementById('aktiviti');
-  if (aktivitiInput) aktivitiInput.value = urlParams.get('aktiviti');
-});
-    // Dapatkan pautan balik dan link laporan OPR yang baru disimpan
-const returnUrl = urlParams.get('return_url');
-const bilMentee = urlParams.get('bil');
-const linkLaporanOpr = "https://opr.semekar.com/view/" + idLaporanBaru; // atau URL laporan yang dijana
-
-if (returnUrl) {
-  // Arahkan kembali semula secara automatik ke web Mentor Mentee
-  window.location.href = `${returnUrl}?status=selesai&bil=${bilMentee}&link=${encodeURIComponent(linkLaporanOpr)}`;
-});
   </script>
 </body>
 </html>
