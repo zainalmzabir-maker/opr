@@ -298,7 +298,7 @@
         
         <div id="printContentPlaceholder" class="m-auto text-center py-24 text-slate-400 flex flex-col items-center">
           <i data-lucide="file-search" class="w-12 h-12 mb-3 text-slate-300"></i>
-          <p class="text-sm font-medium">Sila pilih aktiviti daripada senarai pilihan di atas untuk memaparkan lembaran cetakan.</p>
+          <p id="printPlaceholderText" class="text-sm font-medium">Sila pilih aktiviti daripada senarai pilihan di atas untuk memaparkan lembaran cetakan.</p>
         </div>
 
         <div id="printContentDetails" class="hidden flex-1 flex flex-col justify-between h-full">
@@ -420,6 +420,7 @@
     let storedReports = [];
     let currentFilter = "SEMUA";
     const base64Images = ["", "", "", ""];
+    let isFetchingData = false;
 
     const UNIT_CONFIG = {
       'Kokurikulum': { bg: '#800000', icon: 'trophy', label: 'Kokurikulum', badge: 'bg-red-900 text-white', title: 'LAPORAN AKTIVITI KOKURIKULUM' },
@@ -440,11 +441,15 @@
     // Fungsi Salin Pautan ke Clipboard
     function copyLinkById(reportId) {
       const url = getReportUniqueUrl(reportId);
-      navigator.clipboard.writeText(url).then(() => {
-        alert("Pautan rasmi laporan berjaya disalin ke papan klip (clipboard)!\n\n" + url);
-      }).catch(err => {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(() => {
+          alert("Pautan rasmi laporan berjaya disalin ke papan klip!\n\n" + url);
+        }).catch(() => {
+          prompt("Salin pautan laporan di bawah:", url);
+        });
+      } else {
         prompt("Salin pautan laporan di bawah:", url);
-      });
+      }
     }
 
     function copyCurrentReportLink() {
@@ -463,7 +468,7 @@
       document.getElementById(`menu-${tab}`).classList.remove('hidden');
       document.getElementById(`btn-${tab}`).className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 bg-white text-slate-900 shadow";
 
-      if (tab === 'dashboard' || tab === 'print') {
+      if ((tab === 'dashboard' || tab === 'print') && storedReports.length === 0) {
         loadDataFromSheets();
       }
     }
@@ -554,7 +559,9 @@
 
         alert(existingId ? "Laporan berjaya dikemaskini!" : "Laporan berjaya disimpan ke Google Sheets!");
         cancelEditMode();
+        storedReports = []; // Reset cache supaya data terkini dimuat turun
         switchTab('dashboard');
+        loadDataFromSheets();
       } catch (error) {
         alert("Ralat semasa penghantaran: " + error.message);
       } finally {
@@ -566,10 +573,15 @@
       }
     }
 
-    function loadDataFromSheets() {
+    function loadDataFromSheets(callbackAfterLoad) {
+      if (isFetchingData) return;
+      isFetchingData = true;
+
       const tbody = document.getElementById('dashboardTableBody');
-      tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500"><i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Sedang memuat data dari Google Sheets...</td></tr>`;
-      lucide.createIcons();
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500"><i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Sedang memuat data dari Google Sheets...</td></tr>`;
+        lucide.createIcons();
+      }
 
       const oldScript = document.getElementById('jsonp-script');
       if (oldScript) oldScript.remove();
@@ -578,31 +590,71 @@
       script.id = 'jsonp-script';
       script.src = `${GOOGLE_SCRIPT_URL}?callback=handleSheetsData&t=${new Date().getTime()}`;
       script.onerror = function() {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6" class="p-6 text-center text-red-600">
-              <p class="font-bold">Gagal berhubung dengan Google Apps Script!</p>
-              <p class="text-xs text-slate-500 mt-1">Pastikan deployment Web App ditetapkan kepada <b>Who has access: Anyone</b>.</p>
-            </td>
-          </tr>`;
+        isFetchingData = false;
+        if (tbody) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" class="p-6 text-center text-red-600">
+                <p class="font-bold">Gagal berhubung dengan Google Apps Script!</p>
+                <p class="text-xs text-slate-500 mt-1">Pastikan deployment Web App ditetapkan kepada <b>Who has access: Anyone</b>.</p>
+              </td>
+            </tr>`;
+        }
       };
       document.body.appendChild(script);
     }
 
     window.handleSheetsData = function(data) {
+      isFetchingData = false;
       storedReports = Array.isArray(data) ? data : [];
       renderDashboardTable();
       populatePrintDropdown();
+
+      // Semak jika pengguna datang dengan pautan URL terus
       checkUrlForDirectReport();
     };
 
-    function checkUrlForDirectReport() {
+    // PENGESAN PAUTAN TERUS DARI URL
+    function getReportIdFromUrl() {
+      // 1. Semak dari hash (#id=REP-xxxx)
       const hash = window.location.hash;
       if (hash && hash.includes('id=')) {
-        const targetId = decodeURIComponent(hash.split('id=')[1].split('&')[0]);
-        const index = storedReports.findIndex(item => item['ID'] === targetId);
-        if (index !== -1) {
-          goToPrintRecord(index);
+        return decodeURIComponent(hash.split('id=')[1].split('&')[0]);
+      }
+      // 2. Semak dari query parameter (?id=REP-xxxx)
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('id')) {
+        return params.get('id');
+      }
+      return null;
+    }
+
+    function checkUrlForDirectReport() {
+      const targetId = getReportIdFromUrl();
+      if (!targetId) return;
+
+      // Tukar paparan ke tab cetakan
+      switchTab('print');
+
+      if (storedReports.length === 0) {
+        // Jika data belum siap, tunjukkan status sedang memuat laporan
+        const placeholderText = document.getElementById('printPlaceholderText');
+        if (placeholderText) {
+          placeholderText.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2 text-sky-600"></i>Sedang memuat rekod laporan <b>${targetId}</b>...`;
+          lucide.createIcons();
+        }
+        return;
+      }
+
+      // Cari indeks laporan
+      const index = storedReports.findIndex(item => (item['ID'] || '').trim() === targetId.trim());
+      if (index !== -1) {
+        document.getElementById('selectRecordToPrint').value = index;
+        renderPrintTemplate(index);
+      } else {
+        const placeholderText = document.getElementById('printPlaceholderText');
+        if (placeholderText) {
+          placeholderText.innerHTML = `<span class="text-red-500 font-bold">Ralat: Laporan dengan No. Rujukan <b>"${targetId}"</b> tidak ditemui.</span> Sila pastikan pautan adalah betul atau pilih dari senarai di atas.`;
         }
       }
     }
@@ -621,6 +673,7 @@
 
     function renderDashboardTable() {
       const tbody = document.getElementById('dashboardTableBody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       let filtered = storedReports;
@@ -681,6 +734,7 @@
 
     function populatePrintDropdown() {
       const select = document.getElementById('selectRecordToPrint');
+      if (!select) return;
       select.innerHTML = '<option value="">-- Pilih Aktiviti --</option>';
       storedReports.forEach((item, index) => {
         const opt = document.createElement('option');
@@ -758,7 +812,7 @@
       if (index === "" || !storedReports[index]) {
         document.getElementById('printContentPlaceholder').classList.remove('hidden');
         document.getElementById('printContentDetails').classList.add('hidden');
-        copyBtn.classList.add('hidden');
+        if (copyBtn) copyBtn.classList.add('hidden');
         return;
       }
 
@@ -766,8 +820,9 @@
       const unitName = d['Unit'] || 'Kokurikulum';
       const cfg = UNIT_CONFIG[unitName] || UNIT_CONFIG['Lain-lain'];
 
+      // Kemaskini URL hash secara senyap tanpa reload
       window.history.replaceState(null, null, `#id=${encodeURIComponent(d['ID'])}`);
-      copyBtn.classList.remove('hidden');
+      if (copyBtn) copyBtn.classList.remove('hidden');
 
       const headerEl = document.getElementById('printUnitHeader');
       headerEl.style.backgroundColor = cfg.bg;
@@ -786,7 +841,6 @@
       document.getElementById('p-pelapor-nama').textContent = d['Nama Pelapor'] || '-';
       document.getElementById('p-pelapor-jawatan').textContent = d['Jawatan'] || '-';
 
-      // Paparan pautan rasmi berasaskan domain opr.smekar.com
       const uniqueUrl = getReportUniqueUrl(d['ID']);
       document.getElementById('p-ref-link').textContent = uniqueUrl;
 
@@ -868,11 +922,25 @@
       lucide.createIcons();
     }
 
-    // Auto-buka rekod jika pengguna melayari melalui URL pautan khas
-    window.addEventListener('load', () => {
-      if (window.location.hash.includes('id=')) {
+    // AUTOMATIK MUAT DATA SEBAIK SAHAJA WEB DIBUKA
+    window.addEventListener('DOMContentLoaded', () => {
+      // Jika URL mengandungi rujukan ID, terus aktifkan tab print & tunjuk status loading
+      if (getReportIdFromUrl()) {
         switchTab('print');
+        const placeholderText = document.getElementById('printPlaceholderText');
+        if (placeholderText) {
+          placeholderText.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2 text-sky-600"></i>Sedang menyambung ke pangkalan data Google Sheets...`;
+          lucide.createIcons();
+        }
       }
+
+      // Muat data dari Google Sheets serta-merta
+      loadDataFromSheets();
+    });
+
+    // Semak jika pengguna menukar pautan hash semasa laman web sedang dibuka
+    window.addEventListener('hashchange', () => {
+      checkUrlForDirectReport();
     });
   </script>
 </body>
