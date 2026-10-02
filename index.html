@@ -60,20 +60,51 @@
   <!-- DIALOG POP-UP STATUS KEMASKINI (MODAL OVERLAY) -->
   <div id="progressModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] hidden flex items-center justify-center p-4 no-print transition-opacity">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-100 flex flex-col items-center transform transition-all scale-100">
-      
-      <!-- Bekas Ikon Dinamik -->
       <div id="modalIconContainer" class="w-16 h-16 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center mb-4 transition-colors">
         <i id="modalIcon" data-lucide="loader-2" class="w-8 h-8 animate-spin"></i>
       </div>
-      
-      <!-- Tajuk & Mesej Dialog -->
       <h3 id="modalTitle" class="text-base font-extrabold text-slate-800 mb-1.5">Sedang Mengemas Kini Data</h3>
       <p id="modalMessage" class="text-xs text-slate-500 leading-relaxed">Sila tunggu sebentar. Maklumat dan gambar sedang diproses serta dihantar ke pangkalan data Google Sheets...</p>
-      
-      <!-- Butang Tindakan (Dipaparkan hanya jika Ralat atau Perlu Ditutup Manual) -->
       <div id="modalActionBtn" class="mt-5 hidden w-full">
         <button type="button" onclick="closeProgressModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow">
           Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL / MENU PILIH SUMBER GAMBAR UNTUK MOBILE & DESKTOP -->
+  <div id="imageSourceModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[998] hidden flex items-end sm:items-center justify-center p-0 sm:p-4 no-print transition-opacity" onclick="if(event.target === this) closeImageSourceModal()">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-sm w-full p-5 text-center shadow-2xl border border-slate-100 flex flex-col items-center transform transition-all duration-200">
+      <div class="w-12 h-1.5 bg-slate-300 rounded-full mb-3 sm:hidden"></div>
+      <div class="w-12 h-12 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center mb-2 shadow-inner">
+        <i data-lucide="image-plus" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-base font-extrabold text-slate-800 mb-0.5">Pilih Sumber Gambar</h3>
+      <p id="imageSourceSlotTitle" class="text-xs text-sky-600 font-bold mb-4">Gambar 1</p>
+      
+      <div class="w-full space-y-2.5">
+        <!-- Pilihan 1: Kamera Peranti -->
+        <button type="button" onclick="triggerCameraInput()" class="w-full bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white font-bold py-3 px-4 rounded-xl text-sm transition shadow flex items-center justify-center gap-2.5">
+          <i data-lucide="camera" class="w-5 h-5"></i>
+          <span>Ambil Gambar (Kamera)</span>
+        </button>
+
+        <!-- Pilihan 2: Galeri / Fail -->
+        <button type="button" onclick="triggerFileInput()" class="w-full bg-slate-100 hover:bg-slate-200 active:scale-[0.98] text-slate-800 font-bold py-3 px-4 rounded-xl text-sm transition border border-slate-200 flex items-center justify-center gap-2.5">
+          <i data-lucide="folder-image" class="w-5 h-5 text-slate-600"></i>
+          <span>Pilih dari Galeri / Fail</span>
+        </button>
+
+        <!-- Pilihan 3: Padam Gambar (Jika sudah ada) -->
+        <button type="button" id="btnRemoveImage" onclick="removeSelectedImage()" class="w-full hidden bg-red-50 hover:bg-red-100 active:scale-[0.98] text-red-600 font-bold py-2.5 px-4 rounded-xl text-xs transition border border-red-200 flex items-center justify-center gap-2">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>Padam Gambar Ini</span>
+        </button>
+
+        <!-- Pilihan 4: Batal -->
+        <button type="button" onclick="closeImageSourceModal()" class="w-full text-slate-500 hover:text-slate-700 font-semibold py-2 px-4 rounded-xl text-xs transition mt-1">
+          Batal
         </button>
       </div>
     </div>
@@ -151,7 +182,7 @@
             <option value="Kokurikulum">Kokurikulum</option>
             <option value="Koakademik">Koakademik</option>
             <option value="Kurikulum">Kurikulum</option>
-            <option value="Hem">HEM (Hal Ehwal Murid)</option>
+            <option value="HEM">HEM (Hal Ehwal Murid)</option>
             <option value="Pentadbiran">Pentadbiran</option>
             <option value="Lain-lain">Lain-lain</option>
           </select>
@@ -211,44 +242,124 @@
           <textarea id="hasil" name="hasil" rows="3" required placeholder="Penglibatan murid, penguasaan kemahiran, atau refleksi program..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
-        <!-- UPLOAD GAMBAR DOKUMENTASI -->
+        <!-- UPLOAD GAMBAR DOKUMENTASI DENGAN PILIHAN KAMERA / FAIL -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Muat Naik Gambar Dokumentasi (1 hingga 4 Keping)</label>
-          <p class="text-xs text-slate-500 mb-2">Gambar 1 <span class="text-red-500 font-semibold">*Wajib</span>. Semua saiz gambar akan dimuatkan penuh tanpa terpotong.</p>
+          <p class="text-xs text-slate-500 mb-2">Gambar 1 <span class="text-red-500 font-semibold">*Wajib</span>. Ketuk kotak untuk memilih muat naik daripada <b>Kamera</b> atau <b>Galeri/Fail</b>.</p>
           
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="border-2 border-dashed border-sky-400 bg-sky-50/40 rounded-lg p-2 text-center flex flex-col items-center justify-center relative h-36">
-              <input type="file" id="file-1" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 1)">
-              <img id="prev-1" class="hidden w-full h-full object-contain rounded mb-1">
-              <span id="txt-1" class="text-xs text-slate-600 flex flex-col items-center">
-                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-sky-600"></i> Gambar 1 <span class="text-[10px] text-red-500 font-bold">(Wajib)</span>
-              </span>
+            
+            <!-- GAMBAR 1 -->
+            <div class="border-2 border-dashed border-sky-400 bg-sky-50/40 rounded-xl p-2.5 text-center flex flex-col items-center justify-between min-h-[160px] cursor-pointer hover:bg-sky-50/80 transition shadow-sm" onclick="openImageSourceMenu(1)">
+              <div id="txt-1" class="text-xs text-slate-600 flex flex-col items-center my-auto">
+                <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center mb-1.5 shadow-sm">
+                  <i data-lucide="image-plus" class="w-5 h-5"></i>
+                </div>
+                <span class="font-bold text-slate-800">Gambar 1 <span class="text-[10px] text-red-500">(Wajib)</span></span>
+                <span class="text-[10px] text-slate-400 mt-0.5">Kamera / Fail</span>
+              </div>
+              <img id="prev-1" class="hidden w-full h-24 object-contain rounded mb-1 bg-white border border-slate-200">
+              
+              <!-- Butang Pintas Terus & Kawalan -->
+              <div id="btn-group-1" class="w-full pt-1 flex items-center justify-center gap-1.5">
+                <button type="button" onclick="triggerDirectUpload(1, 'cam', event)" class="bg-white hover:bg-slate-100 text-sky-700 border border-sky-300 rounded-lg px-2 py-1 text-[10px] font-bold shadow-xs flex items-center gap-1">
+                  <i data-lucide="camera" class="w-3 h-3"></i> Kamera
+                </button>
+                <button type="button" onclick="triggerDirectUpload(1, 'file', event)" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg px-2 py-1 text-[10px] font-bold shadow-xs flex items-center gap-1">
+                  <i data-lucide="folder" class="w-3 h-3"></i> Fail
+                </button>
+              </div>
+              <div id="actions-1" class="hidden w-full pt-1 flex items-center justify-center gap-1">
+                <span class="text-[10px] bg-sky-100 text-sky-800 px-2 py-0.5 rounded font-bold">Sentuh untuk Ubah</span>
+              </div>
             </div>
 
-            <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative h-36 bg-slate-50">
-              <input type="file" id="file-2" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 2)">
-              <img id="prev-2" class="hidden w-full h-full object-contain rounded mb-1">
-              <span id="txt-2" class="text-xs text-slate-500 flex flex-col items-center">
-                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 2 <span class="text-[10px] text-slate-400">(Pilihan)</span>
-              </span>
+            <!-- GAMBAR 2 -->
+            <div class="border-2 border-dashed border-slate-300 bg-slate-50 rounded-xl p-2.5 text-center flex flex-col items-center justify-between min-h-[160px] cursor-pointer hover:bg-slate-100 transition shadow-sm" onclick="openImageSourceMenu(2)">
+              <div id="txt-2" class="text-xs text-slate-500 flex flex-col items-center my-auto">
+                <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center mb-1.5 shadow-sm">
+                  <i data-lucide="image-plus" class="w-5 h-5"></i>
+                </div>
+                <span class="font-bold text-slate-700">Gambar 2 <span class="text-[10px] text-slate-400">(Pilihan)</span></span>
+                <span class="text-[10px] text-slate-400 mt-0.5">Kamera / Fail</span>
+              </div>
+              <img id="prev-2" class="hidden w-full h-24 object-contain rounded mb-1 bg-white border border-slate-200">
+              
+              <div id="btn-group-2" class="w-full pt-1 flex items-center justify-center gap-1.5">
+                <button type="button" onclick="triggerDirectUpload(2, 'cam', event)" class="bg-white hover:bg-slate-100 text-sky-700 border border-slate-300 rounded-lg px-2 py-1 text-[10px] font-bold shadow-xs flex items-center gap-1">
+                  <i data-lucide="camera" class="w-3 h-3"></i> Kamera
+                </button>
+                <button type="button" onclick="triggerDirectUpload(2, 'file', event)" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg px-2 py-1 text-[10px] font-bold shadow-xs flex items-center gap-1">
+                  <i data-lucide="folder" class="w-3 h-3"></i> Fail
+                </button>
+              </div>
+              <div id="actions-2" class="hidden w-full pt-1 flex items-center justify-center gap-1">
+                <span class="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-bold">Sentuh untuk Ubah</span>
+              </div>
             </div>
 
-            <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative h-36 bg-slate-50">
-              <input type="file" id="file-3" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 3)">
-              <img id="prev-3" class="hidden w-full h-full object-contain rounded mb-1">
-              <span id="txt-3" class="text-xs text-slate-500 flex flex-col items-center">
-                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 3 <span class="text-[10px] text-slate-400">(Pilihan)</span>
-              </span>
+            <!-- GAMBAR 3 -->
+            <div class="border-2 border-dashed border-slate-300 bg-slate-50 rounded-xl p-2.5 text-center flex flex-col items-center justify-between min-h-[160px] cursor-pointer hover:bg-slate-100 transition shadow-sm" onclick="openImageSourceMenu(3)">
+              <div id="txt-3" class="text-xs text-slate-500 flex flex-col items-center my-auto">
+                <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center mb-1.5 shadow-sm">
+                  <i data-lucide="image-plus" class="w-5 h-5"></i>
+                </div>
+                <span class="font-bold text-slate-700">Gambar 3 <span class="text-[10px] text-slate-400">(Pilihan)</span></span>
+                <span class="text-[10px] text-slate-400 mt-0.5">Kamera / Fail</span>
+              </div>
+              <img id="prev-3" class="hidden w-full h-24 object-contain rounded mb-1 bg-white border border-slate-200">
+              
+              <div id="btn-group-3" class="w-full pt-1 flex items-center justify-center gap-1.5">
+                <button type="button" onclick="triggerDirectUpload(3, 'cam', event)" class="bg-white hover:bg-slate-100 text-sky-700 border border-slate-300 rounded-lg px-2 py-1 text-[10px] font-bold shadow-xs flex items-center gap-1">
+                  <i data-lucide="camera" class="w-3 h-3"></i> Kamera
+                </button>
+                <button type="button" onclick="triggerDirectUpload(3, 'file', event)" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg px-2 py-1 text-[10px] font-bold shadow-xs flex items-center gap-1">
+                  <i data-lucide="folder" class="w-3 h-3"></i> Fail
+                </button>
+              </div>
+              <div id="actions-3" class="hidden w-full pt-1 flex items-center justify-center gap-1">
+                <span class="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-bold">Sentuh untuk Ubah</span>
+              </div>
             </div>
 
-            <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center flex flex-col items-center justify-center relative h-36 bg-slate-50">
-              <input type="file" id="file-4" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this, 4)">
-              <img id="prev-4" class="hidden w-full h-full object-contain rounded mb-1">
-              <span id="txt-4" class="text-xs text-slate-500 flex flex-col items-center">
-                <i data-lucide="image-plus" class="w-5 h-5 mb-1 text-slate-400"></i> Gambar 4 <span class="text-[10px] text-slate-400">(Pilihan)</span>
-              </span>
+            <!-- GAMBAR 4 -->
+            <div class="border-2 border-dashed border-slate-300 bg-slate-50 rounded-xl p-2.5 text-center flex flex-col items-center justify-between min-h-[160px] cursor-pointer hover:bg-slate-100 transition shadow-sm" onclick="openImageSourceMenu(4)">
+              <div id="txt-4" class="text-xs text-slate-500 flex flex-col items-center my-auto">
+                <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center mb-1.5 shadow-sm">
+                  <i data-lucide="image-plus" class="w-5 h-5"></i>
+                </div>
+                <span class="font-bold text-slate-700">Gambar 4 <span class="text-[10px] text-slate-400">(Pilihan)</span></span>
+                <span class="text-[10px] text-slate-400 mt-0.5">Kamera / Fail</span>
+              </div>
+              <img id="prev-4" class="hidden w-full h-24 object-contain rounded mb-1 bg-white border border-slate-200">
+              
+              <div id="btn-group-4" class="w-full pt-1 flex items-center justify-center gap-1.5">
+                <button type="button" onclick="triggerDirectUpload(4, 'cam', event)" class="bg-white hover:bg-slate-100 text-sky-700 border border-slate-300 rounded-lg px-2 py-1 text-[10px] font-bold shadow-xs flex items-center gap-1">
+                  <i data-lucide="camera" class="w-3 h-3"></i> Kamera
+                </button>
+                <button type="button" onclick="triggerDirectUpload(4, 'file', event)" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg px-2 py-1 text-[10px] font-bold shadow-xs flex items-center gap-1">
+                  <i data-lucide="folder" class="w-3 h-3"></i> Fail
+                </button>
+              </div>
+              <div id="actions-4" class="hidden w-full pt-1 flex items-center justify-center gap-1">
+                <span class="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-bold">Sentuh untuk Ubah</span>
+              </div>
             </div>
+
           </div>
+
+          <!-- INPUT TERSEMBUNYI UNTUK KAMERA & FAIL SETIAP SLOT -->
+          <input type="file" id="input-cam-1" accept="image/*" capture="environment" class="hidden" onchange="previewImage(this, 1)">
+          <input type="file" id="input-file-1" accept="image/*" class="hidden" onchange="previewImage(this, 1)">
+
+          <input type="file" id="input-cam-2" accept="image/*" capture="environment" class="hidden" onchange="previewImage(this, 2)">
+          <input type="file" id="input-file-2" accept="image/*" class="hidden" onchange="previewImage(this, 2)">
+
+          <input type="file" id="input-cam-3" accept="image/*" capture="environment" class="hidden" onchange="previewImage(this, 3)">
+          <input type="file" id="input-file-3" accept="image/*" class="hidden" onchange="previewImage(this, 3)">
+
+          <input type="file" id="input-cam-4" accept="image/*" capture="environment" class="hidden" onchange="previewImage(this, 4)">
+          <input type="file" id="input-file-4" accept="image/*" class="hidden" onchange="previewImage(this, 4)">
         </div>
 
         <button type="submit" id="btnSubmit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-lg shadow transition flex justify-center items-center gap-2">
@@ -276,7 +387,7 @@
         <button onclick="filterByUnit('Kokurikulum')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Kokurikulum">Kokurikulum</button>
         <button onclick="filterByUnit('Koakademik')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Koakademik">Koakademik</button>
         <button onclick="filterByUnit('Kurikulum')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Kurikulum">Kurikulum</button>
-        <button onclick="filterByUnit('Hem')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Hem">HEM</button>
+        <button onclick="filterByUnit('HEM')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="HEM">HEM</button>
         <button onclick="filterByUnit('Pentadbiran')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Pentadbiran">Pentadbiran</button>
         <button onclick="filterByUnit('Lain-lain')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Lain-lain">Lain-lain</button>
       </div>
@@ -313,6 +424,10 @@
           </select>
         </div>
         <div class="flex items-center gap-2">
+          <!-- BUTANG EDIT / KEMASKINI LAPORAN -->
+          <button id="btnEdit" onclick="editCurrentReport()" class="btn-edit bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-lg shadow text-sm font-bold flex items-center gap-1.5 transition">
+            <i data-lucide="edit-3" class="w-4 h-4"></i> Kemaskini Laporan
+          </button>
           <!-- BUTANG SALIN PAUTAN LAPORAN -->
           <button id="btnCopyReportLink" onclick="copyCurrentReportLink()" class="hidden bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-lg shadow text-sm font-bold flex items-center gap-1.5 transition">
             <i data-lucide="link" class="w-4 h-4 text-sky-400"></i> Salin Pautan Laporan
@@ -441,6 +556,57 @@
 
   </main>
 
+  <!-- PENGESAN MOD KEMASKINI AUTOMATIK (UNTUK OPR.SEMEKAR.COM) -->
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hash = window.location.hash || '';
+      const isEditMode = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || hash.includes('mode=edit');
+
+      if (isEditMode) {
+        console.log("Mod Kemaskini diaktifkan. Menyalin data ke dalam borang...");
+
+        let cubaan = 0;
+        const autoEditTimer = setInterval(function() {
+          cubaan++;
+
+          // KAEDAH 1: Jika halaman mempunyai butang Edit / Kemaskini sedia ada
+          const existingEditBtn = document.querySelector('button#btnEdit, button.btn-edit, a.btn-edit, [onclick*="edit"], [onclick*="kemaskini"]');
+          if (existingEditBtn && existingEditBtn.offsetParent !== null) {
+            clearInterval(autoEditTimer);
+            existingEditBtn.click(); // Klik butang edit secara automatik
+            return;
+          }
+
+          // KAEDAH 2: Tukar paparan daripada Cetakan kepada Borang Pengisian
+          const printView = document.querySelector('#viewArea, #cetakArea, #printArea, .report-view, #reportContainer');
+          const formView = document.querySelector('#formArea, #borangArea, form');
+
+          if (printView && formView) {
+            printView.style.display = 'none';
+            formView.style.display = 'block';
+
+            const aktivitiInput = document.querySelector('input[name="aktiviti"], #aktiviti');
+            if (aktivitiInput && !aktivitiInput.value && urlParams.get('aktiviti')) {
+              aktivitiInput.value = urlParams.get('aktiviti');
+            }
+
+            const unitSelect = document.querySelector('select[name="unit"], #unit');
+            if (unitSelect) unitSelect.value = 'HEM';
+
+            const btnSubmit = document.querySelector('button[type="submit"], #btnSubmit');
+            if (btnSubmit) btnSubmit.innerText = "Simpan Kemaskini Laporan OPR";
+
+            clearInterval(autoEditTimer);
+          }
+
+          if (cubaan > 25) clearInterval(autoEditTimer);
+        }, 200);
+      }
+    });
+  </script>
+
+  <!-- SKRIP LOGIK APLIKASI UTAMA -->
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzede3L7tgU4zUwW_qwOENAZdMAuEdjWSNZ_t6zqvTQRRZz0qHrbRgfPiVNUZxGiP7Ulw/exec";
 
@@ -457,11 +623,13 @@
     const base64Images = ["", "", "", ""];
     let isFetchingData = false;
     let hasFinishedInitialFetch = false;
+    let currentSelectingSlot = 1;
 
     const UNIT_CONFIG = {
       'Kokurikulum': { bg: '#800000', icon: 'trophy', label: 'Kokurikulum', badge: 'bg-red-900 text-white', title: 'LAPORAN AKTIVITI KOKURIKULUM' },
       'Koakademik': { bg: '#c2410c', icon: 'sparkles', label: 'Koakademik', badge: 'bg-orange-700 text-white', title: 'LAPORAN AKTIVITI KOAKADEMIK' },
       'Kurikulum': { bg: '#1d4ed8', icon: 'book-open', label: 'Kurikulum', badge: 'bg-blue-700 text-white', title: 'LAPORAN PROGRAM KURIKULUM & AKADEMIK' },
+      'HEM': { bg: '#4338ca', icon: 'shield-check', label: 'HEM', badge: 'bg-indigo-700 text-white', title: 'LAPORAN HAL EHWAL MURID (HEM)' },
       'Hem': { bg: '#4338ca', icon: 'shield-check', label: 'HEM', badge: 'bg-indigo-700 text-white', title: 'LAPORAN HAL EHWAL MURID (HEM)' },
       'Pentadbiran': { bg: '#047857', icon: 'building-2', label: 'Pentadbiran', badge: 'bg-emerald-700 text-white', title: 'LAPORAN PROGRAM PENTADBIRAN & PENGURUSAN' },
       'Lain-lain': { bg: '#334155', icon: 'folder-kanban', label: 'Lain-lain', badge: 'bg-slate-700 text-white', title: 'LAPORAN DOKUMENTASI PROGRAM SEKOLAH' }
@@ -469,7 +637,9 @@
 
     lucide.createIcons();
 
-    // FUNGSI KAWALAN DIALOG POP-UP (MODAL)
+    // ==========================================
+    // KAWALAN DIALOG POP-UP & MENU KAMERA / FAIL
+    // ==========================================
     function showProgressModal(title, message, isSuccess = false, isError = false) {
       const modal = document.getElementById('progressModal');
       const modalTitle = document.getElementById('modalTitle');
@@ -499,10 +669,78 @@
     }
 
     function closeProgressModal() {
-      const modal = document.getElementById('progressModal');
-      modal.classList.add('hidden');
+      document.getElementById('progressModal').classList.add('hidden');
     }
 
+    // Buka Menu Pilihan Kamera / Galeri
+    function openImageSourceMenu(slotIndex) {
+      currentSelectingSlot = slotIndex;
+      const titleEl = document.getElementById('imageSourceSlotTitle');
+      titleEl.textContent = `Gambar ${slotIndex}` + (slotIndex === 1 ? ' (Wajib)' : ' (Pilihan)');
+
+      const btnRemove = document.getElementById('btnRemoveImage');
+      if (btnRemove) {
+        if (base64Images[slotIndex - 1] && base64Images[slotIndex - 1].trim() !== '') {
+          btnRemove.classList.remove('hidden');
+        } else {
+          btnRemove.classList.add('hidden');
+        }
+      }
+
+      document.getElementById('imageSourceModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeImageSourceModal() {
+      document.getElementById('imageSourceModal').classList.add('hidden');
+    }
+
+    function triggerCameraInput() {
+      closeImageSourceModal();
+      const el = document.getElementById(`input-cam-${currentSelectingSlot}`);
+      if (el) { el.value = ''; el.click(); }
+    }
+
+    function triggerFileInput() {
+      closeImageSourceModal();
+      const el = document.getElementById(`input-file-${currentSelectingSlot}`);
+      if (el) { el.value = ''; el.click(); }
+    }
+
+    function removeSelectedImage() {
+      closeImageSourceModal();
+      removeImage(currentSelectingSlot);
+    }
+
+    // Butang Pintas Terus pada Kotak Gambar
+    function triggerDirectUpload(slotIndex, type, event) {
+      if (event) event.stopPropagation();
+      currentSelectingSlot = slotIndex;
+      if (type === 'cam') {
+        const el = document.getElementById(`input-cam-${slotIndex}`);
+        if (el) { el.value = ''; el.click(); }
+      } else {
+        const el = document.getElementById(`input-file-${slotIndex}`);
+        if (el) { el.value = ''; el.click(); }
+      }
+    }
+
+    function removeImage(index) {
+      base64Images[index - 1] = "";
+      const prevEl = document.getElementById(`prev-${index}`);
+      const txtEl = document.getElementById(`txt-${index}`);
+      const actionEl = document.getElementById(`actions-${index}`);
+      const btnGroupEl = document.getElementById(`btn-group-${index}`);
+
+      if (prevEl) { prevEl.src = ""; prevEl.classList.add('hidden'); }
+      if (txtEl) txtEl.classList.remove('hidden');
+      if (actionEl) actionEl.classList.add('hidden');
+      if (btnGroupEl) btnGroupEl.classList.remove('hidden');
+    }
+
+    // ==========================================
+    // PAUTAN & NAVIGASI
+    // ==========================================
     function getReportUniqueUrl(reportId) {
       return `${BASE_DOMAIN_URL}/#id=${encodeURIComponent((reportId || '').trim())}`;
     }
@@ -512,7 +750,7 @@
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(url).then(() => {
           showProgressModal("Pautan Disalin!", url, true);
-          setTimeout(closeProgressModal, 2000);
+          setTimeout(closeProgressModal, 1800);
         }).catch(() => {
           prompt("Salin pautan laporan di bawah:", url);
         });
@@ -525,6 +763,19 @@
       const selectVal = document.getElementById('selectRecordToPrint').value;
       if (selectVal !== "" && storedReports[selectVal]) {
         copyLinkById(storedReports[selectVal]['ID']);
+      }
+    }
+
+    function editCurrentReport() {
+      const selectVal = document.getElementById('selectRecordToPrint').value;
+      if (selectVal !== "" && storedReports[selectVal]) {
+        editReport(selectVal);
+      } else {
+        const targetId = getReportIdFromUrl();
+        if (targetId) {
+          const idx = storedReports.findIndex(item => String(item['ID'] || '').trim() === targetId);
+          if (idx !== -1) editReport(idx);
+        }
       }
     }
 
@@ -557,6 +808,7 @@
       document.getElementById('hari').value = days[date.getDay()];
     }
 
+    // Proses Mampat & Paparan Gambar
     function previewImage(input, index) {
       if (input.files && input.files[0]) {
         const file = input.files[0];
@@ -586,9 +838,16 @@
             const compressedBase64 = canvas.toDataURL('image/jpeg', 0.88);
 
             const prevEl = document.getElementById(`prev-${index}`);
+            const txtEl = document.getElementById(`txt-${index}`);
+            const actionEl = document.getElementById(`actions-${index}`);
+            const btnGroupEl = document.getElementById(`btn-group-${index}`);
+
             prevEl.src = compressedBase64;
             prevEl.classList.remove('hidden');
-            document.getElementById(`txt-${index}`).classList.add('hidden');
+            txtEl.classList.add('hidden');
+            if (actionEl) actionEl.classList.remove('hidden');
+            if (btnGroupEl) btnGroupEl.classList.add('hidden');
+
             base64Images[index - 1] = compressedBase64;
           };
           img.src = e.target.result;
@@ -597,6 +856,9 @@
       }
     }
 
+    // ==========================================
+    // PENGHANTARAN BORANG
+    // ==========================================
     async function submitForm(e) {
       e.preventDefault();
 
@@ -609,7 +871,6 @@
       const isEdit = Boolean(existingId);
       const finalReportId = isEdit && existingId.trim() !== "" ? existingId.trim() : ("REP-" + Date.now());
 
-      // PAPARKAN DIALOG MODAL SEBELUM PENGHANTARAN BERMULA
       showProgressModal(
         isEdit ? "Sedang Mengemas Kini Data..." : "Sedang Menyimpan Laporan...",
         "Sila tunggu sebentar. Maklumat laporan dan fail gambar sedang dimuat naik ke Google Sheets & Google Drive..."
@@ -643,7 +904,6 @@
           body: JSON.stringify(payload)
         });
 
-        // TUKAR DIALOG KE STATUS BERJAYA
         showProgressModal(
           isEdit ? "Data Berjaya Dikemas Kini!" : "Laporan Berjaya Disimpan!",
           "Pangkalan data Google Sheets telah dikemas kini dengan maklumat terkini.",
@@ -685,6 +945,9 @@
       }
     }
 
+    // ==========================================
+    // MUAT TURUN DATA DARI GOOGLE SHEETS
+    // ==========================================
     function loadDataFromSheets(isManualRefresh = false) {
       if (isFetchingData) return;
       isFetchingData = true;
@@ -731,7 +994,6 @@
       isFetchingData = false;
       hasFinishedInitialFetch = true;
 
-      // Jika modal sedang memaparkan 'Sedang Menyegerak Data...', tutup modal secara lancar
       const modal = document.getElementById('progressModal');
       const modalTitle = document.getElementById('modalTitle');
       if (modal && !modal.classList.contains('hidden') && modalTitle.textContent === "Sedang Menyegerak Data...") {
@@ -769,7 +1031,13 @@
       const targetId = getReportIdFromUrl();
       if (!targetId) return;
 
-      switchTab('print', true);
+      const urlParams = new URLSearchParams(window.location.search);
+      const hash = window.location.hash || '';
+      const isEditMode = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || hash.includes('mode=edit');
+
+      if (!isEditMode) {
+        switchTab('print', true);
+      }
 
       const cleanTarget = targetId.toLowerCase().replace(/[^a-z0-9]/g, '');
       const targetTs = parseInt(cleanTarget.replace(/\D/g, '')) || 0;
@@ -789,7 +1057,11 @@
 
       if (index !== -1) {
         document.getElementById('selectRecordToPrint').value = index;
-        renderPrintTemplate(index);
+        if (isEditMode) {
+          editReport(index);
+        } else {
+          renderPrintTemplate(index);
+        }
       } else {
         const placeholderText = document.getElementById('printPlaceholderText');
         if (!hasFinishedInitialFetch) {
@@ -915,13 +1187,23 @@
         const imgKey = `Gambar ${i}`;
         const existingImg = d[imgKey] || '';
         base64Images[i - 1] = existingImg;
+
+        const prevEl = document.getElementById(`prev-${i}`);
+        const txtEl = document.getElementById(`txt-${i}`);
+        const actionEl = document.getElementById(`actions-${i}`);
+        const btnGroupEl = document.getElementById(`btn-group-${i}`);
+
         if (existingImg.trim() !== '') {
-          document.getElementById(`prev-${i}`).src = existingImg;
-          document.getElementById(`prev-${i}`).classList.remove('hidden');
-          document.getElementById(`txt-${i}`).classList.add('hidden');
+          prevEl.src = existingImg;
+          prevEl.classList.remove('hidden');
+          txtEl.classList.add('hidden');
+          if (actionEl) actionEl.classList.remove('hidden');
+          if (btnGroupEl) btnGroupEl.classList.add('hidden');
         } else {
-          document.getElementById(`prev-${i}`).classList.add('hidden');
-          document.getElementById(`txt-${i}`).classList.remove('hidden');
+          prevEl.classList.add('hidden');
+          txtEl.classList.remove('hidden');
+          if (actionEl) actionEl.classList.add('hidden');
+          if (btnGroupEl) btnGroupEl.classList.remove('hidden');
         }
       }
 
@@ -942,6 +1224,10 @@
       for (let i = 1; i <= 4; i++) {
         document.getElementById(`prev-${i}`).classList.add('hidden');
         document.getElementById(`txt-${i}`).classList.remove('hidden');
+        const actionEl = document.getElementById(`actions-${i}`);
+        const btnGroupEl = document.getElementById(`btn-group-${i}`);
+        if (actionEl) actionEl.classList.add('hidden');
+        if (btnGroupEl) btnGroupEl.classList.remove('hidden');
         base64Images[i - 1] = "";
       }
     }
@@ -1066,6 +1352,9 @@
       lucide.createIcons();
     }
 
+    // ==========================================
+    // INISIALISASI SISTEM
+    // ==========================================
     function initializeApp() {
       const urlParams = new URLSearchParams(window.location.search);
 
