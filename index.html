@@ -959,6 +959,24 @@
     window.addEventListener('hashchange', () => {
       checkUrlForDirectReport();
     });
+    // Membaca parameter URL yang dihantar oleh web Mentor Mentee
+const urlParams = new URLSearchParams(window.location.search);
+const unitParam = urlParams.get('unit'); // Nilai: "HEM"
+
+if (unitParam) {
+  // Pilih dropdown Unit kepada HEM secara automatik
+  const selectUnit = document.querySelector('select[name="unit"]') || document.getElementById('unit');
+  if (selectUnit) {
+    selectUnit.value = unitParam; // Automatik pilih HEM
+    selectUnit.dispatchEvent(new Event('change'));
+  }
+}
+
+// Pra-isi nama aktiviti dan maklumat jika ada
+if (urlParams.get('aktiviti')) {
+  const aktivitiInput = document.querySelector('input[name="aktiviti"]') || document.getElementById('aktiviti');
+  if (aktivitiInput) aktivitiInput.value = urlParams.get('aktiviti');
+});
   </script>
 </body>
 </html>
