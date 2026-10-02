@@ -93,7 +93,7 @@
       <div id="mentorMenteeAlert" class="hidden mb-5 p-3.5 bg-sky-50 border border-sky-300 rounded-lg flex items-center justify-between">
         <div class="flex items-center gap-2 text-sm text-sky-900 font-medium">
           <i data-lucide="link-2" class="w-5 h-5 text-sky-600"></i>
-          <span>Data dihantar secara automatik dari Sistem Mentor Mentee. Selepas simpan, anda akan diarahkan kembali.</span>
+          <span>Data diterima secara automatik dari Sistem Mentor Mentee. Selepas simpan, anda akan diarahkan kembali.</span>
         </div>
       </div>
 
@@ -425,7 +425,6 @@
     // DOMAIN PAUTAN ASAS RASMI ANDA: OPR.SEMEKAR.COM
     const BASE_DOMAIN_URL = "https://opr.semekar.com";
 
-    // Muat data awal dari cache localStorage jika wujud (membantu buka pautan dengan serta-merta)
     let storedReports = [];
     try {
       const cached = localStorage.getItem('smkka_reports_cache');
@@ -435,6 +434,7 @@
     let currentFilter = "SEMUA";
     const base64Images = ["", "", "", ""];
     let isFetchingData = false;
+    let hasFinishedInitialFetch = false;
 
     const UNIT_CONFIG = {
       'Kokurikulum': { bg: '#800000', icon: 'trophy', label: 'Kokurikulum', badge: 'bg-red-900 text-white', title: 'LAPORAN AKTIVITI KOKURIKULUM' },
@@ -447,12 +447,10 @@
 
     lucide.createIcons();
 
-    // Membina Pautan Alamat Menggunakan Domain Rasmi opr.semekar.com
     function getReportUniqueUrl(reportId) {
       return `${BASE_DOMAIN_URL}/#id=${encodeURIComponent((reportId || '').trim())}`;
     }
 
-    // Fungsi Salin Pautan ke Clipboard
     function copyLinkById(reportId) {
       const url = getReportUniqueUrl(reportId);
       if (navigator.clipboard && window.isSecureContext) {
@@ -556,11 +554,10 @@
       btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span>${existingId ? 'Sedang mengemas kini...' : 'Sedang menyimpan...'}</span>`;
       lucide.createIcons();
 
-      // Gunakan ID sedia ada atau jana ID baharu
-      const generatedId = existingId || ("REP-" + Date.now());
+      const finalReportId = existingId && existingId.trim() !== "" ? existingId.trim() : ("REP-" + Date.now());
 
       const payload = {
-        id: existingId,
+        id: finalReportId,
         unit: document.getElementById('aktivitiUnit').value,
         tarikh: document.getElementById('tarikh').value,
         hari: document.getElementById('hari').value,
@@ -584,14 +581,12 @@
 
         alert(existingId ? "Laporan berjaya dikemaskini!" : "Laporan berjaya disimpan ke Google Sheets!");
 
-        // SEMAK DAN URUS PAUTAN KEMBALI (RETURN URL KE MENTOR MENTEE)
         const urlParams = new URLSearchParams(window.location.search);
         const returnUrl = urlParams.get('return_url');
         const bilMentee = urlParams.get('bil');
-        const linkLaporanOpr = getReportUniqueUrl(generatedId);
+        const linkLaporanOpr = getReportUniqueUrl(finalReportId);
 
         if (returnUrl) {
-          // Arahkan kembali semula secara automatik ke web Mentor Mentee
           window.location.href = `${returnUrl}?status=selesai&bil=${encodeURIComponent(bilMentee || '')}&link=${encodeURIComponent(linkLaporanOpr)}`;
           return;
         }
@@ -628,6 +623,7 @@
       script.src = `${GOOGLE_SCRIPT_URL}?callback=handleSheetsData&t=${new Date().getTime()}`;
       script.onerror = function() {
         isFetchingData = false;
+        hasFinishedInitialFetch = true;
         if (tbody && storedReports.length === 0) {
           tbody.innerHTML = `
             <tr>
@@ -643,6 +639,7 @@
 
     window.handleSheetsData = function(data) {
       isFetchingData = false;
+      hasFinishedInitialFetch = true;
       if (Array.isArray(data)) {
         storedReports = data;
         try {
@@ -657,12 +654,13 @@
       checkUrlForDirectReport();
     };
 
-    // PENGESAN PAUTAN TERUS DARI URL (#id=... atau ?id=...)
     function getReportIdFromUrl() {
       const hash = window.location.hash || '';
       if (hash.includes('id=')) {
         const val = hash.split('id=')[1].split('&')[0];
         return decodeURIComponent(val).trim();
+      } else if (hash.startsWith('#REP-') || hash.startsWith('#rep-')) {
+        return decodeURIComponent(hash.substring(1)).split('&')[0].trim();
       }
       const params = new URLSearchParams(window.location.search);
       if (params.has('id')) {
@@ -675,28 +673,37 @@
       const targetId = getReportIdFromUrl();
       if (!targetId) return;
 
-      // Terus buka tab print dan kekalkan paparan
       switchTab('print', true);
 
-      // Cari indeks laporan secara tepat
-      const cleanTarget = targetId.toLowerCase().replace(/[^a-z0-9_-]/g, '');
-      const index = storedReports.findIndex(item => {
-        const itemId = String(item['ID'] || '').toLowerCase().replace(/[^a-z0-9_-]/g, '');
+      const cleanTarget = targetId.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const targetTs = parseInt(cleanTarget.replace(/\D/g, '')) || 0;
+
+      // 1. Cari padanan tepat ID
+      let index = storedReports.findIndex(item => {
+        const itemId = String(item['ID'] || item['id'] || '').toLowerCase().replace(/[^a-z0-9]/g, '');
         return itemId === cleanTarget;
       });
+
+      // 2. Padanan pintar timestamp dalam lingkungan 30 saat sekiranya terdapat perbezaan masa jam peranti/pelayan
+      if (index === -1 && targetTs > 1000000000000) {
+        index = storedReports.findIndex(item => {
+          const itemId = String(item['ID'] || item['id'] || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+          const itemTs = parseInt(itemId.replace(/\D/g, '')) || 0;
+          return itemTs > 0 && Math.abs(itemTs - targetTs) <= 30000;
+        });
+      }
 
       if (index !== -1) {
         document.getElementById('selectRecordToPrint').value = index;
         renderPrintTemplate(index);
       } else {
-        if (isFetchingData) {
-          const placeholderText = document.getElementById('printPlaceholderText');
+        const placeholderText = document.getElementById('printPlaceholderText');
+        if (!hasFinishedInitialFetch) {
           if (placeholderText) {
-            placeholderText.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2 text-sky-600"></i>Sedang mendapatkan rekod <b>${targetId}</b> dari pangkalan data...`;
+            placeholderText.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2 text-sky-600"></i>Sedang menyambung ke pangkalan data Google Sheets untuk membuka rekod <b>${targetId}</b>...`;
             lucide.createIcons();
           }
         } else {
-          const placeholderText = document.getElementById('printPlaceholderText');
           if (placeholderText) {
             placeholderText.innerHTML = `<span class="text-red-500 font-bold">Laporan dengan No. Rujukan "${targetId}" tidak ditemui.</span> Sila pastikan pautan adalah betul atau pilih dari senarai di atas.`;
           }
@@ -885,14 +892,12 @@
       document.getElementById('p-pelapor-nama').textContent = d['Nama Pelapor'] || '-';
       document.getElementById('p-pelapor-jawatan').textContent = d['Jawatan'] || '-';
 
-      // Paparan pautan rasmi berasaskan domain opr.semekar.com
       const uniqueUrl = getReportUniqueUrl(d['ID']);
       document.getElementById('p-ref-link').textContent = uniqueUrl;
 
       const now = new Date();
       document.getElementById('p-print-date').textContent = now.toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-      // Susun galeri gambar
       const container = document.getElementById('printImagesContainer');
       container.innerHTML = '';
 
@@ -967,16 +972,13 @@
       lucide.createIcons();
     }
 
-    // AUTOMATIK: MEMBACA PARAMETER URL MENTOR MENTEE & CHECK PAUTAN
     function initializeApp() {
       const urlParams = new URLSearchParams(window.location.search);
 
-      // 1. Membaca parameter URL yang dihantar oleh web Mentor Mentee
       const unitParam = urlParams.get('unit');
       if (unitParam) {
         const selectUnit = document.querySelector('select[name="unit"]') || document.getElementById('aktivitiUnit');
         if (selectUnit) {
-          // Cari pilihan yang sepadan (case-insensitive, cth: "HEM" -> "Hem")
           for (let opt of selectUnit.options) {
             if (opt.value.toLowerCase() === unitParam.toLowerCase()) {
               selectUnit.value = opt.value;
@@ -987,13 +989,11 @@
         }
       }
 
-      // Pra-isi nama aktiviti dan maklumat jika ada
       if (urlParams.get('aktiviti')) {
         const aktivitiInput = document.querySelector('input[name="aktiviti"]') || document.getElementById('aktiviti');
         if (aktivitiInput) aktivitiInput.value = urlParams.get('aktiviti');
       }
 
-      // Pra-isi maklumat tambahan sekiranya dibekalkan (Tarikh, Masa, Tempat, Pelapor)
       if (urlParams.get('tarikh')) {
         const el = document.getElementById('tarikh');
         if (el) { el.value = urlParams.get('tarikh'); autoFillDay(el.value); }
@@ -1015,26 +1015,22 @@
         if (el) el.value = urlParams.get('jawatan');
       }
 
-      // Jika ada parameter return_url, tunjukkan notis mentor mentee
       if (urlParams.get('return_url')) {
         const alertBox = document.getElementById('mentorMenteeAlert');
         if (alertBox) alertBox.classList.remove('hidden');
         switchTab('form');
       }
 
-      // 2. Semak jika pengguna membuka pautan laporan sedia ada (#id=... atau ?id=...)
       const targetId = getReportIdFromUrl();
       if (targetId) {
         checkUrlForDirectReport();
       }
 
-      // 3. Muat turun data daripada Google Sheets
       loadDataFromSheets();
     }
 
     window.addEventListener('DOMContentLoaded', initializeApp);
 
-    // Semak jika pengguna menampal pautan baharu semasa laman web sedang dibuka
     window.addEventListener('hashchange', () => {
       checkUrlForDirectReport();
     });
