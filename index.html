@@ -977,6 +977,15 @@ if (urlParams.get('aktiviti')) {
   const aktivitiInput = document.querySelector('input[name="aktiviti"]') || document.getElementById('aktiviti');
   if (aktivitiInput) aktivitiInput.value = urlParams.get('aktiviti');
 });
+    // Dapatkan pautan balik dan link laporan OPR yang baru disimpan
+const returnUrl = urlParams.get('return_url');
+const bilMentee = urlParams.get('bil');
+const linkLaporanOpr = "https://opr.semekar.com/view/" + idLaporanBaru; // atau URL laporan yang dijana
+
+if (returnUrl) {
+  // Arahkan kembali semula secara automatik ke web Mentor Mentee
+  window.location.href = `${returnUrl}?status=selesai&bil=${bilMentee}&link=${encodeURIComponent(linkLaporanOpr)}`;
+});
   </script>
 </body>
 </html>
