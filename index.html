@@ -260,7 +260,6 @@
               </div>
               <img id="prev-1" class="hidden w-full h-24 object-contain rounded mb-1 bg-white border border-slate-200">
               
-              <!-- Butang Pintas Terus & Kawalan -->
               <div id="btn-group-1" class="w-full pt-1 flex items-center justify-center gap-1.5">
                 <button type="button" onclick="triggerDirectUpload(1, 'cam', event)" class="bg-white hover:bg-slate-100 text-sky-700 border border-sky-300 rounded-lg px-2 py-1 text-[10px] font-bold shadow-xs flex items-center gap-1">
                   <i data-lucide="camera" class="w-3 h-3"></i> Kamera
@@ -557,7 +556,7 @@
   </main>
 
   <!-- ================================================================= -->
-  <!-- SKRIP KEKALKAN UNIT KEPADA HEM (UNTUK OPR.SEMEKAR.COM)           -->
+  <!-- 1. SKRIP KEKALKAN UNIT KEPADA HEM (UNTUK OPR.SEMEKAR.COM)         -->
   <!-- ================================================================= -->
   <script>
     function kekalkanUnitKepadaHEM() {
@@ -605,15 +604,13 @@
       });
     }
 
-    // JALANKAN SECARA BERTERUSAN SEHINGGA BORANG SELESAI DIMUAT TURUN
     window.addEventListener('DOMContentLoaded', function() {
       const urlParams = new URLSearchParams(window.location.search);
       const hash = window.location.hash || '';
-      const isEditMode = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || hash.includes('mode=edit') || urlParams.get('unit') === 'HEM';
+      const isEditMode = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || hash.includes('mode=edit') || urlParams.get('unit') === 'HEM' || !!urlParams.get('editId');
 
       if (isEditMode) {
         console.log("Mod Edit / Unit HEM dikesan. Mengunci Unit kepada HEM...");
-        
         kekalkanUnitKepadaHEM();
 
         let ulangan = 0;
@@ -633,12 +630,14 @@
     });
   </script>
 
-  <!-- PENGESAN MOD KEMASKINI AUTOMATIK DARI URL -->
+  <!-- ================================================================= -->
+  <!-- 2. PENGESAN MOD KEMASKINI AUTOMATIK DARI URL                     -->
+  <!-- ================================================================= -->
   <script>
     window.addEventListener('DOMContentLoaded', function() {
       const urlParams = new URLSearchParams(window.location.search);
       const hash = window.location.hash || '';
-      const isEditMode = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || hash.includes('mode=edit');
+      const isEditMode = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || hash.includes('mode=edit') || !!urlParams.get('editId');
 
       if (isEditMode) {
         console.log("Mod Kemaskini diaktifkan. Menyalin data ke dalam borang...");
@@ -647,6 +646,7 @@
         const autoEditTimer = setInterval(function() {
           cubaan++;
 
+          // KAEDAH 1: Jika halaman mempunyai butang Edit / Kemaskini sedia ada
           const existingEditBtn = document.querySelector('button#btnEdit, button.btn-edit, a.btn-edit, [onclick*="edit"], [onclick*="kemaskini"]');
           if (existingEditBtn && existingEditBtn.offsetParent !== null) {
             clearInterval(autoEditTimer);
@@ -654,6 +654,7 @@
             return;
           }
 
+          // KAEDAH 2: Tukar paparan daripada Cetakan kepada Borang Pengisian
           const printView = document.querySelector('#viewArea, #cetakArea, #printArea, .report-view, #reportContainer');
           const formView = document.querySelector('#formArea, #borangArea, form');
 
@@ -681,7 +682,9 @@
     });
   </script>
 
-  <!-- SKRIP LOGIK APLIKASI UTAMA -->
+  <!-- ================================================================= -->
+  <!-- 3. SKRIP LOGIK APLIKASI UTAMA (TERMASUK KOD PENGENDALI SIMPANAN)  -->
+  <!-- ================================================================= -->
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzede3L7tgU4zUwW_qwOENAZdMAuEdjWSNZ_t6zqvTQRRZz0qHrbRgfPiVNUZxGiP7Ulw/exec";
 
@@ -928,20 +931,29 @@
       }
     }
 
-    // ==========================================
-    // PENGHANTARAN BORANG
-    // ==========================================
+    // =================================================================
+    // 3. PENGENDALI SIMPANAN / HANTAR BORANG (INTEGRASI PENUH)
+    // =================================================================
     async function submitForm(e) {
       e.preventDefault();
 
-      const existingId = document.getElementById('reportId').value;
-      if (!existingId && !base64Images[0]) {
+      // Semak sama ada borang dibuka dalam mod edit
+      const urlParams = new URLSearchParams(window.location.search);
+      const editId = urlParams.get('editId') || (urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' ? urlParams.get('id') : null) || document.getElementById('reportId').value;
+      const isEdit = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || Boolean(document.getElementById('reportId').value) || Boolean(urlParams.get('editId'));
+      const returnUrl = urlParams.get('return_url');
+      const bil = urlParams.get('bil');
+      const sesi = urlParams.get('sesi');
+
+      const existingId = document.getElementById('reportId').value || editId;
+      if (!isEdit && !base64Images[0]) {
         alert("Sila muat naik sekurang-kurangnya Gambar 1!");
         return;
       }
 
-      const isEdit = Boolean(existingId);
-      const finalReportId = isEdit && existingId.trim() !== "" ? existingId.trim() : ("REP-" + Date.now());
+      // Jana ID baru sekiranya bukan edit; jika edit, KEKALKAN ID LAMA
+      const newGeneratedId = "REP-" + Date.now();
+      const finalReportId = isEdit && existingId && existingId.trim() !== "" ? existingId.trim() : newGeneratedId;
 
       showProgressModal(
         isEdit ? "Sedang Mengemas Kini Data..." : "Sedang Menyimpan Laporan...",
@@ -982,14 +994,18 @@
           true
         );
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const returnUrl = urlParams.get('return_url');
-        const bilMentee = urlParams.get('bil');
-        const linkLaporanOpr = getReportUniqueUrl(finalReportId);
-
+        // SELEPAS LAPORAN BERJAYA DISIMPAN KE PANGKALAN DATA GOOGLE SHEET:
         if (returnUrl) {
           setTimeout(() => {
-            window.location.href = `${returnUrl}?status=selesai&bil=${encodeURIComponent(bilMentee || '')}&link=${encodeURIComponent(linkLaporanOpr)}`;
+            if (isEdit) {
+              // JIKA EDIT: Pulangkan status=kemaskini supaya web Mentor-Mentee TIDAK menambah pertemuan baru!
+              const linkOpr = "https://opr.semekar.com/#id=" + (editId || finalReportId);
+              window.location.href = `${returnUrl}?status=kemaskini&bil=${encodeURIComponent(bil || '')}&sesi=${encodeURIComponent(sesi || '')}&link=${encodeURIComponent(linkOpr)}`;
+            } else {
+              // JIKA LAPORAN BAHARU: Pulangkan status=selesai
+              const linkOpr = "https://opr.semekar.com/#id=" + newGeneratedId;
+              window.location.href = `${returnUrl}?status=selesai&bil=${encodeURIComponent(bil || '')}&link=${encodeURIComponent(linkOpr)}`;
+            }
           }, 1500);
           return;
         }
@@ -1085,16 +1101,19 @@
     };
 
     function getReportIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('editId')) {
+        return decodeURIComponent(params.get('editId')).trim();
+      }
+      if (params.has('id')) {
+        return decodeURIComponent(params.get('id')).trim();
+      }
       const hash = window.location.hash || '';
       if (hash.includes('id=')) {
         const val = hash.split('id=')[1].split('&')[0];
         return decodeURIComponent(val).trim();
       } else if (hash.startsWith('#REP-') || hash.startsWith('#rep-')) {
         return decodeURIComponent(hash.substring(1)).split('&')[0].trim();
-      }
-      const params = new URLSearchParams(window.location.search);
-      if (params.has('id')) {
-        return decodeURIComponent(params.get('id')).trim();
       }
       return null;
     }
@@ -1105,7 +1124,7 @@
 
       const urlParams = new URLSearchParams(window.location.search);
       const hash = window.location.hash || '';
-      const isEditMode = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || hash.includes('mode=edit');
+      const isEditMode = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || hash.includes('mode=edit') || !!urlParams.get('editId');
 
       if (!isEditMode) {
         switchTab('print', true);
@@ -1208,7 +1227,7 @@
               <button onclick="copyLinkById('${item['ID']}')" title="Salin Pautan Rasmi" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1.5 rounded transition flex items-center gap-1">
                 <i data-lucide="copy" class="w-3 h-3 text-sky-600"></i> Pautan
               </button>
-              <button onclick="editReport(${rawIndex})" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2.5 py-1.5 rounded transition flex items-center gap-1">
+              <button onclick="editReport(${rawIndex})" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2 py-1.5 rounded transition flex items-center gap-1">
                 <i data-lucide="edit" class="w-3 h-3"></i> Edit
               </button>
               <button onclick="goToPrintRecord(${rawIndex})" class="text-xs bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold px-2.5 py-1.5 rounded transition flex items-center gap-1">
@@ -1424,8 +1443,21 @@
       lucide.createIcons();
     }
 
+    // ==========================================
+    // INISIALISASI SISTEM
+    // ==========================================
     function initializeApp() {
       const urlParams = new URLSearchParams(window.location.search);
+
+      // Kunci edit ID sekiranya dibekalkan di URL
+      const editIdParam = urlParams.get('editId') || (urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' ? urlParams.get('id') : null);
+      if (editIdParam) {
+        document.getElementById('reportId').value = editIdParam;
+        document.getElementById('editReportIdText').textContent = editIdParam;
+        document.getElementById('editModeAlert').classList.remove('hidden');
+        const btnText = document.getElementById('btnSubmitText');
+        if (btnText) btnText.textContent = "Simpan Kemaskini Laporan OPR";
+      }
 
       const unitParam = urlParams.get('unit');
       if (unitParam) {
