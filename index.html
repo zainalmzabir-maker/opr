@@ -34,7 +34,7 @@
         print-color-adjust: exact !important;
       }
       
-      /* Sembunyikan elemen laman web dari dokumen cetakan */
+      /* Sembunyikan elemen laman web dari aliran dokumen cetakan */
       header, #menu-form, #menu-dashboard, #progressModal, #imageSourceModal, .no-print {
         display: none !important;
       }
@@ -89,14 +89,14 @@
         overflow: hidden !important;
       }
 
-      /* Pastikan gambar tidak pecah sempadan halaman */
+      /* Pastikan elemen imej tidak menolak pecahan muka surat */
       img {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
       }
     }
 
-    /* Paparan Pratonton pada Skrin Komputer (Nisbah Sebenar Lembaran A4) */
+    /* Paparan Pratonton pada Skrin Komputer (Nisbah Lembaran A4 Rasmi) */
     .sheet-a4 {
       width: 210mm;
       height: 297mm;
@@ -120,8 +120,8 @@
       <div id="modalIconContainer" class="w-16 h-16 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center mb-4 transition-colors">
         <i id="modalIcon" data-lucide="loader-2" class="w-8 h-8 animate-spin"></i>
       </div>
-      <h3 id="modalTitle" class="text-base font-extrabold text-slate-800 mb-1.5">Sedang Mengemas Kini Data</h3>
-      <p id="modalMessage" class="text-xs text-slate-500 leading-relaxed">Sila tunggu sebentar. Maklumat dan gambar sedang diproses serta dihantar ke pangkalan data Google Sheets...</p>
+      <h3 id="modalTitle" class="text-base font-extrabold text-slate-800 mb-1.5">Sedang Memproses Data</h3>
+      <p id="modalMessage" class="text-xs text-slate-500 leading-relaxed">Sila tunggu sebentar. Maklumat dan gambar sedang dimuat naik ke pangkalan data Google Sheets...</p>
       <div id="modalActionBtn" class="mt-5 hidden w-full">
         <button type="button" onclick="closeProgressModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow">
           Tutup
@@ -153,7 +153,7 @@
           <span>Pilih dari Galeri / Fail</span>
         </button>
 
-        <!-- Pilihan 3: Padam Gambar (Jika sudah ada) -->
+        <!-- Pilihan 3: Padam Gambar -->
         <button type="button" id="btnRemoveImage" onclick="removeSelectedImage()" class="w-full hidden bg-red-50 hover:bg-red-100 active:scale-[0.98] text-red-600 font-bold py-2.5 px-4 rounded-xl text-xs transition border border-red-200 flex items-center justify-center gap-2">
           <i data-lucide="trash-2" class="w-4 h-4"></i>
           <span>Padam Gambar Ini</span>
@@ -196,14 +196,14 @@
   <!-- KANDUNGAN UTAMA -->
   <main class="max-w-7xl mx-auto p-4 md:p-6 flex-1 w-full">
 
-    <!-- 1. MENU: BORANG PELAPORAN -->
+    <!-- 1. MENU: BORANG PELAPORAN (HALAMAN UTAMA LALAI) -->
     <section id="menu-form" class="max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
       
       <!-- Pemberitahuan Integrasi Mentor Mentee -->
       <div id="mentorMenteeAlert" class="hidden mb-5 p-3.5 bg-sky-50 border border-sky-300 rounded-lg flex items-center justify-between">
         <div class="flex items-center gap-2 text-sm text-sky-900 font-medium">
           <i data-lucide="link-2" class="w-5 h-5 text-sky-600"></i>
-          <span>Data diterima secara automatik dari Sistem Mentor Mentee. Selepas simpan, anda akan diarahkan kembali.</span>
+          <span>Data disambungkan dengan Sistem Mentor Mentee. Selepas simpan, anda akan diarahkan kembali ke Mentor Mentee.</span>
         </div>
       </div>
 
@@ -291,12 +291,12 @@
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Penerangan Aktiviti <span class="text-red-500">*</span></label>
-          <textarea id="penerangan" name="penerangan" rows="3" required placeholder="Nyatakan perjalanan program, modul, atau agenda aktiviti..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <textarea id="penerangan" name="penerangan" rows="3" required placeholder="Nyatakan perjalanan program, modul, atau agenda aktiviti secara lengkap..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Hasil / Dapatan Aktiviti <span class="text-red-500">*</span></label>
-          <textarea id="hasil" name="hasil" rows="3" required placeholder="Penglibatan murid, penguasaan kemahiran, atau refleksi program..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <textarea id="hasil" name="hasil" rows="3" required placeholder="Penglibatan murid, penguasaan kemahiran, refleksi program secara terperinci..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
         </div>
 
         <!-- UPLOAD GAMBAR DOKUMENTASI DENGAN PILIHAN KAMERA / FAIL -->
@@ -494,7 +494,7 @@
         </div>
       </div>
 
-      <!-- TEMPLAT CETAKAN SATU MUKA A4 (TERJAMIN TIDAK KOSONG & TIDAK MELIMPAH) -->
+      <!-- TEMPLAT CETAKAN SATU MUKA A4 -->
       <div id="printArea" class="sheet-a4 mx-auto bg-white p-6 sm:p-7 rounded-2xl shadow-md border border-slate-200 flex flex-col justify-between relative overflow-hidden">
         
         <div id="printContentPlaceholder" class="hidden m-auto text-center py-24 text-slate-400 flex flex-col items-center">
@@ -615,140 +615,13 @@
   </main>
 
   <!-- ================================================================= -->
-  <!-- 1. SKRIP KEKALKAN UNIT KEPADA HEM (UNTUK OPR.SEMEKAR.COM)         -->
-  <!-- ================================================================= -->
-  <script>
-    function kekalkanUnitKepadaHEM() {
-      const unitSelectors = [
-        'select[name="unit"]', 'select[id="unit"]',
-        'select[name="Unit"]', 'select[id="Unit"]',
-        'select[name*="unit" i]', 'select[id*="unit" i]',
-        'input[name="unit"]', 'input[id="unit"]',
-        'input[name="Unit"]', 'input[id="Unit"]',
-        'input[name*="unit" i]', 'input[id*="unit" i]',
-        '#aktiviti_unit', '#unit_aktiviti', '#kategori_unit', '#kategori'
-      ];
-
-      unitSelectors.forEach(sel => {
-        document.querySelectorAll(sel).forEach(el => {
-          if (el.tagName === 'SELECT') {
-            let dijumpai = false;
-            for (let i = 0; i < el.options.length; i++) {
-              const optText = el.options[i].text.toLowerCase();
-              const optVal = el.options[i].value.toLowerCase();
-              if (
-                optVal === 'hem' || optText === 'hem' ||
-                optVal.includes('hem') || optText.includes('hem') ||
-                optVal.includes('hal ehwal murid') || optText.includes('hal ehwal murid')
-              ) {
-                el.selectedIndex = i;
-                el.value = el.options[i].value;
-                dijumpai = true;
-                break;
-              }
-            }
-
-            if (!dijumpai && el.options.length > 0) {
-              const optBaru = new Option("HEM", "HEM", true, true);
-              el.add(optBaru);
-              el.value = "HEM";
-            }
-            el.dispatchEvent(new Event('change', { bubbles: true }));
-
-          } else if (el.tagName === 'INPUT') {
-            el.value = 'HEM';
-            el.dispatchEvent(new Event('input', { bubbles: true }));
-          }
-        });
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const hash = window.location.hash || '';
-      const isEditMode = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || hash.includes('mode=edit') || urlParams.get('unit') === 'HEM' || !!urlParams.get('editId');
-
-      if (isEditMode) {
-        console.log("Mod Edit / Unit HEM dikesan. Mengunci Unit kepada HEM...");
-        kekalkanUnitKepadaHEM();
-
-        let ulangan = 0;
-        const pemantauUnit = setInterval(function() {
-          kekalkanUnitKepadaHEM();
-          ulangan++;
-          if (ulangan > 20) clearInterval(pemantauUnit);
-        }, 300);
-
-        const borang = document.querySelector('form');
-        if (borang) {
-          borang.addEventListener('submit', function() {
-            kekalkanUnitKepadaHEM();
-          });
-        }
-      }
-    });
-  </script>
-
-  <!-- ================================================================= -->
-  <!-- 2. PENGESAN MOD KEMASKINI AUTOMATIK DARI URL                     -->
-  <!-- ================================================================= -->
-  <script>
-    window.addEventListener('DOMContentLoaded', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const hash = window.location.hash || '';
-      const isEditMode = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || hash.includes('mode=edit') || !!urlParams.get('editId');
-
-      if (isEditMode) {
-        console.log("Mod Kemaskini diaktifkan. Menyalin data ke dalam borang...");
-
-        let cubaan = 0;
-        const autoEditTimer = setInterval(function() {
-          cubaan++;
-
-          const existingEditBtn = document.querySelector('button#btnEdit, button.btn-edit, a.btn-edit, [onclick*="edit"], [onclick*="kemaskini"]');
-          if (existingEditBtn && existingEditBtn.offsetParent !== null) {
-            clearInterval(autoEditTimer);
-            existingEditBtn.click();
-            return;
-          }
-
-          const printView = document.querySelector('#viewArea, #cetakArea, #printArea, .report-view, #reportContainer');
-          const formView = document.querySelector('#formArea, #borangArea, form');
-
-          if (printView && formView) {
-            printView.style.display = 'none';
-            formView.style.display = 'block';
-
-            const aktivitiInput = document.querySelector('input[name="aktiviti"], #aktiviti');
-            if (aktivitiInput && !aktivitiInput.value && urlParams.get('aktiviti')) {
-              aktivitiInput.value = urlParams.get('aktiviti');
-            }
-
-            const unitSelect = document.querySelector('select[name="unit"], #unit');
-            if (unitSelect) unitSelect.value = 'HEM';
-
-            const btnSubmit = document.querySelector('button[type="submit"], #btnSubmit');
-            if (btnSubmit) btnSubmit.innerText = "Simpan Kemaskini Laporan OPR";
-
-            clearInterval(autoEditTimer);
-          }
-
-          if (cubaan > 25) clearInterval(autoEditTimer);
-        }, 200);
-      }
-    });
-  </script>
-
-  <!-- ================================================================= -->
-  <!-- 3. SKRIP LOGIK APLIKASI UTAMA (DILENGKAPI DATA CONTOH & ANTI-KOSONG)-->
+  <!-- SKRIP LOGIK APLIKASI UTAMA & INTEGRASI SISTEM MENTOR MENTEE      -->
   <!-- ================================================================= -->
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzede3L7tgU4zUwW_qwOENAZdMAuEdjWSNZ_t6zqvTQRRZz0qHrbRgfPiVNUZxGiP7Ulw/exec";
-
-    // DOMAIN PAUTAN ASAS RASMI ANDA: OPR.SEMEKAR.COM
     const BASE_DOMAIN_URL = "https://opr.semekar.com";
 
-    // DATA CONTOH RASMI (MEMASTIKAN PRATONTON TIDAK PERNAH KOSONG ATAU "MELALUT")
+    // DATA CONTOH ASAS (SEKIRANYA PENGGUNA BUKA TAB CETAKAN PERTAMA KALI)
     const DEFAULT_SAMPLE_REPORT = {
       "ID": "REP-SMKKA-2026-001",
       "Unit": "Kokurikulum",
@@ -795,9 +668,56 @@
 
     lucide.createIcons();
 
-    // ==========================================
-    // KAWALAN DIALOG POP-UP & MENU KAMERA / FAIL
-    // ==========================================
+    // PEMBANTU PARAMETER URL LENGKAP (SOKONG SEARCH QUERY & HASH)
+    function getCombinedParam(key) {
+      const searchParams = new URLSearchParams(window.location.search);
+      if (searchParams.has(key)) return decodeURIComponent(searchParams.get(key)).trim();
+
+      const hash = window.location.hash ? window.location.hash.substring(1) : '';
+      if (hash.includes('=')) {
+        const hashParams = new URLSearchParams(hash);
+        if (hashParams.has(key)) return decodeURIComponent(hashParams.get(key)).trim();
+      }
+      return null;
+    }
+
+    function getReportIdFromUrl() {
+      const editId = getCombinedParam('editId');
+      if (editId) return editId;
+
+      const idParam = getCombinedParam('id');
+      if (idParam) return idParam;
+
+      const hash = window.location.hash || '';
+      if (hash.includes('id=')) {
+        return decodeURIComponent(hash.split('id=')[1].split('&')[0]).trim();
+      } else if (hash.startsWith('#REP-') || hash.startsWith('#rep-')) {
+        return decodeURIComponent(hash.substring(1)).split('&')[0].trim();
+      }
+      return null;
+    }
+
+    function kekalkanUnitKepadaHEM() {
+      const unitEl = document.getElementById('aktivitiUnit');
+      if (unitEl) {
+        let found = false;
+        for (let i = 0; i < unitEl.options.length; i++) {
+          if (unitEl.options[i].value.toLowerCase() === 'hem') {
+            unitEl.selectedIndex = i;
+            unitEl.value = unitEl.options[i].value;
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          unitEl.add(new Option("HEM", "HEM", true, true));
+          unitEl.value = "HEM";
+        }
+        unitEl.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+
+    // KAWALAN MODAL POP-UP
     function showProgressModal(title, message, isSuccess = false, isError = false) {
       const modal = document.getElementById('progressModal');
       const modalTitle = document.getElementById('modalTitle');
@@ -830,6 +750,7 @@
       document.getElementById('progressModal').classList.add('hidden');
     }
 
+    // PENGURUSAN SUMBER GAMBAR
     function openImageSourceMenu(slotIndex) {
       currentSelectingSlot = slotIndex;
       const titleEl = document.getElementById('imageSourceSlotTitle');
@@ -894,78 +815,6 @@
       if (btnGroupEl) btnGroupEl.classList.remove('hidden');
     }
 
-    // ==========================================
-    // PAUTAN & NAVIGASI
-    // ==========================================
-    function getReportUniqueUrl(reportId) {
-      return `${BASE_DOMAIN_URL}/#id=${encodeURIComponent((reportId || '').trim())}`;
-    }
-
-    function copyLinkById(reportId) {
-      const url = getReportUniqueUrl(reportId);
-      if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(url).then(() => {
-          showProgressModal("Pautan Disalin!", url, true);
-          setTimeout(closeProgressModal, 1800);
-        }).catch(() => {
-          prompt("Salin pautan laporan di bawah:", url);
-        });
-      } else {
-        prompt("Salin pautan laporan di bawah:", url);
-      }
-    }
-
-    function copyCurrentReportLink() {
-      const selectVal = document.getElementById('selectRecordToPrint').value;
-      if (selectVal !== "" && storedReports[selectVal]) {
-        copyLinkById(storedReports[selectVal]['ID']);
-      }
-    }
-
-    function editCurrentReport() {
-      const selectVal = document.getElementById('selectRecordToPrint').value;
-      if (selectVal !== "" && storedReports[selectVal]) {
-        editReport(selectVal);
-      } else {
-        const targetId = getReportIdFromUrl();
-        if (targetId) {
-          const idx = storedReports.findIndex(item => String(item['ID'] || '').trim() === targetId);
-          if (idx !== -1) editReport(idx);
-        }
-      }
-    }
-
-    function switchTab(tab, preserveDetails = false) {
-      ['form', 'dashboard', 'print'].forEach(t => {
-        document.getElementById(`menu-${t}`).classList.add('hidden');
-        document.getElementById(`btn-${t}`).className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-700";
-      });
-
-      document.getElementById(`menu-${tab}`).classList.remove('hidden');
-      document.getElementById(`btn-${tab}`).className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 bg-white text-slate-900 shadow";
-
-      if (tab === 'print') {
-        const selectEl = document.getElementById('selectRecordToPrint');
-        if (selectEl.value === "" && storedReports.length > 0) {
-          selectEl.value = 0;
-          renderPrintTemplate(0);
-        } else if (selectEl.value !== "") {
-          renderPrintTemplate(selectEl.value);
-        }
-      }
-
-      if ((tab === 'dashboard' || tab === 'print') && storedReports.length <= 1) {
-        loadDataFromSheets();
-      }
-    }
-
-    function autoFillDay(dateStr) {
-      if (!dateStr) return;
-      const days = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
-      const date = new Date(dateStr);
-      document.getElementById('hari').value = days[date.getDay()];
-    }
-
     function previewImage(input, index) {
       if (input.files && input.files[0]) {
         const file = input.files[0];
@@ -1013,27 +862,99 @@
       }
     }
 
-    // =================================================================
-    // 3. PENGENDALI SIMPANAN / HANTAR BORANG (INTEGRASI PENUH)
-    // =================================================================
+    // PAUTAN & NAVIGASI
+    function getReportUniqueUrl(reportId) {
+      return `${BASE_DOMAIN_URL}/?view=print&id=${encodeURIComponent((reportId || '').trim())}`;
+    }
+
+    function copyLinkById(reportId) {
+      const url = getReportUniqueUrl(reportId);
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(() => {
+          showProgressModal("Pautan Disalin!", url, true);
+          setTimeout(closeProgressModal, 1800);
+        }).catch(() => {
+          prompt("Salin pautan laporan di bawah:", url);
+        });
+      } else {
+        prompt("Salin pautan laporan di bawah:", url);
+      }
+    }
+
+    function copyCurrentReportLink() {
+      const selectVal = document.getElementById('selectRecordToPrint').value;
+      if (selectVal !== "" && storedReports[selectVal]) {
+        copyLinkById(storedReports[selectVal]['ID']);
+      }
+    }
+
+    function editCurrentReport() {
+      const selectVal = document.getElementById('selectRecordToPrint').value;
+      if (selectVal !== "" && storedReports[selectVal]) {
+        editReport(selectVal);
+      } else {
+        const targetId = getReportIdFromUrl();
+        if (targetId) {
+          const idx = storedReports.findIndex(item => String(item['ID'] || '').trim() === targetId);
+          if (idx !== -1) editReport(idx);
+        }
+      }
+    }
+
+    // PENUKAR TAB (SENTIASA KEKAL STABIL & TIDAK MENGGANGGU BORANG)
+    function switchTab(tab, preserveDetails = false) {
+      ['form', 'dashboard', 'print'].forEach(t => {
+        const menuEl = document.getElementById(`menu-${t}`);
+        const btnEl = document.getElementById(`btn-${t}`);
+        if (menuEl) menuEl.classList.add('hidden');
+        if (btnEl) btnEl.className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-700";
+      });
+
+      const activeMenu = document.getElementById(`menu-${tab}`);
+      const activeBtn = document.getElementById(`btn-${tab}`);
+      if (activeMenu) activeMenu.classList.remove('hidden');
+      if (activeBtn) activeBtn.className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 bg-white text-slate-900 shadow";
+
+      if (tab === 'print') {
+        const selectEl = document.getElementById('selectRecordToPrint');
+        if (selectEl.value === "" && storedReports.length > 0) {
+          selectEl.value = 0;
+          renderPrintTemplate(0);
+        } else if (selectEl.value !== "") {
+          renderPrintTemplate(selectEl.value);
+        }
+      }
+
+      if ((tab === 'dashboard' || tab === 'print') && storedReports.length <= 1) {
+        loadDataFromSheets();
+      }
+    }
+
+    function autoFillDay(dateStr) {
+      if (!dateStr) return;
+      const days = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+      const date = new Date(dateStr);
+      document.getElementById('hari').value = days[date.getDay()];
+    }
+
+    // PENGENDALI SIMPANAN & INTEGRASI MENTOR MENTEE
     async function submitForm(e) {
       e.preventDefault();
 
-      const urlParams = new URLSearchParams(window.location.search);
-      const editId = urlParams.get('editId') || (urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' ? urlParams.get('id') : null) || document.getElementById('reportId').value;
-      const isEdit = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || Boolean(document.getElementById('reportId').value) || Boolean(urlParams.get('editId'));
-      const returnUrl = urlParams.get('return_url');
-      const bil = urlParams.get('bil');
-      const sesi = urlParams.get('sesi');
+      const returnUrl = getCombinedParam('return_url') || getCombinedParam('returnUrl');
+      const bil = getCombinedParam('bil');
+      const sesi = getCombinedParam('sesi');
+      const editIdParam = getCombinedParam('editId') || ((getCombinedParam('mode') === 'edit' || getCombinedParam('action') === 'edit') ? getCombinedParam('id') : null);
+      const existingId = document.getElementById('reportId').value || editIdParam;
+      const isEdit = Boolean(existingId && existingId.trim() !== "");
 
-      const existingId = document.getElementById('reportId').value || editId;
       if (!isEdit && !base64Images[0]) {
-        alert("Sila muat naik sekurang-kurangnya Gambar 1!");
+        showProgressModal("Perhatian", "Sila muat naik sekurang-kurangnya Gambar 1 sebelum menyimpan!", false, true);
         return;
       }
 
       const newGeneratedId = "REP-" + Date.now();
-      const finalReportId = isEdit && existingId && existingId.trim() !== "" ? existingId.trim() : newGeneratedId;
+      const finalReportId = isEdit ? existingId.trim() : newGeneratedId;
 
       showProgressModal(
         isEdit ? "Sedang Mengemas Kini Data..." : "Sedang Menyimpan Laporan...",
@@ -1074,15 +995,16 @@
           true
         );
 
+        // JIKA DIPANGGIL DARIPADA SISTEM MENTOR-MENTEE: HALAKAN KEMBALI SECARA TEPAT
         if (returnUrl) {
           setTimeout(() => {
-            if (isEdit) {
-              const linkOpr = "https://opr.semekar.com/#id=" + (editId || finalReportId);
-              window.location.href = `${returnUrl}?status=kemaskini&bil=${encodeURIComponent(bil || '')}&sesi=${encodeURIComponent(sesi || '')}&link=${encodeURIComponent(linkOpr)}`;
-            } else {
-              const linkOpr = "https://opr.semekar.com/#id=" + newGeneratedId;
-              window.location.href = `${returnUrl}?status=selesai&bil=${encodeURIComponent(bil || '')}&link=${encodeURIComponent(linkOpr)}`;
-            }
+            const returnBase = returnUrl.trim();
+            const sep = returnBase.includes('?') ? '&' : '?';
+            const linkOpr = "https://opr.semekar.com/?view=print&id=" + encodeURIComponent(finalReportId);
+            const statusVal = isEdit ? 'kemaskini' : 'selesai';
+            
+            let redirectUrl = `${returnBase}${sep}status=${encodeURIComponent(statusVal)}&bil=${encodeURIComponent(bil || '')}&sesi=${encodeURIComponent(sesi || '')}&link=${encodeURIComponent(linkOpr)}`;
+            window.location.href = redirectUrl;
           }, 1500);
           return;
         }
@@ -1104,15 +1026,13 @@
       } finally {
         btn.disabled = false;
         const currentId = document.getElementById('reportId') ? document.getElementById('reportId').value : '';
-        const labelText = currentId ? 'Simpan Kemaskini' : 'Simpan Laporan ke Google';
+        const labelText = currentId ? 'Simpan Kemaskini Laporan OPR' : 'Simpan Laporan ke Google';
         btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> <span id="btnSubmitText">${labelText}</span>`;
         lucide.createIcons();
       }
     }
 
-    // ==========================================
     // MUAT TURUN DATA DARI GOOGLE SHEETS
-    // ==========================================
     function loadDataFromSheets(isManualRefresh = false) {
       if (isFetchingData) return;
       isFetchingData = true;
@@ -1122,6 +1042,12 @@
           "Sedang Menyegerak Data...",
           "Mendapatkan senarai rekod laporan terkini daripada Google Sheets..."
         );
+      }
+
+      const tbody = document.getElementById('dashboardTableBody');
+      if (tbody && storedReports.length <= 1) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500"><i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Sedang memuat data dari Google Sheets...</td></tr>`;
+        lucide.createIcons();
       }
 
       const oldScript = document.getElementById('jsonp-script');
@@ -1159,61 +1085,38 @@
 
       renderDashboardTable();
       populatePrintDropdown();
-      checkUrlForDirectReport();
+      checkUrlActionsAfterDataLoaded();
     };
 
-    function getReportIdFromUrl() {
-      const params = new URLSearchParams(window.location.search);
-      if (params.has('editId')) {
-        return decodeURIComponent(params.get('editId')).trim();
-      }
-      if (params.has('id')) {
-        return decodeURIComponent(params.get('id')).trim();
-      }
-      const hash = window.location.hash || '';
-      if (hash.includes('id=')) {
-        const val = hash.split('id=')[1].split('&')[0];
-        return decodeURIComponent(val).trim();
-      } else if (hash.startsWith('#REP-') || hash.startsWith('#rep-')) {
-        return decodeURIComponent(hash.substring(1)).split('&')[0].trim();
-      }
-      return null;
-    }
-
-    function checkUrlForDirectReport() {
-      const targetId = getReportIdFromUrl();
-      if (!targetId) return;
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const hash = window.location.hash || '';
-      const isEditMode = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || hash.includes('mode=edit') || !!urlParams.get('editId');
-
-      if (!isEditMode) {
-        switchTab('print', true);
-      }
-
-      const cleanTarget = targetId.toLowerCase().replace(/[^a-z0-9]/g, '');
-      const targetTs = parseInt(cleanTarget.replace(/\D/g, '')) || 0;
-
-      let index = storedReports.findIndex(item => {
-        const itemId = String(item['ID'] || item['id'] || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-        return itemId === cleanTarget;
-      });
-
-      if (index === -1 && targetTs > 1000000000000) {
-        index = storedReports.findIndex(item => {
+    function checkUrlActionsAfterDataLoaded() {
+      const returnUrl = getCombinedParam('return_url') || getCombinedParam('returnUrl');
+      const editId = getCombinedParam('editId') || ((getCombinedParam('mode') === 'edit' || getCombinedParam('action') === 'edit') ? getCombinedParam('id') : null);
+      
+      // Jika dalam mod suntingan: Isi borang
+      if (editId) {
+        const cleanTarget = editId.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const foundIdx = storedReports.findIndex(item => {
           const itemId = String(item['ID'] || item['id'] || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-          const itemTs = parseInt(itemId.replace(/\D/g, '')) || 0;
-          return itemTs > 0 && Math.abs(itemTs - targetTs) <= 30000;
+          return itemId === cleanTarget;
         });
+        if (foundIdx !== -1) {
+          editReport(foundIdx);
+          return;
+        }
       }
 
-      if (index !== -1) {
-        document.getElementById('selectRecordToPrint').value = index;
-        if (isEditMode) {
-          editReport(index);
-        } else {
-          renderPrintTemplate(index);
+      // HANYA JIKA DIBUKA SECARA EKSPLISIT DENGAN ARAHAN CETAK SPESIFIK (?view=print&id=...)
+      const viewParam = getCombinedParam('view') || getCombinedParam('action');
+      const targetId = getReportIdFromUrl();
+
+      if (!returnUrl && !editId && viewParam === 'print' && targetId) {
+        const cleanTarget = targetId.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const foundIdx = storedReports.findIndex(item => {
+          const itemId = String(item['ID'] || item['id'] || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+          return itemId === cleanTarget;
+        });
+        if (foundIdx !== -1) {
+          goToPrintRecord(foundIdx);
         }
       }
     }
@@ -1310,10 +1213,11 @@
       switchTab('form');
 
       document.getElementById('reportId').value = d['ID'] || '';
-      document.getElementById('editReportIdText').textContent = `${d['ID']} (${d['Aktiviti']})`;
+      document.getElementById('editReportIdText').textContent = `${d['ID']} (${d['Aktiviti'] || ''})`;
       document.getElementById('editModeAlert').classList.remove('hidden');
 
-      document.getElementById('aktivitiUnit').value = d['Unit'] || '';
+      const unitVal = d['Unit'] || 'HEM';
+      document.getElementById('aktivitiUnit').value = unitVal;
       document.getElementById('tarikh').value = d['Tarikh'] || '';
       document.getElementById('hari').value = d['Hari'] || '';
       document.getElementById('masa').value = d['Masa'] || '';
@@ -1334,7 +1238,7 @@
         const actionEl = document.getElementById(`actions-${i}`);
         const btnGroupEl = document.getElementById(`btn-group-${i}`);
 
-        if (existingImg.trim() !== '') {
+        if (existingImg && existingImg.trim() !== '') {
           prevEl.src = existingImg;
           prevEl.classList.remove('hidden');
           txtEl.classList.add('hidden');
@@ -1349,7 +1253,7 @@
       }
 
       const btnText = document.getElementById('btnSubmitText');
-      if (btnText) btnText.textContent = "Kemaskini Rekod Laporan Ini";
+      if (btnText) btnText.textContent = "Simpan Kemaskini Laporan OPR";
       lucide.createIcons();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1379,19 +1283,15 @@
       renderPrintTemplate(index);
     }
 
-    // =========================================================================
-    // RENDER TEMPLAT CETAKAN (PENJAMIN TEKS PENUH, ORIENTASI KEKAL & SATU MUKA)
-    // =========================================================================
+    // RENDER TEMPLAT CETAKAN A4 PENUH (ORIENTASI KEKAL 100% & ADAPTIF)
     function renderPrintTemplate(index) {
       if (index === "" || !storedReports[index]) {
-        index = 0; // Pilihan kecemasan: Sentiasa papar rekod pertama jika tidak sah
+        index = 0;
       }
 
       const d = storedReports[index] || DEFAULT_SAMPLE_REPORT;
       const unitName = d['Unit'] || 'Kokurikulum';
       const cfg = UNIT_CONFIG[unitName] || UNIT_CONFIG['Lain-lain'];
-
-      window.history.replaceState(null, null, `#id=${encodeURIComponent(d['ID'])}`);
 
       const headerEl = document.getElementById('printUnitHeader');
       headerEl.style.backgroundColor = cfg.bg;
@@ -1499,19 +1399,95 @@
       lucide.createIcons();
     }
 
-    // ==========================================
-    // INISIALISASI SISTEM
-    // ==========================================
+    // INISIALISASI SISTEM (SENTIASA MULA DI BORANG PELAPORAN AKTIVITI)
     function initializeApp() {
+      // 1. KETETAPAN UTAMA: BUKA URL SENTIASA KEKAL PADA PAGE PERTAMA (BORANG)
+      switchTab('form');
+
       populatePrintDropdown();
       renderDashboardTable();
 
-      // Sentiasa sediakan paparan rekod pertama secara automatik
+      // Sediakan render awal untuk kegunaan dropdown cetakan
       renderPrintTemplate(0);
 
-      const urlParams = new URLSearchParams(window.location.search);
+      // 2. PARSE MAKLUMAT DARI SISTEM MENTOR-MENTEE
+      const returnUrl = getCombinedParam('return_url') || getCombinedParam('returnUrl');
+      const isMentor = Boolean(returnUrl);
 
-      const editIdParam = urlParams.get('editId') || (urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' ? urlParams.get('id') : null);
+      if (isMentor) {
+        const alertBox = document.getElementById('mentorMenteeAlert');
+        if (alertBox) alertBox.classList.remove('hidden');
+        kekalkanUnitKepadaHEM();
+      }
+
+      const unitParam = getCombinedParam('unit');
+      if (unitParam) {
+        if (unitParam.toLowerCase() === 'hem') {
+          kekalkanUnitKepadaHEM();
+        } else {
+          const selectUnit = document.getElementById('aktivitiUnit');
+          if (selectUnit) {
+            for (let opt of selectUnit.options) {
+              if (opt.value.toLowerCase() === unitParam.toLowerCase()) {
+                selectUnit.value = opt.value;
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // 3. PRA-ISI MEDAN JIKA DIBEKALKAN DARI URL
+      const aktivitiVal = getCombinedParam('aktiviti');
+      if (aktivitiVal) {
+        const el = document.getElementById('aktiviti');
+        if (el) el.value = aktivitiVal;
+      }
+
+      const tarikhVal = getCombinedParam('tarikh');
+      if (tarikhVal) {
+        const el = document.getElementById('tarikh');
+        if (el) { el.value = tarikhVal; autoFillDay(tarikhVal); }
+      }
+
+      const masaVal = getCombinedParam('masa');
+      if (masaVal) {
+        const el = document.getElementById('masa');
+        if (el) el.value = masaVal;
+      }
+
+      const tempatVal = getCombinedParam('tempat');
+      if (tempatVal) {
+        const el = document.getElementById('tempat');
+        if (el) el.value = tempatVal;
+      }
+
+      const namaVal = getCombinedParam('nama') || getCombinedParam('namaPelapor');
+      if (namaVal) {
+        const el = document.getElementById('namaPelapor');
+        if (el) el.value = namaVal;
+      }
+
+      const jawatanVal = getCombinedParam('jawatan');
+      if (jawatanVal) {
+        const el = document.getElementById('jawatan');
+        if (el) el.value = jawatanVal;
+      }
+
+      const peneranganVal = getCombinedParam('penerangan');
+      if (peneranganVal) {
+        const el = document.getElementById('penerangan');
+        if (el) el.value = peneranganVal;
+      }
+
+      const hasilVal = getCombinedParam('hasil');
+      if (hasilVal) {
+        const el = document.getElementById('hasil');
+        if (el) el.value = hasilVal;
+      }
+
+      // 4. KESAN MOD KEMASKINI
+      const editIdParam = getCombinedParam('editId') || ((getCombinedParam('mode') === 'edit' || getCombinedParam('action') === 'edit') ? getCombinedParam('id') : null);
       if (editIdParam) {
         document.getElementById('reportId').value = editIdParam;
         document.getElementById('editReportIdText').textContent = editIdParam;
@@ -1520,65 +1496,11 @@
         if (btnText) btnText.textContent = "Simpan Kemaskini Laporan OPR";
       }
 
-      const unitParam = urlParams.get('unit');
-      if (unitParam) {
-        const selectUnit = document.querySelector('select[name="unit"]') || document.getElementById('aktivitiUnit');
-        if (selectUnit) {
-          for (let opt of selectUnit.options) {
-            if (opt.value.toLowerCase() === unitParam.toLowerCase()) {
-              selectUnit.value = opt.value;
-              break;
-            }
-          }
-          selectUnit.dispatchEvent(new Event('change'));
-        }
-      }
-
-      if (urlParams.get('aktiviti')) {
-        const aktivitiInput = document.querySelector('input[name="aktiviti"]') || document.getElementById('aktiviti');
-        if (aktivitiInput) aktivitiInput.value = urlParams.get('aktiviti');
-      }
-
-      if (urlParams.get('tarikh')) {
-        const el = document.getElementById('tarikh');
-        if (el) { el.value = urlParams.get('tarikh'); autoFillDay(el.value); }
-      }
-      if (urlParams.get('masa')) {
-        const el = document.getElementById('masa');
-        if (el) el.value = urlParams.get('masa');
-      }
-      if (urlParams.get('tempat')) {
-        const el = document.getElementById('tempat');
-        if (el) el.value = urlParams.get('tempat');
-      }
-      if (urlParams.get('nama')) {
-        const el = document.getElementById('namaPelapor');
-        if (el) el.value = urlParams.get('nama');
-      }
-      if (urlParams.get('jawatan')) {
-        const el = document.getElementById('jawatan');
-        if (el) el.value = urlParams.get('jawatan');
-      }
-
-      if (urlParams.get('return_url')) {
-        const alertBox = document.getElementById('mentorMenteeAlert');
-        if (alertBox) alertBox.classList.remove('hidden');
-        switchTab('form');
-      }
-
-      const targetId = getReportIdFromUrl();
-      if (targetId) {
-        checkUrlForDirectReport();
-      }
-
+      // 5. MUAT DATA DARI GOOGLE SHEETS
       loadDataFromSheets();
     }
 
     window.addEventListener('DOMContentLoaded', initializeApp);
-
-    window.addEventListener('hashchange', () => {
-      checkUrlForDirectReport();
-    });
   </script>
 </body>
 </html>
