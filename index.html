@@ -621,7 +621,7 @@
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzede3L7tgU4zUwW_qwOENAZdMAuEdjWSNZ_t6zqvTQRRZz0qHrbRgfPiVNUZxGiP7Ulw/exec";
     const BASE_DOMAIN_URL = "https://opr.semekar.com";
 
-    // DATA CONTOH ASAS (SEKIRANYA PENGGUNA BUKA TAB CETAKAN PERTAMA KALI)
+    // DATA CONTOH ASAS (SEKIRANYA PENGGUNA BUKA TAB CETAKAN PERTAMA KALI TANPA ID)
     const DEFAULT_SAMPLE_REPORT = {
       "ID": "REP-SMKKA-2026-001",
       "Unit": "Kokurikulum",
@@ -642,19 +642,12 @@
     };
 
     let storedReports = [DEFAULT_SAMPLE_REPORT];
-    try {
-      const cached = localStorage.getItem('smkka_reports_cache');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) storedReports = parsed;
-      }
-    } catch(e) {}
-
     let currentFilter = "SEMUA";
     const base64Images = ["", "", "", ""];
     let isFetchingData = false;
     let hasFinishedInitialFetch = false;
     let currentSelectingSlot = 1;
+    let pendingAction = null; // Menyimpan tindakan sementara data Google Sheets dimuat turun
 
     const UNIT_CONFIG = {
       'Kokurikulum': { bg: '#800000', icon: 'trophy', label: 'Kokurikulum', badge: 'bg-red-900 text-white', title: 'LAPORAN AKTIVITI KOKURIKULUM' },
@@ -668,33 +661,176 @@
 
     lucide.createIcons();
 
-    // PEMBANTU PARAMETER URL LENGKAP (SOKONG SEARCH QUERY & HASH)
+    // Normalisasi struktur rekod daripada Google Sheets agar tidak terjejas oleh variasi nama lajur
+    function normalizeReport(item) {
+      if (!item || typeof item !== 'object') return null;
+
+      function findVal(...possibleKeys) {
+        const keys = Object.keys(item);
+        for (const p of possibleKeys) {
+          const cleanP = p.toLowerCase().replace(/[^a-z0-9]/g, '');
+          for (const k of keys) {
+            const cleanK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (cleanK === cleanP) {
+              return (item[k] !== undefined && item[k] !== null) ? String(item[k]).trim() : '';
+            }
+          }
+        }
+        return '';
+      }
+
+      const values = Object.values(item);
+
+      const id = findVal('id', 'id_laporan', 'norujukan', 'rujukan', 'no') || (values[0] ? String(values[0]).trim() : '');
+      const unit = findVal('unit', 'aktivitiunit', 'sektor') || (values[1] ? String(values[1]).trim() : 'Kokurikulum');
+      const tarikh = findVal('tarikh', 'date') || (values[2] ? String(values[2]).trim() : '');
+      const hari = findVal('hari', 'day') || (values[3] ? String(values[3]).trim() : '');
+      const masa = findVal('masa', 'time') || (values[4] ? String(values[4]).trim() : '');
+      const tempat = findVal('tempat', 'lokasi', 'location') || (values[5] ? String(values[5]).trim() : '');
+      const aktiviti = findVal('aktiviti', 'program', 'namaaktiviti', 'nama_aktiviti') || (values[6] ? String(values[6]).trim() : '');
+      const namaPelapor = findVal('namapelapor', 'nama_pelapor', 'pelapor', 'nama') || (values[7] ? String(values[7]).trim() : '');
+      const jawatan = findVal('jawatan', 'jawatanpelapor') || (values[8] ? String(values[8]).trim() : '');
+      const penerangan = findVal('penerangan', 'keterangan', 'ringkasan') || (values[9] ? String(values[9]).trim() : '');
+      const hasil = findVal('hasil', 'dapatan', 'impak') || (values[10] ? String(values[10]).trim() : '');
+      const g1 = findVal('gambar1', 'gambar 1', 'gambar_1', 'image1') || (values[11] ? String(values[11]).trim() : '');
+      const g2 = findVal('gambar2', 'gambar 2', 'gambar_2', 'image2') || (values[12] ? String(values[12]).trim() : '');
+      const g3 = findVal('gambar3', 'gambar 3', 'gambar_3', 'image3') || (values[13] ? String(values[13]).trim() : '');
+      const g4 = findVal('gambar4', 'gambar 4', 'gambar_4', 'image4') || (values[14] ? String(values[14]).trim() : '');
+      const kemaskini = findVal('kemaskiniterakhir', 'kemaskini', 'timestamp') || (values[15] ? String(values[15]).trim() : '');
+
+      return {
+        "ID": id,
+        "Unit": unit || 'Kokurikulum',
+        "Tarikh": tarikh,
+        "Hari": hari,
+        "Masa": masa,
+        "Tempat": tempat,
+        "Aktiviti": aktiviti,
+        "Nama Pelapor": namaPelapor,
+        "Jawatan": jawatan,
+        "Penerangan": penerangan,
+        "Hasil": hasil,
+        "Gambar 1": g1,
+        "Gambar 2": g2,
+        "Gambar 3": g3,
+        "Gambar 4": g4,
+        "Kemaskini Terakhir": kemaskini
+      };
+    }
+
+    // Memuatkan cache laporan tempatan sekiranya ada
+    try {
+      const cached = localStorage.getItem('smkka_reports_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          storedReports = parsed.map(normalizeReport).filter(r => r && r['ID']);
+          if (storedReports.length === 0) storedReports = [DEFAULT_SAMPLE_REPORT];
+        }
+      }
+    } catch(e) {}
+
+    // Penukar format tarikh daripada DD/MM/YYYY ke YYYY-MM-DD untuk input HTML5 date
+    function formatToInputDate(str) {
+      if (!str) return '';
+      str = String(str).trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+      const parts = str.split(/[\/\-.]/);
+      if (parts.length === 3) {
+        if (parts[0].length === 4) {
+          return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+        } else if (parts[2].length === 4) {
+          return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+      }
+      return str;
+    }
+
     function getCombinedParam(key) {
       const searchParams = new URLSearchParams(window.location.search);
-      if (searchParams.has(key)) return decodeURIComponent(searchParams.get(key)).trim();
+      if (searchParams.has(key) && searchParams.get(key) !== '') {
+        return decodeURIComponent(searchParams.get(key)).trim();
+      }
 
       const hash = window.location.hash ? window.location.hash.substring(1) : '';
-      if (hash.includes('=')) {
-        const hashParams = new URLSearchParams(hash);
-        if (hashParams.has(key)) return decodeURIComponent(hashParams.get(key)).trim();
+      if (hash) {
+        const cleanHash = hash.replace(/^\?/, '');
+        if (cleanHash.includes('=')) {
+          const hashParams = new URLSearchParams(cleanHash);
+          if (hashParams.has(key) && hashParams.get(key) !== '') {
+            return decodeURIComponent(hashParams.get(key)).trim();
+          }
+        }
       }
       return null;
     }
 
+    function cleanIdString(val) {
+      if (!val) return '';
+      let str = decodeURIComponent(val).trim();
+      str = str.split('&')[0].split('?')[0].split('#')[0].trim();
+      return str;
+    }
+
     function getReportIdFromUrl() {
-      const editId = getCombinedParam('editId');
-      if (editId) return editId;
+      const possibleKeys = ['editId', 'editid', 'id', 'reportId', 'report_id', 'no_rujukan', 'rujukan'];
+      
+      const searchParams = new URLSearchParams(window.location.search);
+      for (const k of possibleKeys) {
+        if (searchParams.has(k) && searchParams.get(k).trim() !== '') {
+          return cleanIdString(searchParams.get(k));
+        }
+      }
 
-      const idParam = getCombinedParam('id');
-      if (idParam) return idParam;
-
-      const hash = window.location.hash || '';
-      if (hash.includes('id=')) {
-        return decodeURIComponent(hash.split('id=')[1].split('&')[0]).trim();
-      } else if (hash.startsWith('#REP-') || hash.startsWith('#rep-')) {
-        return decodeURIComponent(hash.substring(1)).split('&')[0].trim();
+      const hash = window.location.hash ? window.location.hash.substring(1) : '';
+      if (hash) {
+        if (hash.includes('=')) {
+          const cleanHash = hash.replace(/^\?/, '');
+          const hashParams = new URLSearchParams(cleanHash);
+          for (const k of possibleKeys) {
+            if (hashParams.has(k) && hashParams.get(k).trim() !== '') {
+              return cleanIdString(hashParams.get(k));
+            }
+          }
+        }
+        const idMatch = hash.match(/(REP-\d+|rep-\d+|\b\d{12,14}\b)/i);
+        if (idMatch) {
+          return cleanIdString(idMatch[0]);
+        }
       }
       return null;
+    }
+
+    // Enjin carian pintar untuk mencari indeks laporan dalam storedReports
+    function findReportIndex(targetId) {
+      if (!targetId || storedReports.length === 0) return -1;
+      const cleanTarget = String(targetId).toLowerCase().replace(/[^a-z0-9]/g, '');
+      const targetDigits = String(targetId).replace(/\D/g, '');
+
+      // 1. Padanan tepat ID yang telah dibersihkan
+      let idx = storedReports.findIndex(item => {
+        const rawId = String(item['ID'] || item['id'] || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        return rawId === cleanTarget;
+      });
+
+      // 2. Padanan berasaskan cap masa berangka unik (cth: 1790916610628)
+      if (idx === -1 && targetDigits.length >= 8) {
+        idx = storedReports.findIndex(item => {
+          const rawId = String(item['ID'] || item['id'] || '');
+          const itemDigits = rawId.replace(/\D/g, '');
+          return itemDigits === targetDigits || (itemDigits && itemDigits.includes(targetDigits));
+        });
+      }
+
+      // 3. Padanan separa rentetan ID
+      if (idx === -1) {
+        idx = storedReports.findIndex(item => {
+          const rawId = String(item['ID'] || item['id'] || '').toLowerCase();
+          return rawId.includes(cleanTarget) || cleanTarget.includes(rawId);
+        });
+      }
+
+      return idx;
     }
 
     function kekalkanUnitKepadaHEM() {
@@ -702,7 +838,7 @@
       if (unitEl) {
         let found = false;
         for (let i = 0; i < unitEl.options.length; i++) {
-          if (unitEl.options[i].value.toLowerCase() === 'hem') {
+          if (unitEl.options[i].value.toLowerCase() === 'hem' || unitEl.options[i].text.toLowerCase().includes('hem')) {
             unitEl.selectedIndex = i;
             unitEl.value = unitEl.options[i].value;
             found = true;
@@ -717,7 +853,6 @@
       }
     }
 
-    // KAWALAN MODAL POP-UP
     function showProgressModal(title, message, isSuccess = false, isError = false) {
       const modal = document.getElementById('progressModal');
       const modalTitle = document.getElementById('modalTitle');
@@ -750,7 +885,6 @@
       document.getElementById('progressModal').classList.add('hidden');
     }
 
-    // PENGURUSAN SUMBER GAMBAR
     function openImageSourceMenu(slotIndex) {
       currentSelectingSlot = slotIndex;
       const titleEl = document.getElementById('imageSourceSlotTitle');
@@ -862,9 +996,8 @@
       }
     }
 
-    // PAUTAN & NAVIGASI
     function getReportUniqueUrl(reportId) {
-      return `${BASE_DOMAIN_URL}/?view=print&id=${encodeURIComponent((reportId || '').trim())}`;
+      return `${BASE_DOMAIN_URL}/?id=${encodeURIComponent((reportId || '').trim())}`;
     }
 
     function copyLinkById(reportId) {
@@ -892,16 +1025,19 @@
       const selectVal = document.getElementById('selectRecordToPrint').value;
       if (selectVal !== "" && storedReports[selectVal]) {
         editReport(selectVal);
-      } else {
-        const targetId = getReportIdFromUrl();
-        if (targetId) {
-          const idx = storedReports.findIndex(item => String(item['ID'] || '').trim() === targetId);
-          if (idx !== -1) editReport(idx);
+        return;
+      }
+      const targetId = getReportIdFromUrl();
+      if (targetId) {
+        const idx = findReportIndex(targetId);
+        if (idx !== -1) {
+          editReport(idx);
+          return;
         }
       }
+      switchTab('form');
     }
 
-    // PENUKAR TAB (SENTIASA KEKAL STABIL & TIDAK MENGGANGGU BORANG)
     function switchTab(tab, preserveDetails = false) {
       ['form', 'dashboard', 'print'].forEach(t => {
         const menuEl = document.getElementById(`menu-${t}`);
@@ -934,18 +1070,91 @@
       if (!dateStr) return;
       const days = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
       const date = new Date(dateStr);
-      document.getElementById('hari').value = days[date.getDay()];
+      if (!isNaN(date.getTime())) {
+        document.getElementById('hari').value = days[date.getDay()];
+      }
     }
 
-    // PENGENDALI SIMPANAN & INTEGRASI MENTOR MENTEE
+    function fillFormWithReport(d) {
+      if (!d) return;
+
+      document.getElementById('reportId').value = d['ID'] || '';
+      document.getElementById('editReportIdText').textContent = `${d['ID']} (${d['Aktiviti'] || ''})`;
+      document.getElementById('editModeAlert').classList.remove('hidden');
+
+      const unitVal = d['Unit'] || 'HEM';
+      const unitSelect = document.getElementById('aktivitiUnit');
+      if (unitSelect) {
+        let matched = false;
+        for (let i = 0; i < unitSelect.options.length; i++) {
+          if (unitSelect.options[i].value.toLowerCase() === unitVal.toLowerCase() ||
+              unitSelect.options[i].text.toLowerCase().includes(unitVal.toLowerCase())) {
+            unitSelect.selectedIndex = i;
+            matched = true;
+            break;
+          }
+        }
+        if (!matched && unitVal) {
+          unitSelect.add(new Option(unitVal, unitVal, true, true));
+          unitSelect.value = unitVal;
+        }
+      }
+
+      const tarikhInput = document.getElementById('tarikh');
+      if (tarikhInput) {
+        tarikhInput.value = formatToInputDate(d['Tarikh'] || '');
+        if (!d['Hari'] && tarikhInput.value) {
+          autoFillDay(tarikhInput.value);
+        }
+      }
+
+      if (d['Hari']) document.getElementById('hari').value = d['Hari'];
+      document.getElementById('masa').value = d['Masa'] || '';
+      document.getElementById('tempat').value = d['Tempat'] || '';
+      document.getElementById('namaPelapor').value = d['Nama Pelapor'] || '';
+      document.getElementById('jawatan').value = d['Jawatan'] || '';
+      document.getElementById('aktiviti').value = d['Aktiviti'] || '';
+      document.getElementById('penerangan').value = d['Penerangan'] || '';
+      document.getElementById('hasil').value = d['Hasil'] || '';
+
+      for (let i = 1; i <= 4; i++) {
+        const imgKey = `Gambar ${i}`;
+        const existingImg = d[imgKey] || '';
+        base64Images[i - 1] = existingImg;
+
+        const prevEl = document.getElementById(`prev-${i}`);
+        const txtEl = document.getElementById(`txt-${i}`);
+        const actionEl = document.getElementById(`actions-${i}`);
+        const btnGroupEl = document.getElementById(`btn-group-${i}`);
+
+        if (existingImg && existingImg.trim() !== '') {
+          prevEl.src = existingImg;
+          prevEl.classList.remove('hidden');
+          txtEl.classList.add('hidden');
+          if (actionEl) actionEl.classList.remove('hidden');
+          if (btnGroupEl) btnGroupEl.classList.add('hidden');
+        } else {
+          prevEl.src = '';
+          prevEl.classList.add('hidden');
+          txtEl.classList.remove('hidden');
+          if (actionEl) actionEl.classList.add('hidden');
+          if (btnGroupEl) btnGroupEl.classList.remove('hidden');
+        }
+      }
+
+      const btnText = document.getElementById('btnSubmitText');
+      if (btnText) btnText.textContent = "Simpan Kemaskini Laporan OPR";
+      lucide.createIcons();
+    }
+
     async function submitForm(e) {
       e.preventDefault();
 
       const returnUrl = getCombinedParam('return_url') || getCombinedParam('returnUrl');
       const bil = getCombinedParam('bil');
       const sesi = getCombinedParam('sesi');
-      const editIdParam = getCombinedParam('editId') || ((getCombinedParam('mode') === 'edit' || getCombinedParam('action') === 'edit') ? getCombinedParam('id') : null);
-      const existingId = document.getElementById('reportId').value || editIdParam;
+      const targetId = getReportIdFromUrl();
+      const existingId = document.getElementById('reportId').value || targetId;
       const isEdit = Boolean(existingId && existingId.trim() !== "");
 
       if (!isEdit && !base64Images[0]) {
@@ -995,12 +1204,12 @@
           true
         );
 
-        // JIKA DIPANGGIL DARIPADA SISTEM MENTOR-MENTEE: HALAKAN KEMBALI SECARA TEPAT
+        // Jika dipanggil dari sistem Mentor Mentee: Halakan kembali secara tepat
         if (returnUrl) {
           setTimeout(() => {
             const returnBase = returnUrl.trim();
             const sep = returnBase.includes('?') ? '&' : '?';
-            const linkOpr = "https://opr.semekar.com/?view=print&id=" + encodeURIComponent(finalReportId);
+            const linkOpr = "https://opr.semekar.com/?id=" + encodeURIComponent(finalReportId);
             const statusVal = isEdit ? 'kemaskini' : 'selesai';
             
             let redirectUrl = `${returnBase}${sep}status=${encodeURIComponent(statusVal)}&bil=${encodeURIComponent(bil || '')}&sesi=${encodeURIComponent(sesi || '')}&link=${encodeURIComponent(linkOpr)}`;
@@ -1032,7 +1241,6 @@
       }
     }
 
-    // MUAT TURUN DATA DARI GOOGLE SHEETS
     function loadDataFromSheets(isManualRefresh = false) {
       if (isFetchingData) return;
       isFetchingData = true;
@@ -1077,48 +1285,44 @@
       }
 
       if (Array.isArray(data) && data.length > 0) {
-        storedReports = data;
-        try {
-          localStorage.setItem('smkka_reports_cache', JSON.stringify(data));
-        } catch(e) {}
+        const normalized = data.map(normalizeReport).filter(item => item && (item['ID'] || item['Aktiviti']));
+        if (normalized.length > 0) {
+          storedReports = normalized;
+          try {
+            localStorage.setItem('smkka_reports_cache', JSON.stringify(normalized));
+          } catch(e) {}
+        }
       }
 
       renderDashboardTable();
       populatePrintDropdown();
-      checkUrlActionsAfterDataLoaded();
+      resolvePendingActionAfterFetch();
     };
 
-    function checkUrlActionsAfterDataLoaded() {
-      const returnUrl = getCombinedParam('return_url') || getCombinedParam('returnUrl');
-      const editId = getCombinedParam('editId') || ((getCombinedParam('mode') === 'edit' || getCombinedParam('action') === 'edit') ? getCombinedParam('id') : null);
-      
-      // Jika dalam mod suntingan: Isi borang
-      if (editId) {
-        const cleanTarget = editId.toLowerCase().replace(/[^a-z0-9]/g, '');
-        const foundIdx = storedReports.findIndex(item => {
-          const itemId = String(item['ID'] || item['id'] || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-          return itemId === cleanTarget;
-        });
+    function resolvePendingActionAfterFetch() {
+      if (!pendingAction) return;
+
+      const { type, targetId } = pendingAction;
+      const foundIdx = findReportIndex(targetId);
+
+      if (type === 'edit') {
         if (foundIdx !== -1) {
           editReport(foundIdx);
-          return;
+        } else {
+          showProgressModal("Laporan Tidak Ditemui", `Laporan [${targetId}] tidak ditemui dalam rekod pangkalan data. Anda boleh mengisi laporan baharu.`, false, true);
         }
-      }
-
-      // HANYA JIKA DIBUKA SECARA EKSPLISIT DENGAN ARAHAN CETAK SPESIFIK (?view=print&id=...)
-      const viewParam = getCombinedParam('view') || getCombinedParam('action');
-      const targetId = getReportIdFromUrl();
-
-      if (!returnUrl && !editId && viewParam === 'print' && targetId) {
-        const cleanTarget = targetId.toLowerCase().replace(/[^a-z0-9]/g, '');
-        const foundIdx = storedReports.findIndex(item => {
-          const itemId = String(item['ID'] || item['id'] || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-          return itemId === cleanTarget;
-        });
+      } else if (type === 'print') {
         if (foundIdx !== -1) {
           goToPrintRecord(foundIdx);
+        } else {
+          const placeholderText = document.getElementById('printPlaceholderText');
+          if (placeholderText) {
+            placeholderText.innerHTML = `<span class="text-red-500 font-bold">Laporan dengan No. Rujukan "${targetId}" tidak ditemui.</span> Sila semak pautan atau pilih daripada senarai di atas.`;
+          }
         }
       }
+
+      pendingAction = null;
     }
 
     function filterByUnit(unit) {
@@ -1211,50 +1415,7 @@
       if (!d) return;
 
       switchTab('form');
-
-      document.getElementById('reportId').value = d['ID'] || '';
-      document.getElementById('editReportIdText').textContent = `${d['ID']} (${d['Aktiviti'] || ''})`;
-      document.getElementById('editModeAlert').classList.remove('hidden');
-
-      const unitVal = d['Unit'] || 'HEM';
-      document.getElementById('aktivitiUnit').value = unitVal;
-      document.getElementById('tarikh').value = d['Tarikh'] || '';
-      document.getElementById('hari').value = d['Hari'] || '';
-      document.getElementById('masa').value = d['Masa'] || '';
-      document.getElementById('tempat').value = d['Tempat'] || '';
-      document.getElementById('namaPelapor').value = d['Nama Pelapor'] || '';
-      document.getElementById('jawatan').value = d['Jawatan'] || '';
-      document.getElementById('aktiviti').value = d['Aktiviti'] || '';
-      document.getElementById('penerangan').value = d['Penerangan'] || '';
-      document.getElementById('hasil').value = d['Hasil'] || '';
-
-      for (let i = 1; i <= 4; i++) {
-        const imgKey = `Gambar ${i}`;
-        const existingImg = d[imgKey] || '';
-        base64Images[i - 1] = existingImg;
-
-        const prevEl = document.getElementById(`prev-${i}`);
-        const txtEl = document.getElementById(`txt-${i}`);
-        const actionEl = document.getElementById(`actions-${i}`);
-        const btnGroupEl = document.getElementById(`btn-group-${i}`);
-
-        if (existingImg && existingImg.trim() !== '') {
-          prevEl.src = existingImg;
-          prevEl.classList.remove('hidden');
-          txtEl.classList.add('hidden');
-          if (actionEl) actionEl.classList.remove('hidden');
-          if (btnGroupEl) btnGroupEl.classList.add('hidden');
-        } else {
-          prevEl.classList.add('hidden');
-          txtEl.classList.remove('hidden');
-          if (actionEl) actionEl.classList.add('hidden');
-          if (btnGroupEl) btnGroupEl.classList.remove('hidden');
-        }
-      }
-
-      const btnText = document.getElementById('btnSubmitText');
-      if (btnText) btnText.textContent = "Simpan Kemaskini Laporan OPR";
-      lucide.createIcons();
+      fillFormWithReport(d);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1279,19 +1440,24 @@
 
     function goToPrintRecord(index) {
       switchTab('print', true);
-      document.getElementById('selectRecordToPrint').value = index;
+      const select = document.getElementById('selectRecordToPrint');
+      if (select) select.value = index;
       renderPrintTemplate(index);
     }
 
-    // RENDER TEMPLAT CETAKAN A4 PENUH (ORIENTASI KEKAL 100% & ADAPTIF)
     function renderPrintTemplate(index) {
-      if (index === "" || !storedReports[index]) {
-        index = 0;
+      if (index === "" || index === null || !storedReports[index]) {
+        document.getElementById('printContentPlaceholder').classList.remove('hidden');
+        document.getElementById('printContentDetails').classList.add('hidden');
+        return;
       }
 
-      const d = storedReports[index] || DEFAULT_SAMPLE_REPORT;
+      const d = storedReports[index];
       const unitName = d['Unit'] || 'Kokurikulum';
       const cfg = UNIT_CONFIG[unitName] || UNIT_CONFIG['Lain-lain'];
+
+      const select = document.getElementById('selectRecordToPrint');
+      if (select) select.value = index;
 
       const headerEl = document.getElementById('printUnitHeader');
       headerEl.style.backgroundColor = cfg.bg;
@@ -1329,7 +1495,6 @@
 
       const totalImg = validImages.length;
 
-      // KEKALKAN ORIENTASI MUTLAK: Menggunakan object-contain & Flex-Grow mengisi baki ruang
       if (totalImg === 1) {
         container.className = "flex-1 min-h-0 flex flex-col items-center justify-center w-full h-full overflow-hidden py-1";
         const div = document.createElement('div');
@@ -1374,7 +1539,7 @@
         container.className = "flex-1 min-h-0 grid grid-cols-2 grid-rows-2 gap-2 w-full h-full overflow-hidden py-1";
         validImages.forEach((url, i) => {
           const div = document.createElement('div');
-          div.className = "border border-slate-300 rounded-lg p-1 bg-slate-50/60 shadow-xs flex flex-col justify-between h-full min-h-0 overflow-hidden";
+          div.className = "border border-slate-300 rounded-xl p-1 bg-slate-50/60 shadow-xs flex flex-col justify-between h-full min-h-0 overflow-hidden";
           div.innerHTML = `
             <div class="w-full flex-1 min-h-0 flex items-center justify-center bg-white rounded-md overflow-hidden p-0.5">
               <img class="max-w-full max-h-full w-auto h-auto object-contain rounded" src="${url}" alt="Gambar ${i + 1}">
@@ -1399,27 +1564,94 @@
       lucide.createIcons();
     }
 
-    // INISIALISASI SISTEM (SENTIASA MULA DI BORANG PELAPORAN AKTIVITI)
     function initializeApp() {
-      // 1. KETETAPAN UTAMA: BUKA URL SENTIASA KEKAL PADA PAGE PERTAMA (BORANG)
-      switchTab('form');
-
       populatePrintDropdown();
       renderDashboardTable();
 
-      // Sediakan render awal untuk kegunaan dropdown cetakan
-      renderPrintTemplate(0);
-
-      // 2. PARSE MAKLUMAT DARI SISTEM MENTOR-MENTEE
       const returnUrl = getCombinedParam('return_url') || getCombinedParam('returnUrl');
       const isMentor = Boolean(returnUrl);
+      const targetId = getReportIdFromUrl();
+      const modeParam = (getCombinedParam('mode') || getCombinedParam('action') || '').toLowerCase();
+      const editIdParam = getCombinedParam('editId');
+      
+      const isExplicitEdit = Boolean(
+        editIdParam ||
+        modeParam === 'edit' ||
+        modeParam === 'kemaskini' ||
+        getCombinedParam('edit') === 'true' ||
+        getCombinedParam('edit') === '1'
+      );
 
-      if (isMentor) {
-        const alertBox = document.getElementById('mentorMenteeAlert');
-        if (alertBox) alertBox.classList.remove('hidden');
-        kekalkanUnitKepadaHEM();
+      // KES 1: Lawatan biasa ke opr.semekar.com (tiada ID khusus)
+      if (!targetId && !isExplicitEdit) {
+        switchTab('form');
+        if (isMentor) {
+          const alertBox = document.getElementById('mentorMenteeAlert');
+          if (alertBox) alertBox.classList.remove('hidden');
+          kekalkanUnitKepadaHEM();
+        }
+        applyUrlPrefills();
+        loadDataFromSheets();
+        return;
       }
 
+      // KES 2: Arahan Kemaskini Laporan (ada ID dan dalam mod edit)
+      if (isExplicitEdit || (isMentor && targetId)) {
+        switchTab('form');
+        document.getElementById('reportId').value = targetId || '';
+        document.getElementById('editReportIdText').textContent = targetId || '';
+        document.getElementById('editModeAlert').classList.remove('hidden');
+        document.getElementById('btnSubmitText').textContent = "Simpan Kemaskini Laporan OPR";
+
+        if (isMentor) {
+          const alertBox = document.getElementById('mentorMenteeAlert');
+          if (alertBox) alertBox.classList.remove('hidden');
+          kekalkanUnitKepadaHEM();
+        }
+
+        const foundIdx = findReportIndex(targetId);
+        if (foundIdx !== -1) {
+          fillFormWithReport(storedReports[foundIdx]);
+        } else {
+          pendingAction = { type: 'edit', targetId: targetId };
+        }
+
+        loadDataFromSheets();
+        return;
+      }
+
+      // KES 3: Arahan Lihat / Cetak Laporan (cth: klik dari mentor.semekar.com untuk melihat laporan)
+      if (targetId) {
+        switchTab('print', true);
+
+        const foundIdx = findReportIndex(targetId);
+        if (foundIdx !== -1) {
+          goToPrintRecord(foundIdx);
+        } else {
+          document.getElementById('printContentPlaceholder').classList.remove('hidden');
+          document.getElementById('printContentDetails').classList.add('hidden');
+          const placeholderText = document.getElementById('printPlaceholderText');
+          if (placeholderText) {
+            placeholderText.innerHTML = `
+              <div class="flex flex-col items-center py-10">
+                <i data-lucide="loader-2" class="w-8 h-8 animate-spin text-sky-600 mb-2"></i>
+                <p class="text-sm font-bold text-slate-700">Sedang memuat data laporan <b>${targetId}</b>...</p>
+                <p class="text-xs text-slate-400 mt-1">Sila tunggu sebentar, rekod sedang diselaraskan daripada Google Sheets.</p>
+              </div>`;
+            lucide.createIcons();
+          }
+          pendingAction = { type: 'print', targetId: targetId };
+        }
+
+        loadDataFromSheets();
+        return;
+      }
+
+      loadDataFromSheets();
+    }
+
+    // Mengisi medan borang sekiranya parameter pra-isi dibekalkan dalam URL
+    function applyUrlPrefills() {
       const unitParam = getCombinedParam('unit');
       if (unitParam) {
         if (unitParam.toLowerCase() === 'hem') {
@@ -1437,67 +1669,32 @@
         }
       }
 
-      // 3. PRA-ISI MEDAN JIKA DIBEKALKAN DARI URL
       const aktivitiVal = getCombinedParam('aktiviti');
-      if (aktivitiVal) {
-        const el = document.getElementById('aktiviti');
-        if (el) el.value = aktivitiVal;
-      }
+      if (aktivitiVal) document.getElementById('aktiviti').value = aktivitiVal;
 
       const tarikhVal = getCombinedParam('tarikh');
       if (tarikhVal) {
         const el = document.getElementById('tarikh');
-        if (el) { el.value = tarikhVal; autoFillDay(tarikhVal); }
+        if (el) { el.value = formatToInputDate(tarikhVal); autoFillDay(el.value); }
       }
 
       const masaVal = getCombinedParam('masa');
-      if (masaVal) {
-        const el = document.getElementById('masa');
-        if (el) el.value = masaVal;
-      }
+      if (masaVal) document.getElementById('masa').value = masaVal;
 
       const tempatVal = getCombinedParam('tempat');
-      if (tempatVal) {
-        const el = document.getElementById('tempat');
-        if (el) el.value = tempatVal;
-      }
+      if (tempatVal) document.getElementById('tempat').value = tempatVal;
 
       const namaVal = getCombinedParam('nama') || getCombinedParam('namaPelapor');
-      if (namaVal) {
-        const el = document.getElementById('namaPelapor');
-        if (el) el.value = namaVal;
-      }
+      if (namaVal) document.getElementById('namaPelapor').value = namaVal;
 
       const jawatanVal = getCombinedParam('jawatan');
-      if (jawatanVal) {
-        const el = document.getElementById('jawatan');
-        if (el) el.value = jawatanVal;
-      }
+      if (jawatanVal) document.getElementById('jawatan').value = jawatanVal;
 
       const peneranganVal = getCombinedParam('penerangan');
-      if (peneranganVal) {
-        const el = document.getElementById('penerangan');
-        if (el) el.value = peneranganVal;
-      }
+      if (peneranganVal) document.getElementById('penerangan').value = peneranganVal;
 
       const hasilVal = getCombinedParam('hasil');
-      if (hasilVal) {
-        const el = document.getElementById('hasil');
-        if (el) el.value = hasilVal;
-      }
-
-      // 4. KESAN MOD KEMASKINI
-      const editIdParam = getCombinedParam('editId') || ((getCombinedParam('mode') === 'edit' || getCombinedParam('action') === 'edit') ? getCombinedParam('id') : null);
-      if (editIdParam) {
-        document.getElementById('reportId').value = editIdParam;
-        document.getElementById('editReportIdText').textContent = editIdParam;
-        document.getElementById('editModeAlert').classList.remove('hidden');
-        const btnText = document.getElementById('btnSubmitText');
-        if (btnText) btnText.textContent = "Simpan Kemaskini Laporan OPR";
-      }
-
-      // 5. MUAT DATA DARI GOOGLE SHEETS
-      loadDataFromSheets();
+      if (hasilVal) document.getElementById('hasil').value = hasilVal;
     }
 
     window.addEventListener('DOMContentLoaded', initializeApp);
