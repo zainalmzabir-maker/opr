@@ -236,7 +236,7 @@
             <option value="Kokurikulum">Kokurikulum</option>
             <option value="Koakademik">Koakademik</option>
             <option value="Kurikulum">Kurikulum</option>
-            <option value="HEM">HEM (Hal Ehwal Murid)</option>
+            <option value="HEM (Hal Ehwal Murid)">HEM (Hal Ehwal Murid)</option>
             <option value="Pentadbiran">Pentadbiran</option>
             <option value="Lain-lain">Lain-lain</option>
           </select>
@@ -440,7 +440,7 @@
         <button onclick="filterByUnit('Kokurikulum')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Kokurikulum">Kokurikulum</button>
         <button onclick="filterByUnit('Koakademik')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Koakademik">Koakademik</button>
         <button onclick="filterByUnit('Kurikulum')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Kurikulum">Kurikulum</button>
-        <button onclick="filterByUnit('HEM')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="HEM">HEM</button>
+        <button onclick="filterByUnit('HEM (Hal Ehwal Murid)')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="HEM (Hal Ehwal Murid)">HEM</button>
         <button onclick="filterByUnit('Pentadbiran')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Pentadbiran">Pentadbiran</button>
         <button onclick="filterByUnit('Lain-lain')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition bg-white border border-slate-300 text-slate-700 hover:bg-slate-100" data-unit="Lain-lain">Lain-lain</button>
       </div>
@@ -629,6 +629,7 @@
               const optText = el.options[i].text.toLowerCase();
               const optVal = el.options[i].value.toLowerCase();
               if (
+                optVal === 'hem (hal ehwal murid)' || optText === 'hem (hal ehwal murid)' ||
                 optVal === 'hem' || optText === 'hem' ||
                 optVal.includes('hem') || optText.includes('hem') ||
                 optVal.includes('hal ehwal murid') || optText.includes('hal ehwal murid')
@@ -641,14 +642,14 @@
             }
 
             if (!dijumpai && el.options.length > 0) {
-              const optBaru = new Option("HEM", "HEM", true, true);
+              const optBaru = new Option("HEM (Hal Ehwal Murid)", "HEM (Hal Ehwal Murid)", true, true);
               el.add(optBaru);
-              el.value = "HEM";
+              el.value = "HEM (Hal Ehwal Murid)";
             }
             el.dispatchEvent(new Event('change', { bubbles: true }));
 
           } else if (el.tagName === 'INPUT') {
-            el.value = 'HEM';
+            el.value = 'HEM (Hal Ehwal Murid)';
             el.dispatchEvent(new Event('input', { bubbles: true }));
           }
         });
@@ -701,11 +702,83 @@
       'Kokurikulum': { bg: '#800000', icon: 'trophy', label: 'Kokurikulum', badge: 'bg-red-900 text-white', title: 'LAPORAN AKTIVITI KOKURIKULUM' },
       'Koakademik': { bg: '#c2410c', icon: 'sparkles', label: 'Koakademik', badge: 'bg-orange-700 text-white', title: 'LAPORAN AKTIVITI KOAKADEMIK' },
       'Kurikulum': { bg: '#1d4ed8', icon: 'book-open', label: 'Kurikulum', badge: 'bg-blue-700 text-white', title: 'LAPORAN PROGRAM KURIKULUM & AKADEMIK' },
+      'HEM (Hal Ehwal Murid)': { bg: '#4338ca', icon: 'shield-check', label: 'HEM', badge: 'bg-indigo-700 text-white', title: 'LAPORAN HAL EHWAL MURID (HEM)' },
       'HEM': { bg: '#4338ca', icon: 'shield-check', label: 'HEM', badge: 'bg-indigo-700 text-white', title: 'LAPORAN HAL EHWAL MURID (HEM)' },
       'Hem': { bg: '#4338ca', icon: 'shield-check', label: 'HEM', badge: 'bg-indigo-700 text-white', title: 'LAPORAN HAL EHWAL MURID (HEM)' },
+      'Hal Ehwal Murid': { bg: '#4338ca', icon: 'shield-check', label: 'HEM', badge: 'bg-indigo-700 text-white', title: 'LAPORAN HAL EHWAL MURID (HEM)' },
       'Pentadbiran': { bg: '#047857', icon: 'building-2', label: 'Pentadbiran', badge: 'bg-emerald-700 text-white', title: 'LAPORAN PROGRAM PENTADBIRAN & PENGURUSAN' },
       'Lain-lain': { bg: '#334155', icon: 'folder-kanban', label: 'Lain-lain', badge: 'bg-slate-700 text-white', title: 'LAPORAN DOKUMENTASI PROGRAM SEKOLAH' }
     };
+
+    function getUnitConfig(unitName) {
+      if (!unitName) return UNIT_CONFIG['Lain-lain'];
+      const clean = String(unitName).trim();
+      if (UNIT_CONFIG[clean]) return UNIT_CONFIG[clean];
+      
+      const lower = clean.toLowerCase();
+      if (lower.includes('hem') || lower.includes('hal ehwal murid')) {
+        return UNIT_CONFIG['HEM (Hal Ehwal Murid)'];
+      }
+      if (lower.includes('koku')) return UNIT_CONFIG['Kokurikulum'];
+      if (lower.includes('koakademik')) return UNIT_CONFIG['Koakademik'];
+      if (lower.includes('kuri')) return UNIT_CONFIG['Kurikulum'];
+      if (lower.includes('pentadbir')) return UNIT_CONFIG['Pentadbiran'];
+      return UNIT_CONFIG['Lain-lain'];
+    }
+
+    // Fungsi pintar memastikan dropdown memilih pilihan unit yang betul tanpa hilang
+    function setUnitDropdownValue(val) {
+      const select = document.getElementById('aktivitiUnit');
+      if (!select) return;
+      if (!val) {
+        select.value = "";
+        return;
+      }
+      
+      const cleanVal = String(val).trim().toLowerCase();
+      
+      // 1. Padanan nilai tepat
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].value.toLowerCase() === cleanVal) {
+          select.selectedIndex = i;
+          return;
+        }
+      }
+      
+      // 2. Padanan teks paparan tepat
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].text.toLowerCase() === cleanVal) {
+          select.selectedIndex = i;
+          return;
+        }
+      }
+      
+      // 3. Padanan pintar HEM / Hal Ehwal Murid
+      if (cleanVal.includes('hem') || cleanVal.includes('hal ehwal murid')) {
+        for (let i = 0; i < select.options.length; i++) {
+          const optVal = select.options[i].value.toLowerCase();
+          const optText = select.options[i].text.toLowerCase();
+          if (optVal.includes('hem') || optText.includes('hem') || optVal.includes('hal ehwal murid') || optText.includes('hal ehwal murid')) {
+            select.selectedIndex = i;
+            return;
+          }
+        }
+      }
+
+      // 4. Padanan separa bagi unit lain
+      for (let i = 0; i < select.options.length; i++) {
+        const optVal = select.options[i].value.toLowerCase();
+        if (optVal && (cleanVal.includes(optVal) || optVal.includes(cleanVal))) {
+          select.selectedIndex = i;
+          return;
+        }
+      }
+
+      // 5. Jika nilai unit baru / luar jangka, tambah secara dinamik agar tidak hilang
+      const customOpt = new Option(val, val, true, true);
+      select.add(customOpt);
+      select.value = val;
+    }
 
     lucide.createIcons();
 
@@ -1048,9 +1121,11 @@
       btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span>${isEdit ? 'Sedang mengemas kini...' : 'Sedang menyimpan...'}</span>`;
       lucide.createIcons();
 
+      const selectedUnit = document.getElementById('aktivitiUnit').value || 'HEM (Hal Ehwal Murid)';
+
       const payload = {
         id: finalReportId,
-        unit: document.getElementById('aktivitiUnit').value,
+        unit: selectedUnit,
         tarikh: document.getElementById('tarikh').value,
         hari: document.getElementById('hari').value,
         masa: document.getElementById('masa').value,
@@ -1081,10 +1156,11 @@
           setTimeout(() => {
             const separator = returnUrl.includes('?') ? '&' : '?';
             const linkOpr = "https://opr.semekar.com/#id=" + encodeURIComponent(finalReportId);
+            const unitParamVal = encodeURIComponent(selectedUnit);
             if (isEdit) {
-              window.location.href = `${returnUrl}${separator}status=kemaskini&bil=${encodeURIComponent(bil || '')}&sesi=${encodeURIComponent(sesi || '')}&link=${encodeURIComponent(linkOpr)}`;
+              window.location.href = `${returnUrl}${separator}status=kemaskini&bil=${encodeURIComponent(bil || '')}&sesi=${encodeURIComponent(sesi || '')}&unit=${unitParamVal}&link=${encodeURIComponent(linkOpr)}`;
             } else {
-              window.location.href = `${returnUrl}${separator}status=selesai&bil=${encodeURIComponent(bil || '')}&link=${encodeURIComponent(linkOpr)}`;
+              window.location.href = `${returnUrl}${separator}status=selesai&bil=${encodeURIComponent(bil || '')}&unit=${unitParamVal}&link=${encodeURIComponent(linkOpr)}`;
             }
           }, 1200);
           return;
@@ -1169,7 +1245,7 @@
       const targetId = getReportIdFromUrl();
       if (!targetId) return;
 
-      const isEditMode = getCombinedParam('mode') === 'edit' || getCombinedParam('action') === 'edit' || !!getCombinedParam('editId');
+      const isEditMode = getCombinedParam('mode') === 'edit' || getCombinedParam('action') === 'edit' || !!getCombinedParam('editId') || !!getCombinedParam('return_url');
       const index = findReportIndex(targetId);
 
       if (index !== -1) {
@@ -1201,7 +1277,14 @@
 
       let filtered = storedReports;
       if (currentFilter !== "SEMUA") {
-        filtered = storedReports.filter(item => (item['Unit'] || '').toLowerCase() === currentFilter.toLowerCase());
+        filtered = storedReports.filter(item => {
+          const itemUnit = (item['Unit'] || '').toLowerCase();
+          const target = currentFilter.toLowerCase();
+          if (target.includes('hem') || target.includes('hal ehwal murid')) {
+            return itemUnit.includes('hem') || itemUnit.includes('hal ehwal murid');
+          }
+          return itemUnit === target;
+        });
       }
 
       if (filtered.length === 0) {
@@ -1213,7 +1296,7 @@
         const itemReportId = getReportIdFromItem(item);
         const rawIndex = storedReports.findIndex(orig => getReportIdFromItem(orig) === itemReportId);
         const unitName = item['Unit'] || 'Kokurikulum';
-        const cfg = UNIT_CONFIG[unitName] || UNIT_CONFIG['Lain-lain'];
+        const cfg = getUnitConfig(unitName);
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50/80 border-b transition";
@@ -1291,7 +1374,11 @@
       document.getElementById('editReportIdText').textContent = `${realId} (${d['Aktiviti'] || ''})`;
       document.getElementById('editModeAlert').classList.remove('hidden');
 
-      document.getElementById('aktivitiUnit').value = d['Unit'] || '';
+      // Tetapkan unit menggunakan pemetaan pintar supaya nama unit asal HEM (Hal Ehwal Murid) kekal terpilih
+      const returnUrl = getCombinedParam('return_url') || getCombinedParam('returnUrl');
+      const unitValueToSet = d['Unit'] || (returnUrl ? 'HEM (Hal Ehwal Murid)' : '');
+      setUnitDropdownValue(unitValueToSet);
+
       document.getElementById('tarikh').value = formatToInputDate(d['Tarikh'] || '');
       document.getElementById('hari').value = d['Hari'] || '';
       document.getElementById('masa').value = d['Masa'] || '';
@@ -1308,19 +1395,19 @@
         base64Images[i - 1] = existingImg;
 
         const prevEl = document.getElementById(`prev-${i}`);
-        const txtEl = document.getElementById(`txt-${i}`);
+        const txtEl = document.getElementById(`txt-${index}`);
         const actionEl = document.getElementById(`actions-${i}`);
         const btnGroupEl = document.getElementById(`btn-group-${i}`);
 
         if (existingImg && existingImg.trim() !== '') {
           prevEl.src = existingImg;
           prevEl.classList.remove('hidden');
-          txtEl.classList.add('hidden');
+          if (txtEl) txtEl.classList.add('hidden');
           if (actionEl) actionEl.classList.remove('hidden');
           if (btnGroupEl) btnGroupEl.classList.add('hidden');
         } else {
           prevEl.classList.add('hidden');
-          txtEl.classList.remove('hidden');
+          if (txtEl) txtEl.classList.remove('hidden');
           if (actionEl) actionEl.classList.add('hidden');
           if (btnGroupEl) btnGroupEl.classList.remove('hidden');
         }
@@ -1367,7 +1454,7 @@
 
       const d = storedReports[index] || DEFAULT_SAMPLE_REPORT;
       const unitName = d['Unit'] || 'Kokurikulum';
-      const cfg = UNIT_CONFIG[unitName] || UNIT_CONFIG['Lain-lain'];
+      const cfg = getUnitConfig(unitName);
 
       const headerEl = document.getElementById('printUnitHeader');
       headerEl.style.backgroundColor = cfg.bg;
@@ -1492,15 +1579,17 @@
         document.getElementById('mentorMenteeAlert').classList.remove('hidden');
         switchTab('form');
         kekalkanUnitKepadaHEM();
-      } else if (targetId) {
+      }
+
+      if (targetId) {
         // 2. Ada ID khusus: Buka laporan tersebut
-        if (isEditParam) {
+        if (isEditParam || returnUrl) {
           switchTab('form');
         } else {
           switchTab('print', true);
         }
         checkUrlForDirectReport();
-      } else {
+      } else if (!returnUrl) {
         // 3. Masuk URL Biasa (opr.semekar.com): WAJIB BUKA MUKA PERTAMA (Borang)
         switchTab('form');
       }
@@ -1508,15 +1597,7 @@
       // Pra-isi medan dari parameter URL jika dibekalkan
       const unitParam = getCombinedParam('unit');
       if (unitParam) {
-        const selectUnit = document.getElementById('aktivitiUnit');
-        if (selectUnit) {
-          for (let opt of selectUnit.options) {
-            if (opt.value.toLowerCase() === unitParam.toLowerCase()) {
-              selectUnit.value = opt.value;
-              break;
-            }
-          }
-        }
+        setUnitDropdownValue(unitParam);
       }
 
       if (getCombinedParam('aktiviti')) {
