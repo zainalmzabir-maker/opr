@@ -16,12 +16,16 @@
     @media print {
       @page {
         size: A4 portrait;
-        margin: 10mm 12mm 10mm 12mm;
+        margin: 6mm 8mm 6mm 8mm;
       }
-      body {
-        background: #ffffff !important;
-        padding: 0 !important;
+      html, body {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100% !important;
         margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        background: #ffffff !important;
       }
       body * {
         visibility: hidden;
@@ -30,14 +34,29 @@
         visibility: visible;
       }
       #printArea {
-        position: absolute;
-        left: 0;
-        top: 0;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
         width: 100% !important;
+        height: 284mm !important;
+        max-height: 284mm !important;
         margin: 0 !important;
         padding: 0 !important;
         border: none !important;
         box-shadow: none !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        page-break-after: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      .sheet-a4 {
+        width: 100% !important;
+        height: 284mm !important;
+        max-height: 284mm !important;
+        min-height: 0 !important;
+        box-sizing: border-box !important;
       }
       .no-print {
         display: none !important;
@@ -50,7 +69,8 @@
 
     .sheet-a4 {
       width: 210mm;
-      min-height: 275mm;
+      height: 285mm;
+      max-height: 285mm;
       box-sizing: border-box;
     }
   </style>
@@ -437,33 +457,33 @@
         </div>
       </div>
 
-      <!-- TEMPLAT CETAKAN SATU MUKA A4 -->
-      <div id="printArea" class="sheet-a4 mx-auto bg-white p-7 rounded-2xl shadow-md border border-slate-200 flex flex-col justify-between relative overflow-hidden">
+      <!-- TEMPLAT CETAKAN SATU MUKA A4 (FORCE SINGLE PAGE) -->
+      <div id="printArea" class="sheet-a4 mx-auto bg-white p-5 rounded-2xl shadow-md border border-slate-200 flex flex-col justify-between relative overflow-hidden">
         
         <div id="printContentPlaceholder" class="m-auto text-center py-24 text-slate-400 flex flex-col items-center">
           <i data-lucide="file-search" class="w-12 h-12 mb-3 text-slate-300"></i>
           <p id="printPlaceholderText" class="text-sm font-medium">Sila pilih aktiviti daripada senarai pilihan di atas untuk memaparkan lembaran cetakan.</p>
         </div>
 
-        <div id="printContentDetails" class="hidden flex-1 flex flex-col justify-between h-full">
+        <div id="printContentDetails" class="hidden flex-1 min-h-0 flex flex-col justify-between h-full overflow-hidden">
           
-          <div>
+          <div class="flex-shrink-0">
             <!-- KEPALA SURAT RASMI -->
-            <div id="printUnitHeader" class="relative text-white p-4 rounded-xl shadow-sm mb-3 flex items-center justify-between overflow-hidden" style="background-color: #800000;">
+            <div id="printUnitHeader" class="relative text-white p-3 rounded-xl shadow-sm mb-2 flex items-center justify-between overflow-hidden" style="background-color: #800000;">
               
               <div class="absolute -right-8 -bottom-10 w-44 h-44 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
 
-              <div class="flex items-center gap-3.5 relative z-10">
-                <img src="logo.png" alt="Logo SMKKA" class="w-14 h-14 object-contain bg-white rounded-xl p-1 shadow">
+              <div class="flex items-center gap-3 relative z-10">
+                <img src="logo.png" alt="Logo SMKKA" class="w-12 h-12 object-contain bg-white rounded-xl p-1 shadow">
                 <div>
                   <div class="flex items-center gap-2">
-                    <h2 class="text-base font-black uppercase tracking-wider text-white drop-shadow-sm">SMK KAMARUL ARIFFIN</h2>
-                    <span id="p-unit-tag" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-white/20 tracking-wider text-white border border-white/25">
+                    <h2 class="text-sm font-black uppercase tracking-wider text-white drop-shadow-sm">SMK KAMARUL ARIFFIN</h2>
+                    <span id="p-unit-tag" class="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-white/20 tracking-wider text-white border border-white/25">
                       KOKURIKULUM
                     </span>
                   </div>
-                  <p class="text-[11px] text-white/90 leading-tight">Jalan Tenang, 85300 Labis, Johor Darul Ta'zim | Kod Sekolah: JEA7039 | Tel: 07-9255793</p>
-                  <h3 id="p-unit-badge" class="text-xs font-bold uppercase tracking-wide mt-1 text-amber-200 flex items-center gap-1.5">
+                  <p class="text-[10px] text-white/90 leading-tight">Jalan Tenang, 85300 Labis, Johor Darul Ta'zim | Kod Sekolah: JEA7039 | Tel: 07-9255793</p>
+                  <h3 id="p-unit-badge" class="text-xs font-bold uppercase tracking-wide mt-0.5 text-amber-200 flex items-center gap-1">
                     <span id="p-unit-icon"><i data-lucide="award" class="w-3.5 h-3.5 inline"></i></span>
                     <span id="p-unit-title">LAPORAN AKTIVITI KOKURIKULUM</span>
                   </h3>
@@ -471,79 +491,79 @@
               </div>
 
               <div class="text-right relative z-10 hidden sm:flex flex-col items-end">
-                <div class="flex items-center gap-1 px-2.5 py-1 bg-black/25 rounded-md border border-white/20 text-[10px] font-bold text-white uppercase tracking-wider">
+                <div class="flex items-center gap-1 px-2 py-0.5 bg-black/25 rounded-md border border-white/20 text-[9px] font-bold text-white uppercase tracking-wider">
                   <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-300"></i> Format Satu Muka
                 </div>
-                <span class="text-[9px] text-white/75 mt-1 font-mono">opr.semekar.com</span>
+                <span class="text-[8px] text-white/75 mt-0.5 font-mono">opr.semekar.com</span>
               </div>
             </div>
 
             <!-- JADUAL BUTIRAN AKTIVITI & PELAPOR (TERMASUK TEMPAT) -->
-            <table class="w-full text-xs border-collapse border border-slate-300 rounded-lg overflow-hidden mb-2.5">
+            <table class="w-full text-xs border-collapse border border-slate-300 rounded-lg overflow-hidden mb-1.5">
               <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 w-1/4">Nama Aktiviti / Program</td>
-                <td id="p-aktiviti" class="border border-slate-300 p-2 font-black text-slate-900 text-xs tracking-wide" colspan="3"></td>
+                <td class="border border-slate-300 p-1.5 font-bold bg-slate-100 text-slate-700 w-1/4">Nama Aktiviti / Program</td>
+                <td id="p-aktiviti" class="border border-slate-300 p-1.5 font-black text-slate-900 text-xs tracking-wide" colspan="3"></td>
               </tr>
               <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700">Unit / Sektor</td>
-                <td id="p-unit-text" class="border border-slate-300 p-2 font-semibold text-slate-800" colspan="3"></td>
+                <td class="border border-slate-300 p-1.5 font-bold bg-slate-100 text-slate-700">Unit / Sektor</td>
+                <td id="p-unit-text" class="border border-slate-300 p-1.5 font-semibold text-slate-800" colspan="3"></td>
               </tr>
               <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700">Tarikh & Hari</td>
-                <td id="p-tarikh" class="border border-slate-300 p-2 text-slate-800 font-medium w-1/4"></td>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 w-1/6">Masa Aktiviti</td>
-                <td id="p-masa" class="border border-slate-300 p-2 text-slate-800 font-medium"></td>
+                <td class="border border-slate-300 p-1.5 font-bold bg-slate-100 text-slate-700">Tarikh & Hari</td>
+                <td id="p-tarikh" class="border border-slate-300 p-1.5 text-slate-800 font-medium w-1/4"></td>
+                <td class="border border-slate-300 p-1.5 font-bold bg-slate-100 text-slate-700 w-1/6">Masa Aktiviti</td>
+                <td id="p-masa" class="border border-slate-300 p-1.5 text-slate-800 font-medium"></td>
               </tr>
               <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700">Tempat / Lokasi</td>
-                <td id="p-tempat" class="border border-slate-300 p-2 text-slate-800 font-medium" colspan="3"></td>
+                <td class="border border-slate-300 p-1.5 font-bold bg-slate-100 text-slate-700">Tempat / Lokasi</td>
+                <td id="p-tempat" class="border border-slate-300 p-1.5 text-slate-800 font-medium" colspan="3"></td>
               </tr>
               <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 align-top">Penerangan Aktiviti</td>
-                <td id="p-penerangan" class="border border-slate-300 p-2 whitespace-pre-line leading-relaxed text-slate-800 font-normal" colspan="3"></td>
+                <td class="border border-slate-300 p-1.5 font-bold bg-slate-100 text-slate-700 align-top">Penerangan Aktiviti</td>
+                <td id="p-penerangan" class="border border-slate-300 p-1.5 whitespace-pre-line leading-relaxed text-slate-800 font-normal" colspan="3"></td>
               </tr>
               <tr>
-                <td class="border border-slate-300 p-2 font-bold bg-slate-100 text-slate-700 align-top">Hasil / Dapatan</td>
-                <td id="p-hasil" class="border border-slate-300 p-2 whitespace-pre-line leading-relaxed text-slate-800 font-normal" colspan="3"></td>
+                <td class="border border-slate-300 p-1.5 font-bold bg-slate-100 text-slate-700 align-top">Hasil / Dapatan</td>
+                <td id="p-hasil" class="border border-slate-300 p-1.5 whitespace-pre-line leading-relaxed text-slate-800 font-normal" colspan="3"></td>
               </tr>
             </table>
           </div>
 
-          <!-- DOKUMENTASI BERGAMBAR (AUTO-EXPAND MEMENUHI RUANG) -->
-          <div class="flex-1 flex flex-col justify-start my-1.5 min-h-[125mm]">
-            <div class="flex items-center justify-between border-b-2 pb-1 mb-2 border-slate-200">
+          <!-- DOKUMENTASI BERGAMBAR (AUTO-FIT SATU MUKA SURAT: MENGEJUT & MENYESUAIKAN DIRI) -->
+          <div class="flex-1 min-h-0 flex flex-col justify-start my-1 overflow-hidden">
+            <div class="flex items-center justify-between border-b pb-0.5 mb-1 border-slate-200 flex-shrink-0">
               <h4 class="font-black text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                 <i data-lucide="camera" class="w-3.5 h-3.5 text-slate-600"></i> Evidens & Dokumentasi Bergambar:
               </h4>
-              <span class="text-[10px] font-semibold text-slate-500 italic">Dokumentasi Pelaksanaan Aktiviti</span>
+              <span class="text-[9px] font-semibold text-slate-500 italic">Dokumentasi Pelaksanaan Aktiviti</span>
             </div>
 
-            <div id="printImagesContainer" class="flex-1 grid gap-2.5 w-full items-stretch"></div>
+            <div id="printImagesContainer" class="flex-1 min-h-0 grid gap-2 w-full items-stretch overflow-hidden"></div>
           </div>
 
           <!-- MAKLUMAT PELAPOR BAWAH (TIADA RUANGAN PENGESAHAN) -->
-          <div class="pt-2 border-t border-slate-300">
-            <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 flex items-center justify-between text-xs">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">
-                  <i data-lucide="user-check" class="w-4 h-4"></i>
+          <div class="pt-1.5 border-t border-slate-300 flex-shrink-0">
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold flex-shrink-0">
+                  <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
                 </div>
                 <div>
-                  <p class="text-[10px] text-slate-500 uppercase font-bold">Disediakan Oleh:</p>
+                  <p class="text-[9px] text-slate-500 uppercase font-bold">Disediakan Oleh:</p>
                   <p id="p-pelapor-nama" class="font-black text-slate-900 text-xs">-</p>
-                  <p id="p-pelapor-jawatan" class="text-[11px] text-slate-600 font-medium">-</p>
+                  <p id="p-pelapor-jawatan" class="text-[10px] text-slate-600 font-medium">-</p>
                 </div>
               </div>
               <div class="text-right">
-                <span class="inline-block px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded text-[10px] font-bold uppercase tracking-wide">
+                <span class="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded text-[9px] font-bold uppercase tracking-wide">
                   Laporan Lengkap
                 </span>
-                <p class="text-[9px] text-slate-400 mt-1">Dicetak pada: <span id="p-print-date">-</span></p>
+                <p class="text-[8px] text-slate-400 mt-0.5">Dicetak pada: <span id="p-print-date">-</span></p>
               </div>
             </div>
 
             <!-- RUJUKAN PAUTAN RASMI OPR.SEMEKAR.COM -->
-            <div class="flex items-center justify-between text-[9px] text-slate-400 pt-1.5 mt-1 border-t border-slate-100">
+            <div class="flex items-center justify-between text-[8px] text-slate-400 pt-1 mt-0.5 border-t border-slate-100">
               <span>Sistem Pelaporan Satu Muka SMK Kamarul Ariffin &bull; Versi Digital 2026</span>
               <span class="truncate max-w-[60%]">Pautan Rujukan: <b id="p-ref-link" class="text-slate-600 font-mono">-</b></span>
             </div>
@@ -646,7 +666,6 @@
         const autoEditTimer = setInterval(function() {
           cubaan++;
 
-          // KAEDAH 1: Jika halaman mempunyai butang Edit / Kemaskini sedia ada
           const existingEditBtn = document.querySelector('button#btnEdit, button.btn-edit, a.btn-edit, [onclick*="edit"], [onclick*="kemaskini"]');
           if (existingEditBtn && existingEditBtn.offsetParent !== null) {
             clearInterval(autoEditTimer);
@@ -654,7 +673,6 @@
             return;
           }
 
-          // KAEDAH 2: Tukar paparan daripada Cetakan kepada Borang Pengisian
           const printView = document.querySelector('#viewArea, #cetakArea, #printArea, .report-view, #reportContainer');
           const formView = document.querySelector('#formArea, #borangArea, form');
 
@@ -683,12 +701,11 @@
   </script>
 
   <!-- ================================================================= -->
-  <!-- 3. SKRIP LOGIK APLIKASI UTAMA (TERMASUK KOD PENGENDALI SIMPANAN)  -->
+  <!-- 3. SKRIP LOGIK APLIKASI UTAMA                                     -->
   <!-- ================================================================= -->
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzede3L7tgU4zUwW_qwOENAZdMAuEdjWSNZ_t6zqvTQRRZz0qHrbRgfPiVNUZxGiP7Ulw/exec";
 
-    // DOMAIN PAUTAN ASAS RASMI ANDA: OPR.SEMEKAR.COM
     const BASE_DOMAIN_URL = "https://opr.semekar.com";
 
     let storedReports = [];
@@ -932,12 +949,11 @@
     }
 
     // =================================================================
-    // 3. PENGENDALI SIMPANAN / HANTAR BORANG (INTEGRASI PENUH)
+    // PENGENDALI SIMPANAN (MOD EDIT VS BAHARU)
     // =================================================================
     async function submitForm(e) {
       e.preventDefault();
 
-      // Semak sama ada borang dibuka dalam mod edit
       const urlParams = new URLSearchParams(window.location.search);
       const editId = urlParams.get('editId') || (urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' ? urlParams.get('id') : null) || document.getElementById('reportId').value;
       const isEdit = urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' || Boolean(document.getElementById('reportId').value) || Boolean(urlParams.get('editId'));
@@ -951,7 +967,6 @@
         return;
       }
 
-      // Jana ID baru sekiranya bukan edit; jika edit, KEKALKAN ID LAMA
       const newGeneratedId = "REP-" + Date.now();
       const finalReportId = isEdit && existingId && existingId.trim() !== "" ? existingId.trim() : newGeneratedId;
 
@@ -994,15 +1009,12 @@
           true
         );
 
-        // SELEPAS LAPORAN BERJAYA DISIMPAN KE PANGKALAN DATA GOOGLE SHEET:
         if (returnUrl) {
           setTimeout(() => {
             if (isEdit) {
-              // JIKA EDIT: Pulangkan status=kemaskini supaya web Mentor-Mentee TIDAK menambah pertemuan baru!
               const linkOpr = "https://opr.semekar.com/#id=" + (editId || finalReportId);
               window.location.href = `${returnUrl}?status=kemaskini&bil=${encodeURIComponent(bil || '')}&sesi=${encodeURIComponent(sesi || '')}&link=${encodeURIComponent(linkOpr)}`;
             } else {
-              // JIKA LAPORAN BAHARU: Pulangkan status=selesai
               const linkOpr = "https://opr.semekar.com/#id=" + newGeneratedId;
               window.location.href = `${returnUrl}?status=selesai&bil=${encodeURIComponent(bil || '')}&link=${encodeURIComponent(linkOpr)}`;
             }
@@ -1329,6 +1341,9 @@
       renderPrintTemplate(index);
     }
 
+    // =================================================================
+    // RENDERING CETAKAN A4 (FORCE 1 PAGE TANPA MIN-HEIGHT KERAS)
+    // =================================================================
     function renderPrintTemplate(index) {
       const copyBtn = document.getElementById('btnCopyReportLink');
 
@@ -1369,6 +1384,7 @@
       const now = new Date();
       document.getElementById('p-print-date').textContent = now.toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
+      // Susun galeri gambar yang menguncup secara automatik
       const container = document.getElementById('printImagesContainer');
       container.innerHTML = '';
 
@@ -1383,56 +1399,56 @@
       const totalImg = validImages.length;
 
       if (totalImg === 1) {
-        container.className = "flex-1 flex flex-col items-center justify-center w-full";
+        container.className = "flex-1 min-h-0 flex flex-col items-center justify-center w-full overflow-hidden";
         const div = document.createElement('div');
-        div.className = "w-full max-w-xl h-full max-h-[145mm] border-2 border-slate-300 rounded-xl p-2 bg-slate-50 shadow-inner flex flex-col justify-between";
+        div.className = "w-full max-w-xl flex-1 min-h-0 border-2 border-slate-300 rounded-xl p-1 bg-slate-50 shadow-inner flex flex-col justify-between overflow-hidden";
         div.innerHTML = `
-          <div class="w-full flex-1 flex items-center justify-center bg-white rounded-lg overflow-hidden">
+          <div class="w-full flex-1 min-h-0 flex items-center justify-center bg-white rounded-lg overflow-hidden">
             <img class="max-w-full max-h-full object-contain" src="${validImages[0]}" alt="Evidens Bergambar 1">
           </div>
-          <p class="text-[11px] text-slate-600 text-center mt-1 font-bold uppercase tracking-wider">DOKUMENTASI FOKUS PROGRAM</p>
+          <p class="text-[9px] text-slate-600 text-center mt-0.5 font-bold uppercase tracking-wider flex-shrink-0">DOKUMENTASI FOKUS PROGRAM</p>
         `;
         container.appendChild(div);
 
       } else if (totalImg === 2) {
-        container.className = "flex-1 grid grid-cols-2 gap-3 items-stretch";
+        container.className = "flex-1 min-h-0 grid grid-cols-2 gap-2 items-stretch overflow-hidden";
         validImages.forEach((url, i) => {
           const div = document.createElement('div');
-          div.className = "border border-slate-300 rounded-xl p-2 bg-slate-50 shadow-sm flex flex-col justify-between h-full";
+          div.className = "border border-slate-300 rounded-xl p-1 bg-slate-50 shadow-sm flex flex-col justify-between h-full min-h-0 overflow-hidden";
           div.innerHTML = `
-            <div class="w-full flex-1 flex items-center justify-center bg-white rounded-lg overflow-hidden min-h-[110mm]">
+            <div class="w-full flex-1 min-h-0 flex items-center justify-center bg-white rounded-lg overflow-hidden">
               <img class="max-w-full max-h-full object-contain" src="${url}" alt="Gambar ${i + 1}">
             </div>
-            <p class="text-[10px] text-slate-700 text-center mt-1 font-bold">Gambar Dokumentasi ${i + 1}</p>
+            <p class="text-[8px] text-slate-700 text-center mt-0.5 font-bold flex-shrink-0">Gambar Dokumentasi ${i + 1}</p>
           `;
           container.appendChild(div);
         });
 
       } else if (totalImg === 3) {
-        container.className = "flex-1 grid grid-cols-2 gap-2.5 items-stretch";
+        container.className = "flex-1 min-h-0 grid grid-cols-2 gap-2 items-stretch overflow-hidden";
         validImages.forEach((url, i) => {
           const div = document.createElement('div');
-          const spanClass = (i === 0) ? "col-span-2 min-h-[70mm]" : "col-span-1 min-h-[55mm]";
-          div.className = `border border-slate-300 rounded-xl p-1.5 bg-slate-50 shadow-sm flex flex-col justify-between ${spanClass}`;
+          const spanClass = (i === 0) ? "col-span-2" : "col-span-1";
+          div.className = `border border-slate-300 rounded-xl p-1 bg-slate-50 shadow-sm flex flex-col justify-between ${spanClass} min-h-0 overflow-hidden`;
           div.innerHTML = `
-            <div class="w-full flex-1 flex items-center justify-center bg-white rounded-lg overflow-hidden">
+            <div class="w-full flex-1 min-h-0 flex items-center justify-center bg-white rounded-lg overflow-hidden">
               <img class="max-w-full max-h-full object-contain" src="${url}" alt="Gambar ${i + 1}">
             </div>
-            <p class="text-[10px] text-slate-700 text-center mt-1 font-semibold">Gambar Dokumentasi ${i + 1}</p>
+            <p class="text-[8px] text-slate-700 text-center mt-0.5 font-semibold flex-shrink-0">Gambar Dokumentasi ${i + 1}</p>
           `;
           container.appendChild(div);
         });
 
       } else {
-        container.className = "flex-1 grid grid-cols-2 gap-2.5 items-stretch";
+        container.className = "flex-1 min-h-0 grid grid-cols-2 gap-2 items-stretch overflow-hidden";
         validImages.forEach((url, i) => {
           const div = document.createElement('div');
-          div.className = "border border-slate-300 rounded-xl p-1.5 bg-slate-50 shadow-sm flex flex-col justify-between min-h-[55mm]";
+          div.className = "border border-slate-300 rounded-xl p-1 bg-slate-50 shadow-sm flex flex-col justify-between min-h-0 overflow-hidden";
           div.innerHTML = `
-            <div class="w-full flex-1 flex items-center justify-center bg-white rounded-lg overflow-hidden">
+            <div class="w-full flex-1 min-h-0 flex items-center justify-center bg-white rounded-lg overflow-hidden">
               <img class="max-w-full max-h-full object-contain" src="${url}" alt="Gambar ${i + 1}">
             </div>
-            <p class="text-[10px] text-slate-700 text-center mt-1 font-semibold">Gambar Dokumentasi ${i + 1}</p>
+            <p class="text-[8px] text-slate-700 text-center mt-0.5 font-semibold flex-shrink-0">Gambar Dokumentasi ${i + 1}</p>
           `;
           container.appendChild(div);
         });
@@ -1449,7 +1465,6 @@
     function initializeApp() {
       const urlParams = new URLSearchParams(window.location.search);
 
-      // Kunci edit ID sekiranya dibekalkan di URL
       const editIdParam = urlParams.get('editId') || (urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' ? urlParams.get('id') : null);
       if (editIdParam) {
         document.getElementById('reportId').value = editIdParam;
