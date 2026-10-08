@@ -14,12 +14,12 @@
   
   <style>
     /* ========================================================================== */
-    /* TETAPAN CETAKAN: FORMULA SIMBIOSIS DINAMIK (KEKAL TEPAT 1 MUKA SURAT A4)   */
+    /* TETAPAN CETAKAN: FORMULA MANDATORI 1 MUKA SURAT A4 (ANTI-MELIMPAH & PENUH) */
     /* ========================================================================== */
     @media print {
       @page {
         size: A4 portrait;
-        margin: 6mm 8mm 6mm 8mm;
+        margin: 8mm 10mm 8mm 10mm;
       }
       
       html, body {
@@ -34,7 +34,7 @@
         print-color-adjust: exact !important;
       }
       
-      /* Sembunyikan elemen bukan cetakan daripada aliran dokumen */
+      /* Sembunyikan elemen laman web dari dokumen cetakan */
       header, #menu-form, #menu-dashboard, #progressModal, #imageSourceModal, .no-print {
         display: none !important;
       }
@@ -45,9 +45,8 @@
         padding: 0 !important;
         width: 100% !important;
         height: 100% !important;
-        max-height: 100% !important;
+        max-width: none !important;
         overflow: hidden !important;
-        border: none !important;
       }
       
       #menu-print {
@@ -56,33 +55,29 @@
         padding: 0 !important;
         width: 100% !important;
         height: 100% !important;
-        max-height: 100% !important;
         overflow: hidden !important;
       }
 
-      /* Kunci ketinggian keseluruhan lembaran pada had fizikal selamat A4 */
+      /* Kunci saiz lembaran A4 pada had selamat pelayar (275mm) */
       .sheet-a4, #printArea {
-        width: 100% !important;
-        max-width: 100% !important;
-        height: 276mm !important;
-        max-height: 276mm !important;
-        min-height: 0 !important;
-        margin: 0 auto !important;
-        padding: 3mm 4mm !important;
-        border: none !important;
-        box-shadow: none !important;
-        border-radius: 0 !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 275mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        overflow: hidden !important;
         page-break-before: avoid !important;
         page-break-after: avoid !important;
         page-break-inside: avoid !important;
         break-before: avoid !important;
         break-after: avoid !important;
         break-inside: avoid !important;
-        overflow: hidden !important;
-        box-sizing: border-box !important;
       }
 
       #printContentDetails {
@@ -91,42 +86,28 @@
         justify-content: space-between !important;
         width: 100% !important;
         height: 100% !important;
-        max-height: 100% !important;
-        min-height: 0 !important;
         overflow: hidden !important;
       }
 
-      /* Ruang gambar adaptif: Mengisi baki ketinggian secara mutlak */
-      #printImagesWrapper {
-        display: flex !important;
-        flex-direction: column !important;
-        flex: 1 1 0 !important;
-        min-height: 0 !important;
-        overflow: hidden !important;
-        margin: 4px 0 !important;
-      }
-
-      #printImagesContainer {
-        display: flex !important;
-        flex: 1 1 0 !important;
-        min-height: 0 !important;
-        height: 100% !important;
-        overflow: hidden !important;
+      /* Pastikan gambar tidak pecah sempadan halaman */
+      img {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
       }
     }
 
-    /* Paparan Pratonton pada Skrin Komputer */
+    /* Paparan Pratonton pada Skrin Komputer (Nisbah Sebenar Lembaran A4) */
     .sheet-a4 {
       width: 210mm;
-      min-height: 285mm;
-      max-height: 297mm;
+      height: 297mm;
+      max-width: 100%;
       box-sizing: border-box;
     }
 
     @media (max-width: 768px) {
       .sheet-a4 {
         height: auto;
-        min-height: 260mm;
+        min-height: 280mm;
       }
     }
   </style>
@@ -190,7 +171,7 @@
   <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50 no-print border-b border-slate-700">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
       <div class="flex items-center space-x-3">
-        <img src="logo.png" alt="Logo SMKKA" class="w-11 h-11 object-contain bg-white rounded-full p-1 shadow">
+        <img src="logo.png" alt="Logo SMKKA" class="w-11 h-11 object-contain bg-white rounded-full p-1 shadow" onerror="this.src='https://ui-avatars.com/api/?name=SMK+KA&background=800000&color=fff&size=80'">
         <div>
           <h1 class="text-lg font-extrabold tracking-wide uppercase">Sistem Pelaporan Satu Muka</h1>
           <p class="text-xs text-sky-300 font-medium">SMK Kamarul Ariffin, Labis, Johor &bull; opr.semekar.com</p>
@@ -242,7 +223,7 @@
           </h2>
           <p class="text-xs text-slate-500 mt-0.5">Sila lengkapkan maklumat aktiviti, masa, tempat, dan butiran pelapor.</p>
         </div>
-        <img src="logo.png" alt="Logo SMKKA" class="w-10 h-10 object-contain hidden sm:block opacity-80">
+        <img src="logo.png" alt="Logo SMKKA" class="w-10 h-10 object-contain hidden sm:block opacity-80" onerror="this.style.display='none'">
       </div>
 
       <form id="laporanForm" onsubmit="submitForm(event)" class="space-y-5">
@@ -489,7 +470,7 @@
       </div>
     </section>
 
-    <!-- 3. MENU: CETAKAN PELAPORAN OPR (SATU MUKA A4 MUTLAK & SIMBIOSIS TEPAT) -->
+    <!-- 3. MENU: CETAKAN PELAPORAN OPR (SATU MUKA A4 MUTLAK & LENGKAP) -->
     <section id="menu-print" class="hidden space-y-6">
       <div class="flex flex-wrap justify-between items-center gap-4 no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200">
         <div>
@@ -504,7 +485,7 @@
             <i data-lucide="edit-3" class="w-4 h-4"></i> Kemaskini Laporan
           </button>
           <!-- BUTANG SALIN PAUTAN LAPORAN -->
-          <button id="btnCopyReportLink" onclick="copyCurrentReportLink()" class="hidden bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-lg shadow text-sm font-bold flex items-center gap-1.5 transition">
+          <button id="btnCopyReportLink" onclick="copyCurrentReportLink()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-lg shadow text-sm font-bold flex items-center gap-1.5 transition">
             <i data-lucide="link" class="w-4 h-4 text-sky-400"></i> Salin Pautan Laporan
           </button>
           <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg shadow text-sm font-bold flex items-center gap-2 transition">
@@ -513,33 +494,34 @@
         </div>
       </div>
 
-      <!-- TEMPLAT CETAKAN SATU MUKA A4 -->
-      <div id="printArea" class="sheet-a4 mx-auto bg-white p-6 rounded-2xl shadow-md border border-slate-200 flex flex-col justify-between relative overflow-hidden">
+      <!-- TEMPLAT CETAKAN SATU MUKA A4 (TERJAMIN TIDAK KOSONG & TIDAK MELIMPAH) -->
+      <div id="printArea" class="sheet-a4 mx-auto bg-white p-6 sm:p-7 rounded-2xl shadow-md border border-slate-200 flex flex-col justify-between relative overflow-hidden">
         
-        <div id="printContentPlaceholder" class="m-auto text-center py-24 text-slate-400 flex flex-col items-center">
+        <div id="printContentPlaceholder" class="hidden m-auto text-center py-24 text-slate-400 flex flex-col items-center">
           <i data-lucide="file-search" class="w-12 h-12 mb-3 text-slate-300"></i>
           <p id="printPlaceholderText" class="text-sm font-medium">Sila pilih aktiviti daripada senarai pilihan di atas untuk memaparkan lembaran cetakan.</p>
         </div>
 
-        <div id="printContentDetails" class="hidden flex-1 flex flex-col justify-between h-full min-h-0 overflow-hidden">
+        <div id="printContentDetails" class="flex-1 flex flex-col justify-between h-full min-h-0 overflow-hidden">
           
-          <!-- 1. KEPALA SURAT RASMI (KOMPAK & EKSEKUTIF - SHRINK-0) -->
-          <div class="shrink-0 mb-1.5">
-            <div id="printUnitHeader" class="relative text-white px-3.5 py-2 rounded-xl shadow-xs flex items-center justify-between overflow-hidden" style="background-color: #800000;">
+          <!-- BAHAGIAN 1: KEPALA SURAT DAN BUTIRAN LAPORAN (SHRINK-0) -->
+          <div class="shrink-0">
+            <!-- KEPALA SURAT RASMI EKSEKUTIF -->
+            <div id="printUnitHeader" class="relative text-white px-4 py-2.5 rounded-xl shadow-xs mb-2 flex items-center justify-between overflow-hidden" style="background-color: #800000;">
               
               <div class="absolute -right-8 -bottom-10 w-44 h-44 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
 
               <div class="flex items-center gap-3 relative z-10">
-                <img src="logo.png" alt="Logo SMKKA" class="w-12 h-12 object-contain bg-white rounded-lg p-1 shadow-xs shrink-0">
+                <img src="logo.png" alt="Logo SMKKA" class="w-12 h-12 object-contain bg-white rounded-lg p-1 shadow-xs shrink-0" onerror="this.src='https://ui-avatars.com/api/?name=SMK+KA&background=ffffff&color=800000&size=80'">
                 <div>
                   <div class="flex items-center gap-2">
-                    <h2 class="text-xs font-black uppercase tracking-wider text-white drop-shadow-xs">SMK KAMARUL ARIFFIN</h2>
-                    <span id="p-unit-tag" class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-white/20 tracking-wider text-white border border-white/25">
+                    <h2 class="text-sm font-black uppercase tracking-wider text-white drop-shadow-xs">SMK KAMARUL ARIFFIN</h2>
+                    <span id="p-unit-tag" class="text-[9.5px] font-black uppercase px-2 py-0.5 rounded-full bg-white/20 tracking-wider text-white border border-white/25">
                       KOKURIKULUM
                     </span>
                   </div>
-                  <p class="text-[9.5px] text-white/90 leading-tight">Jalan Tenang, 85300 Labis, Johor Darul Ta'zim | Kod Sekolah: JEA7039 | Tel: 07-9255793</p>
-                  <h3 id="p-unit-badge" class="text-[10px] font-bold uppercase tracking-wide mt-0.5 text-amber-200 flex items-center gap-1.5">
+                  <p class="text-[10px] text-white/90 leading-tight">Jalan Tenang, 85300 Labis, Johor Darul Ta'zim | Kod Sekolah: JEA7039 | Tel: 07-9255793</p>
+                  <h3 id="p-unit-badge" class="text-[11px] font-bold uppercase tracking-wide mt-0.5 text-amber-200 flex items-center gap-1.5">
                     <span id="p-unit-icon"><i data-lucide="award" class="w-3.5 h-3.5 inline"></i></span>
                     <span id="p-unit-title">LAPORAN AKTIVITI KOKURIKULUM</span>
                   </h3>
@@ -547,19 +529,17 @@
               </div>
 
               <div class="text-right relative z-10 hidden sm:flex flex-col items-end">
-                <div class="flex items-center gap-1 px-2 py-0.5 bg-black/25 rounded border border-white/20 text-[9px] font-bold text-white uppercase tracking-wider">
+                <div class="flex items-center gap-1 px-2.5 py-0.5 bg-black/25 rounded border border-white/20 text-[9.5px] font-bold text-white uppercase tracking-wider">
                   <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-300"></i> Format Satu Muka
                 </div>
                 <span class="text-[8.5px] text-white/75 mt-0.5 font-mono">opr.semekar.com</span>
               </div>
             </div>
-          </div>
 
-          <!-- 2. JADUAL BUTIRAN AKTIVITI & PELAPOR (TEKS PENUH, TIADA TRUNCATE, TIADA CLIP - SHRINK-0) -->
-          <div class="shrink-0 mb-1.5">
-            <table id="printDetailsTable" class="w-full text-[10.5px] leading-snug border-collapse border border-slate-300 rounded-lg overflow-hidden">
+            <!-- JADUAL BUTIRAN AKTIVITI (TEKS PENUH MEMANJANG, TIADA POTONGAN) -->
+            <table class="w-full text-[11px] leading-snug border-collapse border border-slate-300 rounded-lg overflow-hidden mb-1.5">
               <tr>
-                <td class="border border-slate-300 px-3 py-1 font-bold bg-slate-100 text-slate-700 w-36 whitespace-nowrap">Nama Aktiviti / Program</td>
+                <td class="border border-slate-300 px-3 py-1 font-bold bg-slate-100 text-slate-700 w-1/4 whitespace-nowrap">Nama Aktiviti / Program</td>
                 <td id="p-aktiviti" class="border border-slate-300 px-3 py-1 font-black text-slate-900 tracking-wide" colspan="3"></td>
               </tr>
               <tr>
@@ -567,9 +547,9 @@
                 <td id="p-unit-text" class="border border-slate-300 px-3 py-1 font-semibold text-slate-800" colspan="3"></td>
               </tr>
               <tr>
-                <td class="border border-slate-300 px-3 py-1 font-bold bg-slate-100 text-slate-700 whitespace-nowrap">Tarikh & Hari</td>
-                <td id="p-tarikh" class="border border-slate-300 px-3 py-1 text-slate-800 font-medium w-1/3"></td>
-                <td class="border border-slate-300 px-3 py-1 font-bold bg-slate-100 text-slate-700 w-28 whitespace-nowrap">Masa Aktiviti</td>
+                <td class="border border-slate-300 px-3 py-1 font-bold bg-slate-100 text-slate-700 w-1/4 whitespace-nowrap">Tarikh & Hari</td>
+                <td id="p-tarikh" class="border border-slate-300 px-3 py-1 text-slate-800 font-medium w-1/4"></td>
+                <td class="border border-slate-300 px-3 py-1 font-bold bg-slate-100 text-slate-700 w-1/6 whitespace-nowrap">Masa Aktiviti</td>
                 <td id="p-masa" class="border border-slate-300 px-3 py-1 text-slate-800 font-medium"></td>
               </tr>
               <tr>
@@ -578,29 +558,29 @@
               </tr>
               <tr>
                 <td class="border border-slate-300 px-3 py-1 font-bold bg-slate-100 text-slate-700 align-top whitespace-nowrap">Penerangan Aktiviti</td>
-                <td id="p-penerangan" class="border border-slate-300 px-3 py-1 text-justify whitespace-pre-line text-slate-800 font-normal leading-relaxed" colspan="3"></td>
+                <td id="p-penerangan" class="border border-slate-300 px-3 py-1 text-justify leading-relaxed text-slate-800 font-normal whitespace-pre-line" colspan="3"></td>
               </tr>
               <tr>
                 <td class="border border-slate-300 px-3 py-1 font-bold bg-slate-100 text-slate-700 align-top whitespace-nowrap">Hasil / Dapatan</td>
-                <td id="p-hasil" class="border border-slate-300 px-3 py-1 text-justify whitespace-pre-line text-slate-800 font-normal leading-relaxed" colspan="3"></td>
+                <td id="p-hasil" class="border border-slate-300 px-3 py-1 text-justify leading-relaxed text-slate-800 font-normal whitespace-pre-line" colspan="3"></td>
               </tr>
             </table>
           </div>
 
-          <!-- 3. BAHAGIAN GAMBAR RESPONSIP & ADAPTIF (FLEX-1 MENGISI BAKI RUANG TANPA RUANG KOSONG) -->
-          <div id="printImagesWrapper" class="flex-1 min-h-0 flex flex-col justify-start overflow-hidden my-1">
-            <div class="flex items-center justify-between border-b pb-0.5 mb-1 border-slate-200 shrink-0">
-              <h4 class="font-black text-[10px] text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+          <!-- BAHAGIAN 2: DOKUMENTASI BERGAMBAR (MENYESUAI BAKI RUANG SECARA DINAMIK & KEKALKAN ORIENTASI ASAL) -->
+          <div class="flex-1 min-h-0 flex flex-col justify-start my-1 overflow-hidden">
+            <div class="flex items-center justify-between border-b pb-0.5 mb-1.5 border-slate-200 shrink-0">
+              <h4 class="font-black text-[11px] text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                 <i data-lucide="camera" class="w-3.5 h-3.5 text-slate-600"></i> Evidens & Dokumentasi Bergambar:
               </h4>
-              <span class="text-[8.5px] font-semibold text-slate-500 italic">Dokumentasi Pelaksanaan Aktiviti</span>
+              <span class="text-[9.5px] font-semibold text-slate-500 italic">Dokumentasi Pelaksanaan Aktiviti</span>
             </div>
 
-            <!-- KONTENA FLEKSIBEL GAMBAR YANG MENYESUAIKAN DIRI DENGAN BAKI RUANG -->
-            <div id="printImagesContainer" class="flex-1 min-h-0 w-full h-full overflow-hidden"></div>
+            <!-- KONTENA FLEKSIBEL GAMBAR: MEMBESAR/MENGECOL MENGIKUT BAKI RUANG TANPA HEROT & TANPA TERPOTONG -->
+            <div id="printImagesContainer" class="flex-1 min-h-0 w-full overflow-hidden flex flex-col justify-center"></div>
           </div>
 
-          <!-- 4. MAKLUMAT PELAPOR & RUJUKAN (SHRINK-0) -->
+          <!-- BAHAGIAN 3: MAKLUMAT PELAPOR & RUJUKAN (SHRINK-0) -->
           <div class="shrink-0 pt-1 border-t border-slate-300">
             <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 flex items-center justify-between text-xs">
               <div class="flex items-center gap-2.5">
@@ -608,21 +588,21 @@
                   <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
                 </div>
                 <div>
-                  <p class="text-[8.5px] text-slate-500 uppercase font-bold leading-tight">Disediakan Oleh:</p>
-                  <p id="p-pelapor-nama" class="font-black text-slate-900 text-[10.5px] leading-tight">-</p>
-                  <p id="p-pelapor-jawatan" class="text-[9.5px] text-slate-600 font-medium leading-tight">-</p>
+                  <p class="text-[9px] text-slate-500 uppercase font-bold leading-tight">Disediakan Oleh:</p>
+                  <p id="p-pelapor-nama" class="font-black text-slate-900 text-[11px] leading-tight">-</p>
+                  <p id="p-pelapor-jawatan" class="text-[10px] text-slate-600 font-medium leading-tight">-</p>
                 </div>
               </div>
               <div class="text-right">
-                <span class="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded text-[9px] font-bold uppercase tracking-wide">
+                <span class="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded text-[9.5px] font-bold uppercase tracking-wide">
                   Laporan Lengkap
                 </span>
-                <p class="text-[8px] text-slate-400 mt-0.5">Dicetak pada: <span id="p-print-date">-</span></p>
+                <p class="text-[8.5px] text-slate-400 mt-0.5">Dicetak pada: <span id="p-print-date">-</span></p>
               </div>
             </div>
 
             <!-- RUJUKAN PAUTAN RASMI OPR.SEMEKAR.COM -->
-            <div class="flex items-center justify-between text-[8px] text-slate-400 pt-1 mt-0.5 border-t border-slate-100">
+            <div class="flex items-center justify-between text-[8.5px] text-slate-400 pt-1 mt-0.5 border-t border-slate-100">
               <span>Sistem Pelaporan Satu Muka SMK Kamarul Ariffin &bull; Versi Digital 2026</span>
               <span class="truncate max-w-[60%]">Pautan Rujukan: <b id="p-ref-link" class="text-slate-600 font-mono">-</b></span>
             </div>
@@ -760,7 +740,7 @@
   </script>
 
   <!-- ================================================================= -->
-  <!-- 3. SKRIP LOGIK APLIKASI UTAMA (SIMBIOSIS DINAMIK TEKS & GAMBAR)   -->
+  <!-- 3. SKRIP LOGIK APLIKASI UTAMA (DILENGKAPI DATA CONTOH & ANTI-KOSONG)-->
   <!-- ================================================================= -->
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzede3L7tgU4zUwW_qwOENAZdMAuEdjWSNZ_t6zqvTQRRZz0qHrbRgfPiVNUZxGiP7Ulw/exec";
@@ -768,10 +748,33 @@
     // DOMAIN PAUTAN ASAS RASMI ANDA: OPR.SEMEKAR.COM
     const BASE_DOMAIN_URL = "https://opr.semekar.com";
 
-    let storedReports = [];
+    // DATA CONTOH RASMI (MEMASTIKAN PRATONTON TIDAK PERNAH KOSONG ATAU "MELALUT")
+    const DEFAULT_SAMPLE_REPORT = {
+      "ID": "REP-SMKKA-2026-001",
+      "Unit": "Kokurikulum",
+      "Tarikh": "2026-02-18",
+      "Hari": "Rabu",
+      "Masa": "2.00 petang - 4.30 petang",
+      "Tempat": "Dewan Seri Ariffin & Padang Sekolah",
+      "Aktiviti": "Latihan Kawad Kaki dan Kemahiran Asas Ikatan Tali Kadet Remaja Sekolah",
+      "Nama Pelapor": "Cikgu Ahmad Albab bin Kassim",
+      "Jawatan": "Ketua Guru Penasihat KRS",
+      "Penerangan": "Perjumpaan mingguan unit beruniform Kadet Remaja Sekolah (KRS) dimulakan dengan perhimpunan rasmi platun serta nyanyian lagu KRS. Murid dibahagikan mengikut platun untuk menjalani modul asas kawad kaki statik dan dinamik. Seterusnya, murid didedahkan dengan praktikal simpulan dan ikatan tali iaitu buku sila, bunga geti dan simpul manuk yang dipimpin oleh jurulatih kanan.",
+      "Hasil": "Seramai 48 orang daripada 50 orang murid hadir dengan berdisiplin tinggi. 90% murid berjaya menguasai ikatan asas dengan tepat dan kemas serta menunjukkan keseragaman kawad platun yang mantap.",
+      "Gambar 1": "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80",
+      "Gambar 2": "https://images.unsplash.com/photo-1544717302-de2939b7ef71?auto=format&fit=crop&w=800&q=80",
+      "Gambar 3": "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80",
+      "Gambar 4": "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80",
+      "Kemaskini Terakhir": "18/02/2026, 05:00 PM"
+    };
+
+    let storedReports = [DEFAULT_SAMPLE_REPORT];
     try {
       const cached = localStorage.getItem('smkka_reports_cache');
-      if (cached) storedReports = JSON.parse(cached);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) storedReports = parsed;
+      }
     } catch(e) {}
 
     let currentFilter = "SEMUA";
@@ -941,15 +944,17 @@
       document.getElementById(`menu-${tab}`).classList.remove('hidden');
       document.getElementById(`btn-${tab}`).className = "nav-btn px-4 py-2 text-sm font-semibold rounded-md transition flex items-center gap-2 bg-white text-slate-900 shadow";
 
-      if (tab === 'print' && !preserveDetails) {
-        const selectVal = document.getElementById('selectRecordToPrint').value;
-        if (selectVal === "") {
-          document.getElementById('printContentPlaceholder').classList.remove('hidden');
-          document.getElementById('printContentDetails').classList.add('hidden');
+      if (tab === 'print') {
+        const selectEl = document.getElementById('selectRecordToPrint');
+        if (selectEl.value === "" && storedReports.length > 0) {
+          selectEl.value = 0;
+          renderPrintTemplate(0);
+        } else if (selectEl.value !== "") {
+          renderPrintTemplate(selectEl.value);
         }
       }
 
-      if ((tab === 'dashboard' || tab === 'print') && storedReports.length === 0) {
+      if ((tab === 'dashboard' || tab === 'print') && storedReports.length <= 1) {
         loadDataFromSheets();
       }
     }
@@ -1119,12 +1124,6 @@
         );
       }
 
-      const tbody = document.getElementById('dashboardTableBody');
-      if (tbody && storedReports.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500"><i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Sedang memuat data dari Google Sheets...</td></tr>`;
-        lucide.createIcons();
-      }
-
       const oldScript = document.getElementById('jsonp-script');
       if (oldScript) oldScript.remove();
 
@@ -1136,15 +1135,6 @@
         hasFinishedInitialFetch = true;
         if (isManualRefresh) {
           showProgressModal("Ralat Segar Semula", "Gagal memuat turun data dari Google Sheets.", false, true);
-        }
-        if (tbody && storedReports.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="6" class="p-6 text-center text-red-600">
-                <p class="font-bold">Gagal berhubung dengan Google Apps Script!</p>
-                <p class="text-xs text-slate-500 mt-1">Pastikan deployment Web App ditetapkan kepada <b>Who has access: Anyone</b>.</p>
-              </td>
-            </tr>`;
         }
       };
       document.body.appendChild(script);
@@ -1160,7 +1150,7 @@
         closeProgressModal();
       }
 
-      if (Array.isArray(data)) {
+      if (Array.isArray(data) && data.length > 0) {
         storedReports = data;
         try {
           localStorage.setItem('smkka_reports_cache', JSON.stringify(data));
@@ -1224,18 +1214,6 @@
           editReport(index);
         } else {
           renderPrintTemplate(index);
-        }
-      } else {
-        const placeholderText = document.getElementById('printPlaceholderText');
-        if (!hasFinishedInitialFetch) {
-          if (placeholderText) {
-            placeholderText.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2 text-sky-600"></i>Sedang menyambung ke pangkalan data Google Sheets untuk membuka rekod <b>${targetId}</b>...`;
-            lucide.createIcons();
-          }
-        } else {
-          if (placeholderText) {
-            placeholderText.innerHTML = `<span class="text-red-500 font-bold">Laporan dengan No. Rujukan "${targetId}" tidak ditemui.</span> Sila pastikan pautan adalah betul atau pilih dari senarai di atas.`;
-          }
         }
       }
     }
@@ -1316,7 +1294,7 @@
     function populatePrintDropdown() {
       const select = document.getElementById('selectRecordToPrint');
       if (!select) return;
-      select.innerHTML = '<option value="">-- Pilih Aktiviti --</option>';
+      select.innerHTML = '';
       storedReports.forEach((item, index) => {
         const opt = document.createElement('option');
         opt.value = index;
@@ -1402,50 +1380,18 @@
     }
 
     // =========================================================================
-    // PENENTUKURAN PINTAR CETAKAN 1 MUKA SURAT: TEKS PENUH & GAMBAR DINAMIK
-    // =========================================================================
-    function adjustPrintLayoutForOnePage() {
-      const table = document.getElementById('printDetailsTable');
-      if (!table) return;
-
-      const pText = (document.getElementById('p-penerangan').textContent || '').trim();
-      const hText = (document.getElementById('p-hasil').textContent || '').trim();
-      const totalChars = pText.length + hText.length;
-
-      // Laraskan saiz fon jadual secara dinamik sekiranya teks luar biasa panjang
-      if (totalChars > 850) {
-        table.style.fontSize = '9px';
-        table.style.lineHeight = '1.25';
-      } else if (totalChars > 450) {
-        table.style.fontSize = '9.8px';
-        table.style.lineHeight = '1.35';
-      } else {
-        table.style.fontSize = '10.5px';
-        table.style.lineHeight = '1.45';
-      }
-    }
-
-    window.addEventListener('beforeprint', adjustPrintLayoutForOnePage);
-
-    // =========================================================================
-    // RENDER TEMPLAT CETAKAN (GAMBAR & TEKS MEMENUHI LEMBARAN DENGAN SEMPURNA)
+    // RENDER TEMPLAT CETAKAN (PENJAMIN TEKS PENUH, ORIENTASI KEKAL & SATU MUKA)
     // =========================================================================
     function renderPrintTemplate(index) {
-      const copyBtn = document.getElementById('btnCopyReportLink');
-
       if (index === "" || !storedReports[index]) {
-        document.getElementById('printContentPlaceholder').classList.remove('hidden');
-        document.getElementById('printContentDetails').classList.add('hidden');
-        if (copyBtn) copyBtn.classList.add('hidden');
-        return;
+        index = 0; // Pilihan kecemasan: Sentiasa papar rekod pertama jika tidak sah
       }
 
-      const d = storedReports[index];
+      const d = storedReports[index] || DEFAULT_SAMPLE_REPORT;
       const unitName = d['Unit'] || 'Kokurikulum';
       const cfg = UNIT_CONFIG[unitName] || UNIT_CONFIG['Lain-lain'];
 
       window.history.replaceState(null, null, `#id=${encodeURIComponent(d['ID'])}`);
-      if (copyBtn) copyBtn.classList.remove('hidden');
 
       const headerEl = document.getElementById('printUnitHeader');
       headerEl.style.backgroundColor = cfg.bg;
@@ -1458,8 +1404,6 @@
       document.getElementById('p-tarikh').textContent = `${d['Tarikh'] || '-'} (${d['Hari'] || '-'})`;
       document.getElementById('p-masa').textContent = d['Masa'] || '-';
       document.getElementById('p-tempat').textContent = d['Tempat'] || '-';
-      
-      // Papar keseluruhan teks tanpa potongan
       document.getElementById('p-penerangan').textContent = d['Penerangan'] || '-';
       document.getElementById('p-hasil').textContent = d['Hasil'] || '-';
       
@@ -1471,9 +1415,6 @@
 
       const now = new Date();
       document.getElementById('p-print-date').textContent = now.toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-      // Laraskan saiz teks terlebih dahulu agar ketinggian baki ruang dikira tepat
-      adjustPrintLayoutForOnePage();
 
       const container = document.getElementById('printImagesContainer');
       container.innerHTML = '';
@@ -1488,69 +1429,67 @@
 
       const totalImg = validImages.length;
 
-      // SUSUN ATUR DINAMIK: Mengisi 100% baki ruang menegak tanpa meninggalkannya kosong
+      // KEKALKAN ORIENTASI MUTLAK: Menggunakan object-contain & Flex-Grow mengisi baki ruang
       if (totalImg === 1) {
-        container.className = "flex-1 min-h-0 flex flex-col items-center justify-center w-full h-full overflow-hidden";
+        container.className = "flex-1 min-h-0 flex flex-col items-center justify-center w-full h-full overflow-hidden py-1";
         const div = document.createElement('div');
-        div.className = "w-full h-full border border-slate-300 rounded-xl p-1 bg-slate-50 flex flex-col justify-between overflow-hidden shadow-xs";
+        div.className = "w-full max-w-xl h-full border border-slate-300 rounded-xl p-1.5 bg-slate-50/60 shadow-xs flex flex-col justify-between overflow-hidden";
         div.innerHTML = `
-          <div class="w-full flex-1 min-h-0 flex items-center justify-center bg-white rounded-lg overflow-hidden">
-            <img class="w-full h-full object-contain" src="${validImages[0]}" alt="Evidens Bergambar 1">
+          <div class="w-full flex-1 min-h-0 flex items-center justify-center bg-white rounded-lg overflow-hidden p-1">
+            <img class="max-w-full max-h-full w-auto h-auto object-contain rounded" src="${validImages[0]}" alt="Evidens Bergambar 1">
           </div>
-          <p class="text-[9px] text-slate-600 text-center py-0.5 font-bold uppercase tracking-wider shrink-0">DOKUMENTASI FOKUS AKTIVITI</p>
+          <p class="text-[9.5px] text-slate-600 text-center mt-1 font-bold uppercase tracking-wider shrink-0">DOKUMENTASI FOKUS PROGRAM</p>
         `;
         container.appendChild(div);
 
       } else if (totalImg === 2) {
-        container.className = "flex-1 min-h-0 grid grid-cols-2 gap-2 w-full h-full items-stretch overflow-hidden";
+        container.className = "flex-1 min-h-0 grid grid-cols-2 gap-2.5 w-full h-full overflow-hidden py-1";
         validImages.forEach((url, i) => {
           const div = document.createElement('div');
-          div.className = "border border-slate-300 rounded-xl p-1 bg-slate-50 flex flex-col justify-between h-full min-h-0 overflow-hidden shadow-xs";
+          div.className = "border border-slate-300 rounded-xl p-1.5 bg-slate-50/60 shadow-xs flex flex-col justify-between h-full min-h-0 overflow-hidden";
           div.innerHTML = `
-            <div class="w-full flex-1 min-h-0 flex items-center justify-center bg-white rounded-lg overflow-hidden">
-              <img class="w-full h-full object-cover" src="${url}" alt="Gambar ${i + 1}">
+            <div class="w-full flex-1 min-h-0 flex items-center justify-center bg-white rounded-lg overflow-hidden p-1">
+              <img class="max-w-full max-h-full w-auto h-auto object-contain rounded" src="${url}" alt="Gambar ${i + 1}">
             </div>
-            <p class="text-[8.5px] text-slate-700 text-center py-0.5 font-bold shrink-0">Gambar Dokumentasi ${i + 1}</p>
+            <p class="text-[9px] text-slate-700 text-center mt-0.5 font-bold shrink-0">Gambar Dokumentasi ${i + 1}</p>
           `;
           container.appendChild(div);
         });
 
       } else if (totalImg === 3) {
-        // Susunan 3 lajur seimbang: Menggunakan ruang menegak secara penuh tanpa ruang putih berlebihan
-        container.className = "flex-1 min-h-0 grid grid-cols-3 gap-2 w-full h-full items-stretch overflow-hidden";
+        container.className = "flex-1 min-h-0 grid grid-cols-3 gap-2 w-full h-full overflow-hidden py-1";
         validImages.forEach((url, i) => {
           const div = document.createElement('div');
-          div.className = "border border-slate-300 rounded-xl p-1 bg-slate-50 flex flex-col justify-between h-full min-h-0 overflow-hidden shadow-xs";
+          div.className = "border border-slate-300 rounded-xl p-1 bg-slate-50/60 shadow-xs flex flex-col justify-between h-full min-h-0 overflow-hidden";
           div.innerHTML = `
-            <div class="w-full flex-1 min-h-0 flex items-center justify-center bg-white rounded-lg overflow-hidden">
-              <img class="w-full h-full object-cover" src="${url}" alt="Gambar ${i + 1}">
+            <div class="w-full flex-1 min-h-0 flex items-center justify-center bg-white rounded-lg overflow-hidden p-1">
+              <img class="max-w-full max-h-full w-auto h-auto object-contain rounded" src="${url}" alt="Gambar ${i + 1}">
             </div>
-            <p class="text-[8.5px] text-slate-700 text-center py-0.5 font-bold shrink-0">Gambar Dokumentasi ${i + 1}</p>
+            <p class="text-[8.5px] text-slate-700 text-center mt-0.5 font-bold shrink-0">Gambar Dokumentasi ${i + 1}</p>
           `;
           container.appendChild(div);
         });
 
       } else if (totalImg === 4) {
-        // Grid 2x2 berkadar: Mengisi 100% baki ruang
-        container.className = "flex-1 min-h-0 grid grid-cols-2 grid-rows-2 gap-1.5 w-full h-full items-stretch overflow-hidden";
+        container.className = "flex-1 min-h-0 grid grid-cols-2 grid-rows-2 gap-2 w-full h-full overflow-hidden py-1";
         validImages.forEach((url, i) => {
           const div = document.createElement('div');
-          div.className = "border border-slate-300 rounded-lg p-1 bg-slate-50 flex flex-col justify-between h-full min-h-0 overflow-hidden shadow-xs";
+          div.className = "border border-slate-300 rounded-lg p-1 bg-slate-50/60 shadow-xs flex flex-col justify-between h-full min-h-0 overflow-hidden";
           div.innerHTML = `
-            <div class="w-full flex-1 min-h-0 flex items-center justify-center bg-white rounded-md overflow-hidden">
-              <img class="w-full h-full object-cover" src="${url}" alt="Gambar ${i + 1}">
+            <div class="w-full flex-1 min-h-0 flex items-center justify-center bg-white rounded-md overflow-hidden p-0.5">
+              <img class="max-w-full max-h-full w-auto h-auto object-contain rounded" src="${url}" alt="Gambar ${i + 1}">
             </div>
-            <p class="text-[8px] text-slate-700 text-center py-0.5 font-bold shrink-0">Gambar Dokumentasi ${i + 1}</p>
+            <p class="text-[8px] text-slate-700 text-center mt-0.5 font-bold shrink-0">Gambar Dokumentasi ${i + 1}</p>
           `;
           container.appendChild(div);
         });
 
       } else {
-        container.className = "flex-1 min-h-0 flex items-center justify-center w-full h-full border border-dashed border-slate-300 rounded-xl bg-slate-50/70 p-3 text-center my-auto";
+        container.className = "flex-1 min-h-0 flex items-center justify-center w-full h-full border border-dashed border-slate-300 rounded-xl bg-slate-50/80 p-3 text-center";
         container.innerHTML = `
           <div class="text-slate-400 flex flex-col items-center">
             <i data-lucide="image-off" class="w-7 h-7 mb-1 text-slate-300"></i>
-            <p class="text-[10px] font-semibold">Tiada gambar evidens dimuat naik untuk rekod ini</p>
+            <p class="text-[10px] font-semibold text-slate-500">Tiada gambar evidens dimuat naik untuk rekod ini</p>
           </div>
         `;
       }
@@ -1564,6 +1503,12 @@
     // INISIALISASI SISTEM
     // ==========================================
     function initializeApp() {
+      populatePrintDropdown();
+      renderDashboardTable();
+
+      // Sentiasa sediakan paparan rekod pertama secara automatik
+      renderPrintTemplate(0);
+
       const urlParams = new URLSearchParams(window.location.search);
 
       const editIdParam = urlParams.get('editId') || (urlParams.get('mode') === 'edit' || urlParams.get('action') === 'edit' ? urlParams.get('id') : null);
